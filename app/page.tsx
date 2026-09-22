@@ -330,18 +330,8 @@ export default function HomePage() {
       {/* ── Interactive Viewport Canvas ── */}
       <div
         style={{
-          width:
-            deviceType === "mobile"
-              ? "min(100vw, 56.28vh)"
-              : deviceType === "tablet"
-              ? "min(100vw, 133.33vh)"
-              : "min(100vw, 177.68vh)",
-          height:
-            deviceType === "mobile"
-              ? "min(100vh, 177.68vw)"
-              : deviceType === "tablet"
-              ? "min(100vh, 75vw)"
-              : "min(100vh, 56.28vw)",
+          width: "100vw",
+          height: "100vh",
           position: "relative",
           display: "flex",
           alignItems: "center",
@@ -349,7 +339,7 @@ export default function HomePage() {
           overflow: "hidden",
         }}
       >
-        {/* The Exact Image Rendered with contain */}
+        {/* The Exact Image Rendered to fill the screen */}
         <Image
           src={
             deviceType === "mobile"
@@ -361,9 +351,9 @@ export default function HomePage() {
           alt="جزر مدار الأمل التعليمية السحرية"
           fill
           priority
-          sizes="(max-width: 768px) 100vw, 1920px"
+          sizes="100vw"
           style={{
-            objectFit: "contain",
+            objectFit: "fill",
             objectPosition: "center",
           }}
         />
