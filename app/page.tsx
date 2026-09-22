@@ -420,7 +420,7 @@ export default function HomePage() {
               <div>
                 <span style={{ color: "#718096", fontWeight: 700 }}>🔐 طريقة الدخول: </span>
                 <span style={{ color: "#2D3748", fontWeight: 800 }}>
-                  {currentUser?.app_metadata?.provider === "google" ? "حساب Google (جيميل) 🌐" : "البريد الإلكتروني ✉️"}
+                  {currentUser?.app_metadata?.provider === "google" ? "حساب Google 🌐" : "البريد الإلكتروني ✉️"}
                 </span>
               </div>
             </div>
@@ -437,7 +437,7 @@ export default function HomePage() {
               }}
             >
               <h3 style={{ color: "#166534", margin: "0 0 12px 0", fontSize: 15, fontWeight: 800, display: "flex", alignItems: "center", gap: 6 }}>
-                <span>📝 بيانات ولي الأمر والطفل (يمكنك تعديلها)</span>
+                <span>📝 بيانات ولي الأمر والطفل</span>
               </h3>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
