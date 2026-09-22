@@ -7,7 +7,6 @@ interface IslandItem {
   id: string;
   title: string;
   subtitle: string;
-  icon: string;
   gradientTop: string;
   gradientBottom: string;
   borderColor: string;
@@ -19,57 +18,52 @@ const ISLANDS: IslandItem[] = [
   {
     id: "animals",
     title: "تعرف على الحيوانات",
-    subtitle: "أصوات وأشكال أصدقائنا الحيوانات 🦁",
-    icon: "🦁",
+    subtitle: "أصوات وأشكال أصدقائنا الحيوانات",
     gradientTop: "#FF8C42",
     gradientBottom: "#E0533C",
     borderColor: "#FFB074",
     animationClass: "island-float-1",
-    badges: ["🐰 أرنب", "🐘 فيل", "🦒 زرافة"],
+    badges: ["أرنب", "فيل", "زرافة"],
   },
   {
     id: "fruits",
     title: "تعرف على الفواكه",
-    subtitle: "فواكه لذيذة وصحية ومفيدة 🍓",
-    icon: "🍎",
+    subtitle: "فواكه لذيذة وصحية ومفيدة",
     gradientTop: "#FF5376",
     gradientBottom: "#D62246",
     borderColor: "#FFA3B5",
     animationClass: "island-float-2",
-    badges: ["🍌 موز", "🍇 عنب", "🍊 برتقال"],
+    badges: ["موز", "عنب", "برتقال"],
   },
   {
     id: "vegetables",
     title: "تعرف على الخضار",
-    subtitle: "خضروات طازجة وقوية للجسم 🥕",
-    icon: "🥕",
+    subtitle: "خضروات طازجة وقوية للجسم",
     gradientTop: "#4CAF50",
     gradientBottom: "#2E7D32",
     borderColor: "#81C784",
     animationClass: "island-float-3",
-    badges: ["🥒 خيار", "🍅 طماطم", "🥦 بروكلي"],
+    badges: ["خيار", "طماطم", "بروكلي"],
   },
   {
     id: "vehicles",
     title: "تعرف على المواصلات",
-    subtitle: "سيارات وطائرات وقطارات سريعة 🚗",
-    icon: "🚀",
+    subtitle: "سيارات وطائرات وقطارات سريعة",
     gradientTop: "#00B4D8",
     gradientBottom: "#0077B6",
     borderColor: "#90E0EF",
     animationClass: "island-float-4",
-    badges: ["🚗 سيارة", "✈️ طيارة", "🚂 قطار"],
+    badges: ["سيارة", "طيارة", "قطار"],
   },
   {
     id: "daily-actions",
     title: "تعرف على الأفعال اليومية",
-    subtitle: "أغسل يدي، أنام مبكراً، وأبتسم 😊",
-    icon: "🌟",
+    subtitle: "أغسل يدي، أنام مبكراً، وأبتسم",
     gradientTop: "#8E44AD",
     gradientBottom: "#5B4FA8",
     borderColor: "#BB8FCE",
     animationClass: "island-float-5",
-    badges: ["🧼 نظافة", "🛌 نوم", "🎒 مدرسة"],
+    badges: ["نظافة", "نوم", "مدرسة"],
   },
 ];
 
@@ -193,10 +187,10 @@ export default function DashboardPage() {
                 textShadow: "0 2px 4px rgba(255,255,255,0.8)",
               }}
             >
-              مدار الأمل السعودية ✨
+              مدار الأمل السعودية
             </h1>
             <p style={{ margin: 0, color: "#3A7BC8", fontSize: "14px", fontWeight: 700 }}>
-              رحلة الاستكشاف والتعلم للأبطال الصغار 🌈
+              رحلة الاستكشاف والتعلم للأبطال الصغار
             </p>
           </div>
         </div>
@@ -219,7 +213,7 @@ export default function DashboardPage() {
                 boxShadow: "0 4px 12px rgba(91,79,168,0.1)",
               }}
             >
-              <span>👋 مرحباً:</span>
+              <span>مرحباً:</span>
               <span style={{ direction: "ltr" }}>{userEmail.split("@")[0]}</span>
             </div>
           )}
@@ -241,7 +235,7 @@ export default function DashboardPage() {
             onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            خروج 🚪
+            خروج
           </button>
         </div>
       </header>
@@ -257,7 +251,7 @@ export default function DashboardPage() {
           alignItems: "center",
           justifyContent: "center",
           padding: "20px 20px 60px",
-          maxWidth: "1350px",
+          maxWidth: "1400px",
           margin: "0 auto",
           width: "100%",
         }}
@@ -266,27 +260,28 @@ export default function DashboardPage() {
           <span
             style={{
               background: "rgba(255, 255, 255, 0.9)",
-              padding: "6px 20px",
+              padding: "8px 24px",
               borderRadius: 30,
               color: "#E07820",
               fontWeight: 800,
-              fontSize: 15,
+              fontSize: 16,
               border: "2px dashed #E07820",
               boxShadow: "0 4px 14px rgba(224,120,32,0.15)",
             }}
           >
-            ☁️ اختر جزيرتك السحرية وابدأ اللعب والتعلم 🎈
+            اختر جزيرتك وابدأ التعلم
           </span>
         </div>
 
-        {/* Islands Grid */}
+        {/* Islands Row/Grid */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "28px",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "24px",
             width: "100%",
-            justifyItems: "center",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           {ISLANDS.map((island) => (
@@ -295,8 +290,7 @@ export default function DashboardPage() {
               className={`${island.animationClass} island-interactive-card`}
               onClick={() => setSelectedIsland(island)}
               style={{
-                width: "100%",
-                maxWidth: 260,
+                width: 240,
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
@@ -307,75 +301,61 @@ export default function DashboardPage() {
               <div
                 style={{
                   width: "100%",
-                  borderRadius: "28px 28px 38px 38px",
+                  minHeight: "220px",
+                  borderRadius: "28px 28px 36px 36px",
                   background: `linear-gradient(145deg, ${island.gradientTop}, ${island.gradientBottom})`,
                   border: `4px solid ${island.borderColor}`,
                   boxShadow: "0 18px 30px rgba(0,0,0,0.18), inset 0 3px 6px rgba(255,255,255,0.4)",
-                  padding: "24px 18px 20px",
+                  padding: "30px 18px 24px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
+                  justifyContent: "space-between",
                   textAlign: "center",
                   position: "relative",
                   zIndex: 2,
                 }}
               >
-                {/* Island Big Icon */}
-                <div
-                  style={{
-                    width: 86,
-                    height: 86,
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.95)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 44,
-                    boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                    marginBottom: 12,
-                    border: `3px solid ${island.borderColor}`,
-                  }}
-                >
-                  {island.icon}
+                <div>
+                  {/* Island Title */}
+                  <h3
+                    style={{
+                      margin: "0 0 10px 0",
+                      color: "white",
+                      fontSize: 22,
+                      fontWeight: 900,
+                      lineHeight: 1.3,
+                      textShadow: "0 2px 4px rgba(0,0,0,0.3)",
+                    }}
+                  >
+                    {island.title}
+                  </h3>
+
+                  {/* Island Description */}
+                  <p
+                    style={{
+                      margin: "0 0 14px 0",
+                      color: "rgba(255,255,255,0.95)",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {island.subtitle}
+                  </p>
                 </div>
 
-                {/* Island Title */}
-                <h3
-                  style={{
-                    margin: "0 0 6px 0",
-                    color: "white",
-                    fontSize: 20,
-                    fontWeight: 900,
-                    textShadow: "0 2px 4px rgba(0,0,0,0.3)",
-                  }}
-                >
-                  {island.title}
-                </h3>
-
-                {/* Island Description */}
-                <p
-                  style={{
-                    margin: "0 0 14px 0",
-                    color: "rgba(255,255,255,0.92)",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {island.subtitle}
-                </p>
-
-                {/* Mini Badges / Preview */}
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center" }}>
+                {/* Badges without icons */}
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", margin: "8px 0" }}>
                   {island.badges.map((b, i) => (
                     <span
                       key={i}
                       style={{
                         background: "rgba(255,255,255,0.25)",
                         color: "white",
-                        padding: "3px 8px",
-                        borderRadius: 12,
-                        fontSize: 11,
+                        padding: "4px 10px",
+                        borderRadius: 14,
+                        fontSize: 12,
                         fontWeight: 700,
                         border: "1px solid rgba(255,255,255,0.4)",
                       }}
@@ -388,27 +368,23 @@ export default function DashboardPage() {
                 {/* Start Button */}
                 <button
                   style={{
-                    marginTop: 16,
+                    marginTop: 12,
                     background: "white",
                     color: island.gradientBottom,
                     border: "none",
-                    borderRadius: 20,
-                    padding: "8px 22px",
+                    borderRadius: 22,
+                    padding: "9px 24px",
                     fontWeight: 900,
-                    fontSize: 14,
-                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                    fontSize: 15,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                     cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
                   }}
                 >
-                  <span>استكشف</span>
-                  <span>✨</span>
+                  استكشف
                 </button>
               </div>
 
-              {/* Cloud Base Under Island (الجزيرة في السما وتحتها سحاب) */}
+              {/* Cloud Base Under Island */}
               <div
                 style={{
                   marginTop: -26,
@@ -479,16 +455,15 @@ export default function DashboardPage() {
               position: "relative",
             }}
           >
-            <div style={{ fontSize: 64, marginBottom: 12 }}>{selectedIsland.icon}</div>
-            <h2 style={{ color: selectedIsland.gradientBottom, margin: "0 0 10px 0", fontSize: 24, fontWeight: 900 }}>
+            <h2 style={{ color: selectedIsland.gradientBottom, margin: "0 0 14px 0", fontSize: 24, fontWeight: 900 }}>
               {selectedIsland.title}
             </h2>
-            <p style={{ color: "#555", fontSize: 16, lineHeight: 1.5, marginBottom: 24, fontWeight: 600 }}>
-              أهلاً بك يا بطل في هذه الجزيرة! سنبدأ معاً مغامرة تعليمية تفاعلية ممتعة بالصوت والصورة والألعاب الذكية 🎈
+            <p style={{ color: "#555", fontSize: 16, lineHeight: 1.6, marginBottom: 24, fontWeight: 600 }}>
+              أهلاً بك في هذه الجزيرة! سنبدأ معاً مغامرة تعليمية تفاعلية ممتعة بالصوت والصورة والألعاب الذكية
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
               <button
-                onClick={() => alert(`قريباً: فتح دروس وأنشطة ${selectedIsland.title} 🎮`)}
+                onClick={() => alert(`قريباً: فتح دروس وأنشطة ${selectedIsland.title}`)}
                 style={{
                   background: `linear-gradient(135deg, ${selectedIsland.gradientTop}, ${selectedIsland.gradientBottom})`,
                   color: "white",
@@ -501,7 +476,7 @@ export default function DashboardPage() {
                   boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
                 }}
               >
-                ابدأ المغامرة 🚀
+                ابدأ المغامرة
               </button>
               <button
                 onClick={() => setSelectedIsland(null)}
@@ -516,7 +491,7 @@ export default function DashboardPage() {
                   cursor: "pointer",
                 }}
               >
-                إغلاق ✖️
+                إغلاق
               </button>
             </div>
           </div>
