@@ -95,141 +95,126 @@ export default function DashboardPage() {
   return (
     <div
       style={{
-        minHeight: "100vh",
-        width: "100vw",
-        background: "linear-gradient(180deg, #78D4FA 0%, #AEE6FF 40%, #E8F7FF 100%)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "16px",
-        boxSizing: "border-box",
         position: "relative",
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+        background: "#78D4FA",
       }}
     >
-      {/* ── Top Bar (Floating Pill) ── */}
-      <div
+      {/* ── Fullscreen Background Image ── */}
+      <Image
+        src="/sky-map.png"
+        alt="جزر مدار الأمل التعليمية السحرية"
+        fill
+        priority
+        sizes="100vw"
         style={{
-          width: "100%",
-          maxWidth: "1400px",
+          objectFit: "cover",
+          objectPosition: "center",
+        }}
+      />
+
+      {/* ── Top Bar Controls (Floating over the image) ── */}
+      <header
+        style={{
+          position: "absolute",
+          top: "16px",
+          left: "20px",
+          right: "20px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "12px",
-          padding: "0 8px",
-          zIndex: 30,
+          zIndex: 40,
+          pointerEvents: "none",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {userEmail && (
-            <div
-              style={{
-                background: "white",
-                padding: "8px 18px",
-                borderRadius: 24,
-                color: "#5B4FA8",
-                fontWeight: 800,
-                fontSize: 14,
-                boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
-                border: "2px solid rgba(91,79,168,0.2)",
-              }}
-            >
-              مرحباً بك: <span style={{ direction: "ltr" }}>{userEmail.split("@")[0]}</span>
-            </div>
-          )}
-        </div>
-
+        {/* Sign Out Button (on left in LTR context, accessible) */}
         <button
           onClick={handleSignOut}
           style={{
+            pointerEvents: "auto",
             background: "#FF5E7E",
             color: "white",
-            border: "none",
-            borderRadius: 24,
-            padding: "8px 20px",
-            fontSize: 14,
+            border: "2px solid white",
+            borderRadius: "24px",
+            padding: "8px 22px",
+            fontSize: "14px",
             fontWeight: 800,
             cursor: "pointer",
-            boxShadow: "0 4px 14px rgba(255,94,126,0.35)",
-            transition: "transform 0.2s",
+            boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
+            transition: "transform 0.2s, background-color 0.2s",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >
-          تسجيل الخروج
+          تسجيل الخروج 🚪
         </button>
-      </div>
 
-      {/* ── Main Canvas (Reference Image Container) ── */}
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "1400px",
-          aspectRatio: "16 / 9",
-          position: "relative",
-          borderRadius: "32px",
-          overflow: "hidden",
-          boxShadow: "0 25px 60px rgba(45, 115, 185, 0.25), 0 0 0 4px rgba(255,255,255,0.7)",
-          background: "#8EDCFF",
-        }}
-      >
-        {/* The Exact Design Background Image */}
-        <Image
-          src="/sky-map.png"
-          alt="جزر مدار الأمل التعليمية السحرية"
-          fill
-          priority
-          sizes="(max-width: 1400px) 100vw, 1400px"
-          style={{ objectFit: "cover", objectPosition: "center" }}
-        />
-
-        {/* ── Interactive Clickable Hotspots for Each Island ── */}
-        {ISLAND_ZONES.map((zone) => (
+        {/* User Pill if logged in */}
+        {userEmail && (
           <div
-            key={zone.id}
-            className="island-hotspot"
-            onClick={() => setActiveIsland(zone)}
             style={{
-              top: zone.top,
-              left: zone.left,
-              width: zone.width,
-              height: zone.height,
+              pointerEvents: "auto",
+              background: "rgba(255, 255, 255, 0.92)",
+              padding: "7px 18px",
+              borderRadius: "24px",
+              color: "#5B4FA8",
+              fontWeight: 800,
+              fontSize: "13px",
+              boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
+              border: "2px solid rgba(91,79,168,0.25)",
+              backdropFilter: "blur(6px)",
             }}
           >
-            {/* Visual subtle hint / glowing button over the wood sign */}
-            <div
-              className="hotspot-tag"
-              style={{
-                position: "absolute",
-                top: zone.buttonTop,
-                left: "50%",
-                transform: "translateX(-50%)",
-                background: "rgba(255, 255, 255, 0.92)",
-                color: zone.themeColor,
-                padding: "6px 18px",
-                borderRadius: "20px",
-                fontWeight: 900,
-                fontSize: "clamp(11px, 1.2vw, 15px)",
-                border: `2px solid ${zone.themeColor}`,
-                boxShadow: "0 6px 14px rgba(0,0,0,0.2)",
-                whiteSpace: "nowrap",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-              }}
-            >
-              <span>اضغط للبدء</span>
-            </div>
+            مرحباً بك: <span style={{ direction: "ltr" }}>{userEmail.split("@")[0]}</span>
           </div>
-        ))}
-      </div>
+        )}
+      </header>
 
-      {/* ── Interactive Modal When Island is Clicked ── */}
+      {/* ── Interactive Clickable Hotspots over each island ── */}
+      {ISLAND_ZONES.map((zone) => (
+        <div
+          key={zone.id}
+          className="island-hotspot"
+          onClick={() => setActiveIsland(zone)}
+          style={{
+            top: zone.top,
+            left: zone.left,
+            width: zone.width,
+            height: zone.height,
+          }}
+        >
+          {/* Subtle pulsating call-to-action button */}
+          <div
+            className="hotspot-tag"
+            style={{
+              position: "absolute",
+              top: zone.buttonTop,
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "rgba(255, 255, 255, 0.95)",
+              color: zone.themeColor,
+              padding: "7px 20px",
+              borderRadius: "22px",
+              fontWeight: 900,
+              fontSize: "clamp(12px, 1.1vw, 16px)",
+              border: `2px solid ${zone.themeColor}`,
+              boxShadow: "0 8px 18px rgba(0,0,0,0.25)",
+              whiteSpace: "nowrap",
+              cursor: "pointer",
+            }}
+          >
+            اضغط للبدء ✨
+          </div>
+        </div>
+      ))}
+
+      {/* ── Modal Pop-up on Island Click ── */}
       {activeIsland && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(10, 35, 70, 0.5)", backdropFilter: "blur(8px)" }}
+          style={{ background: "rgba(10, 35, 70, 0.55)", backdropFilter: "blur(8px)" }}
         >
           <div
             style={{
@@ -239,7 +224,7 @@ export default function DashboardPage() {
               width: "100%",
               padding: "36px 30px",
               textAlign: "center",
-              boxShadow: "0 28px 56px rgba(0,0,0,0.3)",
+              boxShadow: "0 28px 56px rgba(0,0,0,0.35)",
               border: `5px solid ${activeIsland.themeColor}`,
               position: "relative",
             }}
@@ -282,7 +267,7 @@ export default function DashboardPage() {
                   boxShadow: "0 6px 18px rgba(0,0,0,0.2)",
                 }}
               >
-                ابدأ المغامرة الآن
+                ابدأ المغامرة الآن 🚀
               </button>
 
               <button
@@ -298,7 +283,7 @@ export default function DashboardPage() {
                   cursor: "pointer",
                 }}
               >
-                إغلاق
+                إغلاق ✖️
               </button>
             </div>
           </div>
