@@ -69,90 +69,50 @@ html[lang="ar"] * {
 
 @keyframes islandFloat {
   0%, 100% {
-    transform: translateY(0px) rotate(0deg);
+    transform: translateY(0px);
   }
   50% {
-    transform: translateY(-14px) rotate(1.2deg);
+    transform: translateY(-8px);
   }
 }
 
-@keyframes pulseGlow {
+@keyframes pulseGlowRing {
   0%, 100% {
-    filter: drop-shadow(0 10px 25px rgba(255, 255, 255, 0.45));
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7), 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: scale(1);
   }
   50% {
-    filter: drop-shadow(0 16px 35px rgba(255, 215, 0, 0.65));
+    box-shadow: 0 0 0 12px rgba(255, 215, 0, 0.4), 0 15px 35px rgba(255, 165, 0, 0.4);
+    transform: scale(1.03);
   }
-}
-
-@keyframes logoReveal {
-  0% {
-    opacity: 0;
-    transform: scale(0.5) rotate(-10deg);
-  }
-  60% {
-    transform: scale(1.1) rotate(2deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-}
-
-@keyframes titleSlideUp {
-  0% {
-    opacity: 0;
-    transform: translateY(40px);
-    letter-spacing: 0.5em;
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    letter-spacing: normal;
-  }
-}
-
-@keyframes loginBoxReveal {
-  0% {
-    opacity: 0;
-    transform: translateY(60px) scale(0.9);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes starTwinkle {
-  0%, 100% { opacity: 0.3; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
-
-@keyframes bubbleRise {
-  0% { transform: translateY(100vh) scale(0); opacity: 0; }
-  10% { opacity: 0.6; }
-  90% { opacity: 0.3; }
-  100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
-}
-
-@keyframes sunRays {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 
 .cloud-zoom { animation: cloudZoom 3s ease-in-out forwards; }
 .cloud-drift-1 { animation: cloudDriftSlow 12s ease-in-out infinite; }
 .cloud-drift-2 { animation: cloudDriftFast 16s ease-in-out infinite; }
-.island-float-1 { animation: islandFloat 5s ease-in-out infinite; }
-.island-float-2 { animation: islandFloat 6.2s ease-in-out infinite 0.8s; }
-.island-float-3 { animation: islandFloat 5.6s ease-in-out infinite 1.5s; }
-.island-float-4 { animation: islandFloat 6.8s ease-in-out infinite 0.4s; }
-.island-float-5 { animation: islandFloat 5.2s ease-in-out infinite 2s; }
-.logo-reveal { animation: logoReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-.title-slide { animation: titleSlideUp 0.8s ease-out forwards; }
-.login-reveal { animation: loginBoxReveal 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-.sun-rotate { animation: sunRays 40s linear infinite; }
+
+/* Interactive Hotspot Zone */
+.island-hotspot {
+  position: absolute;
+  cursor: pointer;
+  border-radius: 40px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  z-index: 10;
+}
+
+.island-hotspot:hover {
+  animation: pulseGlowRing 2s infinite ease-in-out;
+}
+
+.island-hotspot:hover .hotspot-tag {
+  transform: translateY(-5px) scale(1.08);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+}
+
+.hotspot-tag {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
 /* Glassmorphism card */
 .glass-card {
@@ -163,22 +123,6 @@ html[lang="ar"] * {
   box-shadow: 
     0 8px 32px rgba(91, 79, 168, 0.25),
     0 2px 8px rgba(255, 255, 255, 0.3) inset;
-}
-
-/* Island Card */
-.island-interactive-card {
-  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  cursor: pointer;
-  user-select: none;
-}
-
-.island-interactive-card:hover {
-  transform: translateY(-16px) scale(1.05);
-  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.25));
-}
-
-.island-interactive-card:active {
-  transform: translateY(-4px) scale(0.98);
 }
 
 /* Input field styles */
@@ -202,10 +146,6 @@ html[lang="ar"] * {
   transform: scale(1.02);
 }
 
-.kid-input::placeholder {
-  color: rgba(91, 79, 168, 0.5);
-}
-
 /* Button styles */
 .kid-btn-primary {
   background: linear-gradient(135deg, #5B4FA8 0%, #7B6FC8 50%, #5B4FA8 100%);
@@ -221,17 +161,6 @@ html[lang="ar"] * {
   transition: all 0.3s ease;
   box-shadow: 0 6px 20px rgba(91, 79, 168, 0.5);
   letter-spacing: 1px;
-}
-
-.kid-btn-primary:hover {
-  background-position: right center;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(91, 79, 168, 0.6);
-}
-
-.kid-btn-primary:active {
-  transform: translateY(1px);
-  box-shadow: 0 3px 10px rgba(91, 79, 168, 0.4);
 }
 
 .kid-btn-google {
@@ -252,21 +181,12 @@ html[lang="ar"] * {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.kid-btn-google:hover {
-  background: #f8f8ff;
-  border-color: #5B4FA8;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-/* Stars */
 .star {
   position: absolute;
   border-radius: 50%;
   animation: starTwinkle 2s ease-in-out infinite;
 }
 
-/* Bubbles */
 .bubble {
   position: absolute;
   border-radius: 50%;
