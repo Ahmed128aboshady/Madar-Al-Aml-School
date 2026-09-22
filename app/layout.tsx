@@ -8,7 +8,7 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "مدار الأمل السعودية",
+  title: "مركز مدار الأمل بالمملكة العربية السعودية",
   description: "منصة تعليمية للأطفال ذوي الاحتياجات الخاصة",
 };
 

@@ -265,10 +265,10 @@ export default function LoginPage() {
                 textShadow: "0 4px 20px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
                 letterSpacing: "0.05em",
                 lineHeight: 1.2,
-                fontSize: phase === "login" ? "clamp(18px, 4vw, 26px)" : "clamp(24px, 5vw, 40px)",
+                fontSize: phase === "login" ? "clamp(16px, 3.5vw, 24px)" : "clamp(20px, 4.5vw, 36px)",
               }}
             >
-              مدار الأمل السعودية
+              مركز مدار الأمل بالمملكة العربية السعودية
             </h1>
             {phase !== "login" && (
               <p

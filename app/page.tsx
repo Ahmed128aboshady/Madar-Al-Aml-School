@@ -112,6 +112,14 @@ export default function HomePage() {
   const [isMobile, setIsMobile] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
+  // بيانات ولي الأمر
+  const [parentName, setParentName] = useState("");
+  const [childName, setChildName] = useState("");
+  const [parentPhone, setParentPhone] = useState("");
+  const [parentCity, setParentCity] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
   useEffect(() => {
     function checkOrientation() {
       setIsMobile(window.innerWidth < 768 || window.innerHeight > window.innerWidth);
@@ -124,6 +132,11 @@ export default function HomePage() {
         const { data } = await supabase.auth.getUser();
         if (data?.user) {
           setCurrentUser(data.user);
+          const meta = data.user.user_metadata || {};
+          setParentName(meta.parent_name || "");
+          setChildName(meta.child_name || "");
+          setParentPhone(meta.parent_phone || meta.phone || "");
+          setParentCity(meta.parent_city || "");
         } else {
           // If not logged in, redirect to login page
           window.location.href = "/login";
@@ -140,6 +153,33 @@ export default function HomePage() {
 
     return () => window.removeEventListener("resize", checkOrientation);
   }, []);
+
+  async function handleSaveParentData() {
+    setSavingProfile(true);
+    setSaveSuccess(false);
+    try {
+      const { supabase } = await import("@/lib/supabase");
+      const { data, error } = await supabase.auth.updateUser({
+        data: {
+          parent_name: parentName,
+          child_name: childName,
+          parent_phone: parentPhone,
+          parent_city: parentCity,
+        },
+      });
+      if (error) throw error;
+      if (data?.user) {
+        setCurrentUser(data.user);
+      }
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      alert("حدث خطأ أثناء حفظ البيانات، يرجى المحاولة لاحقاً");
+      console.error(err);
+    } finally {
+      setSavingProfile(false);
+    }
+  }
 
   async function handleSignOut() {
     const { supabase } = await import("@/lib/supabase");
@@ -326,66 +366,202 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* ── User Profile Details Modal ── */}
+      {/* ── User & Guardian Profile Modal ── */}
       {showProfileModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(10, 35, 70, 0.6)", backdropFilter: "blur(8px)" }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3"
+          style={{ background: "rgba(10, 35, 70, 0.65)", backdropFilter: "blur(8px)" }}
         >
           <div
             style={{
               background: "white",
               borderRadius: 32,
-              maxWidth: 420,
+              maxWidth: 460,
               width: "100%",
-              padding: "30px 24px",
+              maxHeight: "92vh",
+              overflowY: "auto",
+              padding: "24px 20px",
               textAlign: "center",
               boxShadow: "0 28px 56px rgba(0,0,0,0.35)",
               border: "4px solid #5B4FA8",
               position: "relative",
             }}
           >
-            <div style={{ fontSize: 48, marginBottom: 8 }}>🧒⭐</div>
-            <h2 style={{ color: "#5B4FA8", margin: "0 0 16px 0", fontSize: 22, fontWeight: 900 }}>
-              بيانات البطل المسجل
+            <div style={{ fontSize: 40, marginBottom: 4 }}>👨‍👩‍👧‍👦🌟</div>
+            <h2 style={{ color: "#5B4FA8", margin: "0 0 4px 0", fontSize: 20, fontWeight: 900 }}>
+              بيانات الحساب وولي الأمر
             </h2>
+            <p style={{ margin: "0 0 16px 0", color: "#718096", fontSize: 13, fontWeight: 600 }}>
+              مركز مدار الأمل بالمملكة العربية السعودية
+            </p>
 
+            {/* Account Details Box */}
             <div
               style={{
                 background: "#F8FAFC",
-                borderRadius: 20,
-                padding: "16px",
-                marginBottom: 20,
+                borderRadius: 18,
+                padding: "12px 16px",
+                marginBottom: 16,
                 textAlign: "right",
-                fontSize: 14,
+                fontSize: 13,
                 display: "flex",
                 flexDirection: "column",
-                gap: 10,
+                gap: 8,
                 border: "1px solid #E2E8F0",
               }}
             >
               <div>
-                <span style={{ color: "#718096", fontWeight: 700 }}>📧 البريد الإلكتروني: </span>
+                <span style={{ color: "#718096", fontWeight: 700 }}>📧 الحساب المسجل: </span>
                 <span style={{ color: "#2D3748", fontWeight: 800, direction: "ltr", display: "inline-block" }}>
                   {currentUser?.email || "غير متوفر"}
                 </span>
               </div>
 
               <div>
-                <span style={{ color: "#718096", fontWeight: 700 }}>🔐 نوع تسجيل الدخول: </span>
+                <span style={{ color: "#718096", fontWeight: 700 }}>🔐 طريقة الدخول: </span>
                 <span style={{ color: "#2D3748", fontWeight: 800 }}>
-                  {currentUser?.app_metadata?.provider === "google" ? "حساب Google (جيميل) 🌐" : "البريد الإلكتروني وكلمة المرور ✉️"}
-                </span>
-              </div>
-
-              <div>
-                <span style={{ color: "#718096", fontWeight: 700 }}>📅 تاريخ الانضمام: </span>
-                <span style={{ color: "#2D3748", fontWeight: 800 }}>
-                  {currentUser?.created_at ? new Date(currentUser.created_at).toLocaleDateString("ar-SA") : "اليوم"}
+                  {currentUser?.app_metadata?.provider === "google" ? "حساب Google (جيميل) 🌐" : "البريد الإلكتروني ✉️"}
                 </span>
               </div>
             </div>
 
+            {/* Guardian & Child Editable Form */}
+            <div
+              style={{
+                background: "#F0FDF4",
+                borderRadius: 20,
+                padding: "14px 16px",
+                marginBottom: 16,
+                textAlign: "right",
+                border: "1.5px solid #BBF7D0",
+              }}
+            >
+              <h3 style={{ color: "#166534", margin: "0 0 12px 0", fontSize: 15, fontWeight: 800, display: "flex", alignItems: "center", gap: 6 }}>
+                <span>📝 بيانات ولي الأمر والطفل (يمكنك تعديلها)</span>
+              </h3>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#374151", marginBottom: 3 }}>
+                    اسم ولي الأمر:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="مثال: أحمد عبد الله"
+                    value={parentName}
+                    onChange={(e) => setParentName(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: "12px",
+                      border: "1.5px solid #CBD5E1",
+                      fontSize: "13px",
+                      outline: "none",
+                      background: "white",
+                      textAlign: "right",
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#374151", marginBottom: 3 }}>
+                    اسم البطل / الطفل:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="مثال: سارة أو محمد"
+                    value={childName}
+                    onChange={(e) => setChildName(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: "12px",
+                      border: "1.5px solid #CBD5E1",
+                      fontSize: "13px",
+                      outline: "none",
+                      background: "white",
+                      textAlign: "right",
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#374151", marginBottom: 3 }}>
+                      رقم الجوال:
+                    </label>
+                    <input
+                      type="tel"
+                      placeholder="05XXXXXXXX"
+                      value={parentPhone}
+                      onChange={(e) => setParentPhone(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "8px 12px",
+                        borderRadius: "12px",
+                        border: "1.5px solid #CBD5E1",
+                        fontSize: "13px",
+                        outline: "none",
+                        background: "white",
+                        direction: "ltr",
+                        textAlign: "right",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#374151", marginBottom: 3 }}>
+                      المدينة:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="الرياض، جدة..."
+                      value={parentCity}
+                      onChange={(e) => setParentCity(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "8px 12px",
+                        borderRadius: "12px",
+                        border: "1.5px solid #CBD5E1",
+                        fontSize: "13px",
+                        outline: "none",
+                        background: "white",
+                        textAlign: "right",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Save Button */}
+                <button
+                  onClick={handleSaveParentData}
+                  disabled={savingProfile}
+                  style={{
+                    marginTop: 6,
+                    background: "linear-gradient(135deg, #16A34A 0%, #15803D 100%)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "14px",
+                    padding: "10px",
+                    fontSize: "14px",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    boxShadow: "0 4px 10px rgba(22, 163, 74, 0.3)",
+                    transition: "transform 0.2s",
+                  }}
+                >
+                  {savingProfile ? "⏳ جارٍ الحفظ..." : "💾 حفظ وتحديث البيانات"}
+                </button>
+
+                {saveSuccess && (
+                  <div style={{ color: "#15803D", fontSize: 13, fontWeight: 700, textAlign: "center", marginTop: 4 }}>
+                    ✅ تم حفظ وتحديث البيانات بنجاح في قاعدة البيانات!
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
               <button
                 onClick={() => setShowProfileModal(false)}
@@ -393,15 +569,15 @@ export default function HomePage() {
                   background: "#5B4FA8",
                   color: "white",
                   border: "none",
-                  borderRadius: 20,
-                  padding: "10px 26px",
-                  fontSize: 15,
+                  borderRadius: 18,
+                  padding: "9px 24px",
+                  fontSize: 14,
                   fontWeight: 800,
                   cursor: "pointer",
                   boxShadow: "0 4px 12px rgba(91,79,168,0.3)",
                 }}
               >
-                حسناً 👍
+                إغلاق النافذة
               </button>
 
               <button
@@ -410,8 +586,8 @@ export default function HomePage() {
                   background: "#FF5E7E",
                   color: "white",
                   border: "none",
-                  borderRadius: 20,
-                  padding: "10px 20px",
+                  borderRadius: 18,
+                  padding: "9px 18px",
                   fontSize: 14,
                   fontWeight: 800,
                   cursor: "pointer",
