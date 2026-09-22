@@ -67,27 +67,36 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isRegister, setIsRegister] = useState(false);
 
-  /* ── Supabase (dynamic import to avoid SSR issues) ── */
+  /* ── Supabase ── */
   const [supabase, setSupabase] = useState<import("@supabase/supabase-js").SupabaseClient | null>(null);
+
   useEffect(() => {
+    // 1. Setup Supabase and check session
     import("@/lib/supabase").then(async (m) => {
       setSupabase(m.supabase);
-      const { data } = await m.supabase.auth.getSession();
-      if (data?.session) {
-        window.location.href = "/dashboard";
+      try {
+        const { data } = await m.supabase.auth.getSession();
+        if (data?.session) {
+          window.location.href = "/dashboard";
+        }
+      } catch (err) {
+        console.error("Auth session check error:", err);
       }
     });
-  }, []);
 
-  /* ── Animation sequence ── */
-  useEffect(() => {
-    // Clouds zoom for 2.8s then fade
-    const t1 = setTimeout(() => setCloudsVisible(false), 2200);
-    // Logo appears at 2.8s
-    const t2 = setTimeout(() => setPhase("logo"), 2800);
-    // Login box appears at 4.2s
-    const t3 = setTimeout(() => setPhase("login"), 4200);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+    // 2. Smooth animation timing
+    // Clouds vanish after 2 seconds
+    const t1 = setTimeout(() => setCloudsVisible(false), 2000);
+    // Logo appears
+    const t2 = setTimeout(() => setPhase("logo"), 2200);
+    // Login box appears directly
+    const t3 = setTimeout(() => setPhase("login"), 3200);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, []);
 
   /* ── Handlers ── */
@@ -106,7 +115,7 @@ export default function LoginPage() {
           password,
         });
         if (e) throw e;
-        setError("✅ تم إنشاء الحساب بنجاح! تفقد بريدك لتأكيد الحساب إذا لزم.");
+        setError("✅ تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.");
       } else {
         const { error: e } = await supabase.auth.signInWithPassword({ email, password });
         if (e) throw e;
@@ -148,6 +157,7 @@ export default function LoginPage() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        padding: "20px 10px",
       }}
     >
       {/* ── Background stars ── */}
@@ -217,21 +227,20 @@ export default function LoginPage() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 0,
             position: phase === "login" ? "relative" : "absolute",
             top: phase === "login" ? undefined : "50%",
             transform: phase === "login" ? undefined : "translateY(-50%)",
             zIndex: 20,
-            marginBottom: phase === "login" ? 24 : 0,
+            marginBottom: phase === "login" ? 18 : 0,
+            transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
           }}
         >
           {/* Logo */}
           <div
             className="logo-reveal"
             style={{
-              opacity: 0,
-              width: phase === "login" ? 130 : 200,
-              height: phase === "login" ? 80 : 122,
+              width: phase === "login" ? 120 : 190,
+              height: phase === "login" ? 75 : 115,
               position: "relative",
               filter: "drop-shadow(0 8px 24px rgba(91,79,168,0.4))",
               transition: "all 0.5s ease",
@@ -244,10 +253,8 @@ export default function LoginPage() {
           <div
             className="title-slide"
             style={{
-              opacity: 0,
-              animationDelay: "0.3s",
               textAlign: "center",
-              marginTop: 8,
+              marginTop: 6,
             }}
           >
             <h1
@@ -258,7 +265,7 @@ export default function LoginPage() {
                 textShadow: "0 4px 20px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
                 letterSpacing: "0.05em",
                 lineHeight: 1.2,
-                fontSize: phase === "login" ? "clamp(18px, 4vw, 28px)" : "clamp(24px, 5vw, 42px)",
+                fontSize: phase === "login" ? "clamp(18px, 4vw, 26px)" : "clamp(24px, 5vw, 40px)",
               }}
             >
               مدار الأمل السعودية
@@ -267,9 +274,9 @@ export default function LoginPage() {
               <p
                 style={{
                   margin: "8px 0 0",
-                  color: "rgba(255,255,255,0.85)",
-                  fontSize: "clamp(12px, 2.5vw, 18px)",
-                  fontWeight: 500,
+                  color: "rgba(255,255,255,0.9)",
+                  fontSize: "clamp(12px, 2.5vw, 17px)",
+                  fontWeight: 600,
                   textShadow: "0 2px 8px rgba(0,0,0,0.2)",
                 }}
               >
@@ -287,16 +294,15 @@ export default function LoginPage() {
         <div
           className="login-reveal glass-card"
           style={{
-            opacity: 0,
-            width: "min(440px, 90vw)",
-            borderRadius: 32,
-            padding: "32px 36px 28px",
+            width: "min(420px, 92vw)",
+            borderRadius: 28,
+            padding: "26px 28px 22px",
             position: "relative",
             zIndex: 20,
           }}
         >
           {/* Decorative top dots */}
-          <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 16 }}>
             {["#E07820", "#6AAD3D", "#5B4FA8", "#3AB5C8", "#F5A623"].map((c, i) => (
               <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
             ))}
@@ -306,8 +312,8 @@ export default function LoginPage() {
             style={{
               textAlign: "center",
               color: "#5B4FA8",
-              margin: "0 0 20px",
-              fontSize: 22,
+              margin: "0 0 18px",
+              fontSize: 21,
               fontWeight: 800,
             }}
           >
@@ -321,10 +327,10 @@ export default function LoginPage() {
                 background: error.startsWith("✅") ? "rgba(106,173,61,0.15)" : "rgba(220,53,69,0.12)",
                 border: `2px solid ${error.startsWith("✅") ? "#6AAD3D" : "#dc3545"}`,
                 borderRadius: 16,
-                padding: "10px 16px",
-                marginBottom: 16,
+                padding: "8px 14px",
+                marginBottom: 14,
                 color: error.startsWith("✅") ? "#4a7a28" : "#c0392b",
-                fontSize: 14,
+                fontSize: 13,
                 textAlign: "center",
               }}
             >
@@ -333,28 +339,28 @@ export default function LoginPage() {
           )}
 
           {/* ─ Email Form ─ */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>📧</span>
+              <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>📧</span>
               <input
                 className="kid-input"
                 type="email"
                 placeholder="البريد الإلكتروني"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                style={{ paddingRight: 48 }}
+                style={{ paddingRight: 44 }}
               />
             </div>
 
             <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>🔒</span>
+              <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>🔒</span>
               <input
                 className="kid-input"
                 type={showPass ? "text" : "password"}
                 placeholder="كلمة المرور"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ paddingRight: 48, paddingLeft: 48 }}
+                style={{ paddingRight: 44, paddingLeft: 44 }}
                 onKeyDown={(e) => e.key === "Enter" && handleEmailAuth()}
               />
               <button
@@ -368,7 +374,7 @@ export default function LoginPage() {
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  fontSize: 18,
+                  fontSize: 17,
                   padding: 0,
                 }}
               >
@@ -386,8 +392,8 @@ export default function LoginPage() {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 12,
-              margin: "20px 0",
+              gap: 10,
+              margin: "16px 0",
               color: "rgba(91,79,168,0.6)",
               fontSize: 13,
               fontWeight: 600,
@@ -410,7 +416,7 @@ export default function LoginPage() {
           </button>
 
           {/* ─ Switch Register / Login ─ */}
-          <div style={{ textAlign: "center", marginTop: 18 }}>
+          <div style={{ textAlign: "center", marginTop: 14 }}>
             <button
               onClick={() => { setIsRegister(!isRegister); setError(""); }}
               style={{
@@ -419,7 +425,7 @@ export default function LoginPage() {
                 color: "#5B4FA8",
                 fontWeight: 700,
                 cursor: "pointer",
-                fontSize: 14,
+                fontSize: 13,
                 textDecoration: "underline",
                 padding: 0,
               }}
@@ -429,7 +435,7 @@ export default function LoginPage() {
           </div>
 
           {/* Footer decoration */}
-          <div style={{ textAlign: "center", marginTop: 16, fontSize: 20, letterSpacing: 6 }}>
+          <div style={{ textAlign: "center", marginTop: 12, fontSize: 18, letterSpacing: 5 }}>
             ⭐🌙✨🌟💫
           </div>
         </div>
