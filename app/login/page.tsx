@@ -66,6 +66,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isRegister, setIsRegister] = useState(false);
+  const [otpMode, setOtpMode] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [resending, setResending] = useState(false);
 
   /* ── Supabase ── */
   const [supabase, setSupabase] = useState<import("@supabase/supabase-js").SupabaseClient | null>(null);
@@ -110,21 +113,95 @@ export default function LoginPage() {
     setError("");
     try {
       if (isRegister) {
-        const { error: e } = await supabase.auth.signUp({
-          email,
+        const { data, error: e } = await supabase.auth.signUp({
+          email: email.trim(),
           password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+          },
         });
         if (e) throw e;
-        setError("✅ تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.");
+        setOtpMode(true);
+        setError("✅ تم إنشاء الحساب وإرسال كود التحقق بنجاح! تفقد بريدك الوارد (Inbox) أو الرسائل غير الهامة (Spam).");
       } else {
-        const { error: e } = await supabase.auth.signInWithPassword({ email, password });
-        if (e) throw e;
+        const { error: e } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (e) {
+          if (e.message.toLowerCase().includes("email not confirmed")) {
+            setOtpMode(true);
+            setError("⚠️ الحساب مسجل ولكن يحتاج لتأكيد البريد. تم إرسال كود التحقق، أدخله لتفعيل الحساب.");
+            return;
+          }
+          throw e;
+        }
         window.location.href = "/";
       }
     } catch (e: unknown) {
       setError((e as { message?: string })?.message || "حدث خطأ، حاول مجدداً");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleVerifyOtp() {
+    if (!supabase) return;
+    const cleanToken = otpCode.trim();
+    if (!cleanToken || cleanToken.length < 6) {
+      setError("من فضلك أدخل رمز التحقق المكون من 6 أرقام");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      let res = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: cleanToken,
+        type: "signup",
+      });
+
+      if (res.error) {
+        res = await supabase.auth.verifyOtp({
+          email: email.trim(),
+          token: cleanToken,
+          type: "email",
+        });
+      }
+
+      if (res.error) throw res.error;
+
+      if (res.data?.session || res.data?.user) {
+        window.location.href = "/";
+      } else {
+        setError("تعذر التحقق من الرمز، يرجى إعادة المحاولة");
+      }
+    } catch (e: unknown) {
+      const msg = (e as { message?: string })?.message || "";
+      if (msg.includes("expired")) {
+        setError("انتهت صلاحية الرمز، اضغط على 'إعادة إرسال الكود' للحصول على رمز جديد");
+      } else if (msg.includes("invalid")) {
+        setError("رمز التحقق غير صحيح، يرجى مراجعة البريد وإعادة إدخاله");
+      } else {
+        setError(msg || "حدث خطأ أثناء تأكيد الرمز");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResendOtp() {
+    if (!supabase || !email) return;
+    setResending(true);
+    setError("");
+    try {
+      const { error: e } = await supabase.auth.resend({
+        type: "signup",
+        email: email.trim(),
+      });
+      if (e) throw e;
+      setError("✅ تم إرسال كود تحقق جديد إلى بريدك الإلكتروني!");
+    } catch (e: unknown) {
+      setError((e as { message?: string })?.message || "حدث خطأ أثناء إعادة إرسال الكود");
+    } finally {
+      setResending(false);
     }
   }
 
@@ -308,131 +385,266 @@ export default function LoginPage() {
             ))}
           </div>
 
-          <h2
-            style={{
-              textAlign: "center",
-              color: "#5B4FA8",
-              margin: "0 0 18px",
-              fontSize: 21,
-              fontWeight: 800,
-            }}
-          >
-            {isRegister ? "✨ إنشاء حساب جديد" : "👋 أهلاً بك!"}
-          </h2>
-
-          {/* Error message */}
-          {error && (
-            <div
-              style={{
-                background: error.startsWith("✅") ? "rgba(106,173,61,0.15)" : "rgba(220,53,69,0.12)",
-                border: `2px solid ${error.startsWith("✅") ? "#6AAD3D" : "#dc3545"}`,
-                borderRadius: 16,
-                padding: "8px 14px",
-                marginBottom: 14,
-                color: error.startsWith("✅") ? "#4a7a28" : "#c0392b",
-                fontSize: 13,
-                textAlign: "center",
-              }}
-            >
-              {error}
-            </div>
-          )}
-
-          {/* ─ Email Form ─ */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>📧</span>
-              <input
-                className="kid-input"
-                type="email"
-                placeholder="البريد الإلكتروني"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={{ paddingRight: 44 }}
-              />
-            </div>
-
-            <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>🔒</span>
-              <input
-                className="kid-input"
-                type={showPass ? "text" : "password"}
-                placeholder="كلمة المرور"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={{ paddingRight: 44, paddingLeft: 44 }}
-                onKeyDown={(e) => e.key === "Enter" && handleEmailAuth()}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPass(!showPass)}
+          {otpMode ? (
+            /* ─ OTP Verification View ─ */
+            <div>
+              <h2
                 style={{
-                  position: "absolute",
-                  left: 14,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 17,
-                  padding: 0,
+                  textAlign: "center",
+                  color: "#5B4FA8",
+                  margin: "0 0 10px",
+                  fontSize: 21,
+                  fontWeight: 800,
                 }}
               >
-                {showPass ? "🙈" : "👁️"}
-              </button>
+                🔐 تأكيد كود الحساب
+              </h2>
+
+              <p
+                style={{
+                  textAlign: "center",
+                  color: "#555",
+                  fontSize: 13,
+                  margin: "0 0 14px",
+                  lineHeight: 1.5,
+                }}
+              >
+                تم إرسال رمز التحقق (الكود) إلى بريدك الإلكتروني:
+                <br />
+                <strong style={{ color: "#5B4FA8", wordBreak: "break-all" }}>{email}</strong>
+              </p>
+
+              {/* Status/Error message */}
+              {error && (
+                <div
+                  style={{
+                    background: error.startsWith("✅") ? "rgba(106,173,61,0.15)" : "rgba(220,53,69,0.12)",
+                    border: `2px solid ${error.startsWith("✅") ? "#6AAD3D" : "#dc3545"}`,
+                    borderRadius: 16,
+                    padding: "8px 14px",
+                    marginBottom: 14,
+                    color: error.startsWith("✅") ? "#4a7a28" : "#c0392b",
+                    fontSize: 13,
+                    textAlign: "center",
+                  }}
+                >
+                  {error}
+                </div>
+              )}
+
+              {/* ─ OTP Input Field ─ */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{ position: "relative" }}>
+                  <input
+                    className="kid-input"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={8}
+                    placeholder="أدخل الكود (6 أرقام)"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                    style={{
+                      textAlign: "center",
+                      fontSize: 20,
+                      fontWeight: 900,
+                      letterSpacing: "4px",
+                      color: "#5B4FA8",
+                    }}
+                    onKeyDown={(e) => e.key === "Enter" && handleVerifyOtp()}
+                  />
+                </div>
+
+                <button className="kid-btn-primary" onClick={handleVerifyOtp} disabled={loading}>
+                  {loading ? "⏳ جارٍ التحقق..." : "🚀 تأكيد الكود والدخول"}
+                </button>
+
+                {/* Resend and Edit buttons */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
+                  <button
+                    onClick={handleResendOtp}
+                    disabled={resending}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#0077B6",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      fontSize: 12,
+                      textDecoration: "underline",
+                      padding: 0,
+                    }}
+                  >
+                    {resending ? "⏳ جارٍ الإرسال..." : "🔄 إعادة إرسال الكود"}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setOtpMode(false);
+                      setOtpCode("");
+                      setError("");
+                    }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#888",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      fontSize: 12,
+                      textDecoration: "underline",
+                      padding: 0,
+                    }}
+                  >
+                    ✏️ تعديل البريد
+                  </button>
+                </div>
+
+                <div
+                  style={{
+                    background: "rgba(91,79,168,0.06)",
+                    borderRadius: 14,
+                    padding: "10px 12px",
+                    marginTop: 8,
+                    fontSize: 11,
+                    color: "#5B4FA8",
+                    lineHeight: 1.5,
+                    textAlign: "center",
+                  }}
+                >
+                  💡 <strong>ملاحظة:</strong> يمكنك أيضاً النقر على رابط التفعيل الموجود داخل رسالة الإيميل مباشرة لتسجيل الدخول الفوري.
+                </div>
+              </div>
             </div>
+          ) : (
+            /* ─ Standard Login / Sign Up Form ─ */
+            <>
+              <h2
+                style={{
+                  textAlign: "center",
+                  color: "#5B4FA8",
+                  margin: "0 0 18px",
+                  fontSize: 21,
+                  fontWeight: 800,
+                }}
+              >
+                {isRegister ? "✨ إنشاء حساب جديد" : "👋 أهلاً بك!"}
+              </h2>
 
-            <button className="kid-btn-primary" onClick={handleEmailAuth} disabled={loading}>
-              {loading ? "⏳ جارٍ التحميل..." : isRegister ? "✨ إنشاء الحساب" : "🚀 تسجيل الدخول"}
-            </button>
-          </div>
+              {/* Error message */}
+              {error && (
+                <div
+                  style={{
+                    background: error.startsWith("✅") ? "rgba(106,173,61,0.15)" : "rgba(220,53,69,0.12)",
+                    border: `2px solid ${error.startsWith("✅") ? "#6AAD3D" : "#dc3545"}`,
+                    borderRadius: 16,
+                    padding: "8px 14px",
+                    marginBottom: 14,
+                    color: error.startsWith("✅") ? "#4a7a28" : "#c0392b",
+                    fontSize: 13,
+                    textAlign: "center",
+                  }}
+                >
+                  {error}
+                </div>
+              )}
 
-          {/* ─ Divider ─ */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              margin: "16px 0",
-              color: "rgba(91,79,168,0.6)",
-              fontSize: 13,
-              fontWeight: 600,
-            }}
-          >
-            <div style={{ flex: 1, height: 2, background: "rgba(91,79,168,0.2)", borderRadius: 1 }} />
-            أو
-            <div style={{ flex: 1, height: 2, background: "rgba(91,79,168,0.2)", borderRadius: 1 }} />
-          </div>
+              {/* ─ Email Form ─ */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>📧</span>
+                  <input
+                    className="kid-input"
+                    type="email"
+                    placeholder="البريد الإلكتروني"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{ paddingRight: 44 }}
+                  />
+                </div>
 
-          {/* ─ Google button ─ */}
-          <button className="kid-btn-google" onClick={handleGoogle} disabled={loading}>
-            <svg width="20" height="20" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            الدخول بـ Google
-          </button>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>🔒</span>
+                  <input
+                    className="kid-input"
+                    type={showPass ? "text" : "password"}
+                    placeholder="كلمة المرور"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{ paddingRight: 44, paddingLeft: 44 }}
+                    onKeyDown={(e) => e.key === "Enter" && handleEmailAuth()}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPass(!showPass)}
+                    style={{
+                      position: "absolute",
+                      left: 14,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 17,
+                      padding: 0,
+                    }}
+                  >
+                    {showPass ? "🙈" : "👁️"}
+                  </button>
+                </div>
 
-          {/* ─ Switch Register / Login ─ */}
-          <div style={{ textAlign: "center", marginTop: 14 }}>
-            <button
-              onClick={() => { setIsRegister(!isRegister); setError(""); }}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#5B4FA8",
-                fontWeight: 700,
-                cursor: "pointer",
-                fontSize: 13,
-                textDecoration: "underline",
-                padding: 0,
-              }}
-            >
-              {isRegister ? "لديك حساب؟ سجّل دخولك" : "ليس لديك حساب؟ أنشئ حساباً الآن"}
-            </button>
-          </div>
+                <button className="kid-btn-primary" onClick={handleEmailAuth} disabled={loading}>
+                  {loading ? "⏳ جارٍ التحميل..." : isRegister ? "✨ إنشاء الحساب وإرسال الكود" : "🚀 تسجيل الدخول"}
+                </button>
+              </div>
+
+              {/* ─ Divider ─ */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  margin: "16px 0",
+                  color: "rgba(91,79,168,0.6)",
+                  fontSize: 13,
+                  fontWeight: 600,
+                }}
+              >
+                <div style={{ flex: 1, height: 2, background: "rgba(91,79,168,0.2)", borderRadius: 1 }} />
+                أو
+                <div style={{ flex: 1, height: 2, background: "rgba(91,79,168,0.2)", borderRadius: 1 }} />
+              </div>
+
+              {/* ─ Google button ─ */}
+              <button className="kid-btn-google" onClick={handleGoogle} disabled={loading}>
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                الدخول بـ Google
+              </button>
+
+              {/* ─ Switch Register / Login ─ */}
+              <div style={{ textAlign: "center", marginTop: 14 }}>
+                <button
+                  onClick={() => { setIsRegister(!isRegister); setError(""); }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#5B4FA8",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontSize: 13,
+                    textDecoration: "underline",
+                    padding: 0,
+                  }}
+                >
+                  {isRegister ? "لديك حساب؟ سجّل دخولك" : "ليس لديك حساب؟ أنشئ حساباً الآن"}
+                </button>
+              </div>
+            </>
+          )}
 
           {/* Footer decoration */}
           <div style={{ textAlign: "center", marginTop: 12, fontSize: 18, letterSpacing: 5 }}>

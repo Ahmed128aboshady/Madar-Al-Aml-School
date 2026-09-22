@@ -211,6 +211,19 @@ export default function HomePage() {
       if (error) throw error;
       if (data?.user) {
         setCurrentUser(data.user);
+        try {
+          await supabase.from("profiles").upsert({
+            id: data.user.id,
+            email: data.user.email,
+            parent_name: parentName,
+            child_name: childName,
+            parent_phone: parentPhone,
+            parent_city: parentCity,
+            updated_at: new Date().toISOString(),
+          });
+        } catch {
+          // Table may not exist yet; metadata is safely saved in auth.users
+        }
       }
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
