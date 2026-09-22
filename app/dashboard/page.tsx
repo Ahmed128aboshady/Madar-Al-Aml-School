@@ -25,7 +25,7 @@ const ISLAND_ZONES: IslandZone[] = [
     left: "7%",
     width: "24%",
     height: "36%",
-    buttonTop: "72%",
+    buttonTop: "75%",
   },
   {
     id: "fruits",
@@ -36,7 +36,7 @@ const ISLAND_ZONES: IslandZone[] = [
     left: "37.5%",
     width: "24%",
     height: "36%",
-    buttonTop: "72%",
+    buttonTop: "75%",
   },
   {
     id: "vegetables",
@@ -47,7 +47,7 @@ const ISLAND_ZONES: IslandZone[] = [
     left: "68%",
     width: "25%",
     height: "38%",
-    buttonTop: "70%",
+    buttonTop: "73%",
   },
   {
     id: "vehicles",
@@ -58,7 +58,7 @@ const ISLAND_ZONES: IslandZone[] = [
     left: "22%",
     width: "26%",
     height: "36%",
-    buttonTop: "73%",
+    buttonTop: "75%",
   },
   {
     id: "daily-actions",
@@ -69,7 +69,7 @@ const ISLAND_ZONES: IslandZone[] = [
     left: "53%",
     width: "26%",
     height: "36%",
-    buttonTop: "73%",
+    buttonTop: "75%",
   },
 ];
 
@@ -95,76 +95,61 @@ export default function DashboardPage() {
   return (
     <div
       style={{
-        position: "relative",
         width: "100vw",
         height: "100vh",
+        background: "radial-gradient(circle at center, #A0E4FF 0%, #68C8F7 50%, #4FAEE6 100%)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         overflow: "hidden",
-        background: "#78D4FA",
+        position: "relative",
       }}
     >
-      {/* ── Fullscreen Background Image ── */}
-      <Image
-        src="/sky-map.png"
-        alt="جزر مدار الأمل التعليمية السحرية"
-        fill
-        priority
-        sizes="100vw"
-        style={{
-          objectFit: "cover",
-          objectPosition: "center",
-        }}
-      />
-
-      {/* ── Top Bar Controls (Floating over the image) ── */}
+      {/* ── Top Bar Controls ── */}
       <header
         style={{
           position: "absolute",
-          top: "16px",
+          top: "12px",
           left: "20px",
           right: "20px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           zIndex: 40,
-          pointerEvents: "none",
         }}
       >
-        {/* Sign Out Button (on left in LTR context, accessible) */}
         <button
           onClick={handleSignOut}
           style={{
-            pointerEvents: "auto",
             background: "#FF5E7E",
             color: "white",
             border: "2px solid white",
-            borderRadius: "24px",
-            padding: "8px 22px",
-            fontSize: "14px",
+            borderRadius: "20px",
+            padding: "6px 18px",
+            fontSize: "13px",
             fontWeight: 800,
             cursor: "pointer",
-            boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
-            transition: "transform 0.2s, background-color 0.2s",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            transition: "transform 0.2s",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >
           تسجيل الخروج 🚪
         </button>
 
-        {/* User Pill if logged in */}
         {userEmail && (
           <div
             style={{
-              pointerEvents: "auto",
-              background: "rgba(255, 255, 255, 0.92)",
-              padding: "7px 18px",
-              borderRadius: "24px",
+              background: "rgba(255, 255, 255, 0.95)",
+              padding: "6px 16px",
+              borderRadius: "20px",
               color: "#5B4FA8",
               fontWeight: 800,
               fontSize: "13px",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
-              border: "2px solid rgba(91,79,168,0.25)",
-              backdropFilter: "blur(6px)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              border: "1.5px solid rgba(91,79,168,0.25)",
             }}
           >
             مرحباً بك: <span style={{ direction: "ltr" }}>{userEmail.split("@")[0]}</span>
@@ -172,43 +157,69 @@ export default function DashboardPage() {
         )}
       </header>
 
-      {/* ── Interactive Clickable Hotspots over each island ── */}
-      {ISLAND_ZONES.map((zone) => (
-        <div
-          key={zone.id}
-          className="island-hotspot"
-          onClick={() => setActiveIsland(zone)}
+      {/* ── Perfectly Scaled Responsive Canvas Container ── */}
+      <div
+        style={{
+          width: "min(100vw, 177.78vh)",
+          height: "min(100vh, 56.25vw)",
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+        }}
+      >
+        {/* The Image Rendered with contain so nothing ever cuts */}
+        <Image
+          src="/sky-map.png"
+          alt="جزر مدار الأمل التعليمية السحرية"
+          fill
+          priority
+          sizes="(max-width: 1920px) 100vw, 1920px"
           style={{
-            top: zone.top,
-            left: zone.left,
-            width: zone.width,
-            height: zone.height,
+            objectFit: "contain",
+            objectPosition: "center",
           }}
-        >
-          {/* Subtle pulsating call-to-action button */}
+        />
+
+        {/* ── Interactive Hotspots locked strictly to the Canvas Container ── */}
+        {ISLAND_ZONES.map((zone) => (
           <div
-            className="hotspot-tag"
+            key={zone.id}
+            className="island-hotspot"
+            onClick={() => setActiveIsland(zone)}
             style={{
-              position: "absolute",
-              top: zone.buttonTop,
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "rgba(255, 255, 255, 0.95)",
-              color: zone.themeColor,
-              padding: "7px 20px",
-              borderRadius: "22px",
-              fontWeight: 900,
-              fontSize: "clamp(12px, 1.1vw, 16px)",
-              border: `2px solid ${zone.themeColor}`,
-              boxShadow: "0 8px 18px rgba(0,0,0,0.25)",
-              whiteSpace: "nowrap",
-              cursor: "pointer",
+              top: zone.top,
+              left: zone.left,
+              width: zone.width,
+              height: zone.height,
             }}
           >
-            اضغط للبدء ✨
+            {/* Click to start tag */}
+            <div
+              className="hotspot-tag"
+              style={{
+                position: "absolute",
+                top: zone.buttonTop,
+                left: "50%",
+                transform: "translateX(-50%)",
+                background: "rgba(255, 255, 255, 0.95)",
+                color: zone.themeColor,
+                padding: "4px 14px",
+                borderRadius: "18px",
+                fontWeight: 900,
+                fontSize: "clamp(10px, 1vw, 14px)",
+                border: `2px solid ${zone.themeColor}`,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+              }}
+            >
+              <span>اضغط للبدء ✨</span>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
 
       {/* ── Modal Pop-up on Island Click ── */}
       {activeIsland && (
