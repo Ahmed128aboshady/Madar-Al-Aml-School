@@ -110,6 +110,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [registerPhone, setRegisterPhone] = useState(""); // رقم تليفون في التسجيل
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -140,7 +141,18 @@ export default function LoginPage() {
     setError("");
     try {
       if (isRegister) {
-        const { error: e } = await supabase.auth.signUp({ email, password });
+        if (!registerPhone) {
+          setError("من فضلك أدخل رقم الهاتف");
+          setLoading(false);
+          return;
+        }
+        const { error: e } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { phone: registerPhone },
+          },
+        });
         if (e) throw e;
         setError("✅ تم إنشاء الحساب! تحقق من بريدك الإلكتروني.");
       } else {
@@ -446,6 +458,22 @@ export default function LoginPage() {
                   style={{ paddingRight: 48 }}
                 />
               </div>
+
+              {/* حقل رقم التليفون - يظهر فقط عند التسجيل */}
+              {isRegister && (
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>📱</span>
+                  <input
+                    className="kid-input"
+                    type="tel"
+                    placeholder="رقم الهاتف (مثال: 0501234567)"
+                    value={registerPhone}
+                    onChange={(e) => setRegisterPhone(e.target.value)}
+                    style={{ paddingRight: 48, direction: "ltr", textAlign: "right" }}
+                  />
+                </div>
+              )}
+
               <div style={{ position: "relative" }}>
                 <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>🔒</span>
                 <input
