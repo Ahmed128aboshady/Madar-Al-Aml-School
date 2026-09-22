@@ -14,6 +14,12 @@ interface IslandZone {
   desktopWidth: string;
   desktopHeight: string;
   desktopButtonTop: string;
+  // Tablet 4:3 coordinates
+  tabletTop: string;
+  tabletLeft: string;
+  tabletWidth: string;
+  tabletHeight: string;
+  tabletButtonTop: string;
   // Mobile 9:16 coordinates
   mobileTop: string;
   mobileLeft: string;
@@ -33,6 +39,11 @@ const ISLAND_ZONES: IslandZone[] = [
     desktopWidth: "25%",
     desktopHeight: "34%",
     desktopButtonTop: "74%",
+    tabletTop: "20%",
+    tabletLeft: "12%",
+    tabletWidth: "27%",
+    tabletHeight: "33%",
+    tabletButtonTop: "74%",
     mobileTop: "19%",
     mobileLeft: "5%",
     mobileWidth: "44%",
@@ -49,6 +60,11 @@ const ISLAND_ZONES: IslandZone[] = [
     desktopWidth: "26%",
     desktopHeight: "34%",
     desktopButtonTop: "75%",
+    tabletTop: "24%",
+    tabletLeft: "57%",
+    tabletWidth: "28%",
+    tabletHeight: "33%",
+    tabletButtonTop: "75%",
     mobileTop: "19.5%",
     mobileLeft: "51%",
     mobileWidth: "44%",
@@ -65,6 +81,11 @@ const ISLAND_ZONES: IslandZone[] = [
     desktopWidth: "27%",
     desktopHeight: "36%",
     desktopButtonTop: "74%",
+    tabletTop: "40%",
+    tabletLeft: "34%",
+    tabletWidth: "30%",
+    tabletHeight: "35%",
+    tabletButtonTop: "74%",
     mobileTop: "40%",
     mobileLeft: "27%",
     mobileWidth: "46%",
@@ -81,6 +102,11 @@ const ISLAND_ZONES: IslandZone[] = [
     desktopWidth: "26%",
     desktopHeight: "34%",
     desktopButtonTop: "75%",
+    tabletTop: "57%",
+    tabletLeft: "5%",
+    tabletWidth: "29%",
+    tabletHeight: "33%",
+    tabletButtonTop: "75%",
     mobileTop: "63%",
     mobileLeft: "5%",
     mobileWidth: "44%",
@@ -97,6 +123,11 @@ const ISLAND_ZONES: IslandZone[] = [
     desktopWidth: "27%",
     desktopHeight: "34%",
     desktopButtonTop: "75%",
+    tabletTop: "59%",
+    tabletLeft: "63%",
+    tabletWidth: "30%",
+    tabletHeight: "33%",
+    tabletButtonTop: "75%",
     mobileTop: "63%",
     mobileLeft: "51%",
     mobileWidth: "44%",
@@ -109,7 +140,7 @@ export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<import("@supabase/supabase-js").User | null>(null);
   const [activeIsland, setActiveIsland] = useState<IslandZone | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [deviceType, setDeviceType] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   // بيانات ولي الأمر
@@ -122,7 +153,17 @@ export default function HomePage() {
 
   useEffect(() => {
     function checkOrientation() {
-      setIsMobile(window.innerWidth < 768 || window.innerHeight > window.innerWidth);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const isPortrait = h > w;
+
+      if (w < 640 || (isPortrait && w < 768)) {
+        setDeviceType("mobile");
+      } else if ((w >= 640 && w <= 1024) || (isPortrait && w >= 768)) {
+        setDeviceType("tablet");
+      } else {
+        setDeviceType("desktop");
+      }
     }
     checkOrientation();
     window.addEventListener("resize", checkOrientation);
@@ -289,8 +330,18 @@ export default function HomePage() {
       {/* ── Interactive Viewport Canvas ── */}
       <div
         style={{
-          width: isMobile ? "min(100vw, 56.25vh)" : "min(100vw, 177.78vh)",
-          height: isMobile ? "min(100vh, 177.78vw)" : "min(100vh, 56.25vw)",
+          width:
+            deviceType === "mobile"
+              ? "min(100vw, 56.28vh)"
+              : deviceType === "tablet"
+              ? "min(100vw, 133.33vh)"
+              : "min(100vw, 177.68vh)",
+          height:
+            deviceType === "mobile"
+              ? "min(100vh, 177.68vw)"
+              : deviceType === "tablet"
+              ? "min(100vh, 75vw)"
+              : "min(100vh, 56.28vw)",
           position: "relative",
           display: "flex",
           alignItems: "center",
@@ -300,7 +351,13 @@ export default function HomePage() {
       >
         {/* The Exact Image Rendered with contain */}
         <Image
-          src={isMobile ? "/sky-map-mobile.png" : "/sky-map.png"}
+          src={
+            deviceType === "mobile"
+              ? "/sky-map-mobile.png"
+              : deviceType === "tablet"
+              ? "/sky-map-tablet.png"
+              : "/sky-map.png"
+          }
           alt="جزر مدار الأمل التعليمية السحرية"
           fill
           priority
@@ -316,10 +373,10 @@ export default function HomePage() {
           onClick={() => setShowProfileModal(true)}
           style={{
             position: "absolute",
-            top: isMobile ? "1.5%" : "2%",
-            left: isMobile ? "2.5%" : "1.5%",
-            width: isMobile ? "24%" : "13%",
-            height: isMobile ? "4.5%" : "6%",
+            top: deviceType === "mobile" ? "1.5%" : deviceType === "tablet" ? "1.8%" : "2%",
+            left: deviceType === "mobile" ? "2.5%" : deviceType === "tablet" ? "1.8%" : "1.5%",
+            width: deviceType === "mobile" ? "24%" : deviceType === "tablet" ? "16%" : "13%",
+            height: deviceType === "mobile" ? "4.5%" : deviceType === "tablet" ? "5.5%" : "6%",
             cursor: "pointer",
             borderRadius: "20px",
             zIndex: 35,
@@ -334,10 +391,30 @@ export default function HomePage() {
             className="island-hotspot"
             onClick={() => setActiveIsland(zone)}
             style={{
-              top: isMobile ? zone.mobileTop : zone.desktopTop,
-              left: isMobile ? zone.mobileLeft : zone.desktopLeft,
-              width: isMobile ? zone.mobileWidth : zone.desktopWidth,
-              height: isMobile ? zone.mobileHeight : zone.desktopHeight,
+              top:
+                deviceType === "mobile"
+                  ? zone.mobileTop
+                  : deviceType === "tablet"
+                  ? zone.tabletTop
+                  : zone.desktopTop,
+              left:
+                deviceType === "mobile"
+                  ? zone.mobileLeft
+                  : deviceType === "tablet"
+                  ? zone.tabletLeft
+                  : zone.desktopLeft,
+              width:
+                deviceType === "mobile"
+                  ? zone.mobileWidth
+                  : deviceType === "tablet"
+                  ? zone.tabletWidth
+                  : zone.desktopWidth,
+              height:
+                deviceType === "mobile"
+                  ? zone.mobileHeight
+                  : deviceType === "tablet"
+                  ? zone.tabletHeight
+                  : zone.desktopHeight,
             }}
           >
             {/* Click to start tag */}
@@ -345,15 +422,20 @@ export default function HomePage() {
               className="hotspot-tag"
               style={{
                 position: "absolute",
-                top: isMobile ? zone.mobileButtonTop : zone.desktopButtonTop,
+                top:
+                  deviceType === "mobile"
+                    ? zone.mobileButtonTop
+                    : deviceType === "tablet"
+                    ? zone.tabletButtonTop
+                    : zone.desktopButtonTop,
                 left: "50%",
                 transform: "translateX(-50%)",
                 background: "rgba(255, 255, 255, 0.95)",
                 color: zone.themeColor,
-                padding: isMobile ? "3px 10px" : "5px 16px",
+                padding: deviceType === "mobile" ? "3px 10px" : "5px 16px",
                 borderRadius: "18px",
                 fontWeight: 900,
-                fontSize: isMobile ? "11px" : "clamp(11px, 1vw, 14px)",
+                fontSize: deviceType === "mobile" ? "11px" : "clamp(11px, 1vw, 14px)",
                 border: `2px solid ${zone.themeColor}`,
                 boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
                 whiteSpace: "nowrap",
