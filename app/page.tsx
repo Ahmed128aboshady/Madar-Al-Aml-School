@@ -70,7 +70,13 @@ export default function LoginPage() {
   /* ── Supabase (dynamic import to avoid SSR issues) ── */
   const [supabase, setSupabase] = useState<import("@supabase/supabase-js").SupabaseClient | null>(null);
   useEffect(() => {
-    import("@/lib/supabase").then((m) => setSupabase(m.supabase));
+    import("@/lib/supabase").then(async (m) => {
+      setSupabase(m.supabase);
+      const { data } = await m.supabase.auth.getSession();
+      if (data?.session) {
+        window.location.href = "/dashboard";
+      }
+    });
   }, []);
 
   /* ── Animation sequence ── */
