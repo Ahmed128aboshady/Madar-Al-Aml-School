@@ -51,52 +51,6 @@ const Bubble = ({ x, size, delay, duration }: { x: number; size: number; delay: 
   />
 );
 
-/* ───── OTP Modal ───── */
-function OtpModal({
-  phone,
-  onClose,
-  onVerify,
-}: {
-  phone: string;
-  onClose: () => void;
-  onVerify: (otp: string) => void;
-}) {
-  const [otp, setOtp] = useState("");
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.5)" }}>
-      <div
-        className="glass-card rounded-3xl p-8 text-center"
-        style={{ width: 320, background: "white" }}
-      >
-        <div style={{ fontSize: 48 }}>📱</div>
-        <h3 style={{ color: "#5B4FA8", fontSize: 20, fontWeight: "bold", margin: "12px 0 8px" }}>
-          كود التحقق
-        </h3>
-        <p style={{ color: "#666", fontSize: 14, marginBottom: 20 }}>
-          أرسلنا كود إلى <strong>{phone}</strong>
-        </p>
-        <input
-          className="kid-input"
-          style={{ textAlign: "center", fontSize: 24, letterSpacing: "0.5em", marginBottom: 16 }}
-          placeholder="_ _ _ _ _ _"
-          maxLength={6}
-          value={otp}
-          onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-        />
-        <button className="kid-btn-primary" style={{ marginBottom: 10 }} onClick={() => onVerify(otp)}>
-          تحقق ✓
-        </button>
-        <button
-          onClick={onClose}
-          style={{ background: "none", border: "none", color: "#999", cursor: "pointer", fontSize: 14 }}
-        >
-          إلغاء
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* ═══════════════════════════════════════════
    MAIN PAGE
 ═══════════════════════════════════════════ */
@@ -106,15 +60,11 @@ export default function LoginPage() {
   const [cloudsVisible, setCloudsVisible] = useState(true);
 
   /* ── Form state ── */
-  const [tab, setTab] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [registerPhone, setRegisterPhone] = useState(""); // رقم تليفون في التسجيل
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showOtp, setShowOtp] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
 
   /* ── Supabase (dynamic import to avoid SSR issues) ── */
@@ -137,24 +87,20 @@ export default function LoginPage() {
   /* ── Handlers ── */
   async function handleEmailAuth() {
     if (!supabase) return;
+    if (!email || !password) {
+      setError("من فضلك أدخل البريد الإلكتروني وكلمة المرور");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
       if (isRegister) {
-        if (!registerPhone) {
-          setError("من فضلك أدخل رقم الهاتف");
-          setLoading(false);
-          return;
-        }
         const { error: e } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            data: { phone: registerPhone },
-          },
         });
         if (e) throw e;
-        setError("✅ تم إنشاء الحساب! تحقق من بريدك الإلكتروني.");
+        setError("✅ تم إنشاء الحساب بنجاح! تفقد بريدك لتأكيد الحساب إذا لزم.");
       } else {
         const { error: e } = await supabase.auth.signInWithPassword({ email, password });
         if (e) throw e;
@@ -178,39 +124,8 @@ export default function LoginPage() {
       });
       if (e) throw e;
     } catch (e: unknown) {
-      setError((e as { message?: string })?.message || "خطأ في تسجيل الدخول بالجيميل");
+      setError((e as { message?: string })?.message || "خطأ في تسجيل الدخول بجوجل");
       setLoading(false);
-    }
-  }
-
-  async function handlePhoneOtp() {
-    if (!supabase || !phone) return;
-    setLoading(true);
-    setError("");
-    try {
-      const { error: e } = await supabase.auth.signInWithOtp({ phone });
-      if (e) throw e;
-      setShowOtp(true);
-    } catch (e: unknown) {
-      setError((e as { message?: string })?.message || "خطأ في إرسال الكود");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleVerifyOtp(otp: string) {
-    if (!supabase) return;
-    setLoading(true);
-    setError("");
-    try {
-      const { error: e } = await supabase.auth.verifyOtp({ phone, token: otp, type: "sms" });
-      if (e) throw e;
-      window.location.href = "/dashboard";
-    } catch (e: unknown) {
-      setError((e as { message?: string })?.message || "كود خاطئ، حاول مجدداً");
-    } finally {
-      setLoading(false);
-      setShowOtp(false);
     }
   }
 
@@ -386,45 +301,12 @@ export default function LoginPage() {
               textAlign: "center",
               color: "#5B4FA8",
               margin: "0 0 20px",
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: 800,
             }}
           >
-            {isRegister ? "✨ حساب جديد" : "👋 أهلاً بك!"}
+            {isRegister ? "✨ إنشاء حساب جديد" : "👋 أهلاً بك!"}
           </h2>
-
-          {/* Tab selector: Email / Phone */}
-          <div
-            style={{
-              display: "flex",
-              background: "rgba(91,79,168,0.1)",
-              borderRadius: 20,
-              padding: 4,
-              marginBottom: 20,
-              gap: 4,
-            }}
-          >
-            {(["email", "phone"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  borderRadius: 16,
-                  border: "none",
-                  cursor: "pointer",
-                  fontWeight: 700,
-                  fontSize: 14,
-                  transition: "all 0.3s",
-                  background: tab === t ? "#5B4FA8" : "transparent",
-                  color: tab === t ? "white" : "#5B4FA8",
-                }}
-              >
-                {t === "email" ? "📧 بريد إلكتروني" : "📱 رقم الهاتف"}
-              </button>
-            ))}
-          </div>
 
           {/* Error message */}
           {error && (
@@ -444,90 +326,54 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* ─ Email Tab ─ */}
-          {tab === "email" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>📧</span>
-                <input
-                  className="kid-input"
-                  type="email"
-                  placeholder="البريد الإلكتروني"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  style={{ paddingRight: 48 }}
-                />
-              </div>
+          {/* ─ Email Form ─ */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ position: "relative" }}>
+              <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>📧</span>
+              <input
+                className="kid-input"
+                type="email"
+                placeholder="البريد الإلكتروني"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{ paddingRight: 48 }}
+              />
+            </div>
 
-              {/* حقل رقم التليفون - يظهر فقط عند التسجيل */}
-              {isRegister && (
-                <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>📱</span>
-                  <input
-                    className="kid-input"
-                    type="tel"
-                    placeholder="رقم الهاتف (مثال: 0501234567)"
-                    value={registerPhone}
-                    onChange={(e) => setRegisterPhone(e.target.value)}
-                    style={{ paddingRight: 48, direction: "ltr", textAlign: "right" }}
-                  />
-                </div>
-              )}
-
-              <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>🔒</span>
-                <input
-                  className="kid-input"
-                  type={showPass ? "text" : "password"}
-                  placeholder="كلمة المرور"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={{ paddingRight: 48, paddingLeft: 48 }}
-                  onKeyDown={(e) => e.key === "Enter" && handleEmailAuth()}
-                />
-                <button
-                  onClick={() => setShowPass(!showPass)}
-                  style={{
-                    position: "absolute",
-                    left: 14,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: 18,
-                    padding: 0,
-                  }}
-                >
-                  {showPass ? "🙈" : "👁️"}
-                </button>
-              </div>
-
-              <button className="kid-btn-primary" onClick={handleEmailAuth} disabled={loading}>
-                {loading ? "⏳ جارٍ التحميل..." : isRegister ? "✨ إنشاء الحساب" : "🚀 تسجيل الدخول"}
+            <div style={{ position: "relative" }}>
+              <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>🔒</span>
+              <input
+                className="kid-input"
+                type={showPass ? "text" : "password"}
+                placeholder="كلمة المرور"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{ paddingRight: 48, paddingLeft: 48 }}
+                onKeyDown={(e) => e.key === "Enter" && handleEmailAuth()}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass(!showPass)}
+                style={{
+                  position: "absolute",
+                  left: 14,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 18,
+                  padding: 0,
+                }}
+              >
+                {showPass ? "🙈" : "👁️"}
               </button>
             </div>
-          )}
 
-          {/* ─ Phone Tab ─ */}
-          {tab === "phone" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>📱</span>
-                <input
-                  className="kid-input"
-                  type="tel"
-                  placeholder="+966 5X XXX XXXX"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  style={{ paddingRight: 48, direction: "ltr", textAlign: "left" }}
-                />
-              </div>
-              <button className="kid-btn-primary" onClick={handlePhoneOtp} disabled={loading}>
-                {loading ? "⏳ جارٍ الإرسال..." : "📨 إرسال كود التحقق"}
-              </button>
-            </div>
-          )}
+            <button className="kid-btn-primary" onClick={handleEmailAuth} disabled={loading}>
+              {loading ? "⏳ جارٍ التحميل..." : isRegister ? "✨ إنشاء الحساب" : "🚀 تسجيل الدخول"}
+            </button>
+          </div>
 
           {/* ─ Divider ─ */}
           <div
@@ -581,11 +427,6 @@ export default function LoginPage() {
             ⭐🌙✨🌟💫
           </div>
         </div>
-      )}
-
-      {/* OTP Modal */}
-      {showOtp && (
-        <OtpModal phone={phone} onClose={() => setShowOtp(false)} onVerify={handleVerifyOtp} />
       )}
     </div>
   );
