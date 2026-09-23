@@ -1002,12 +1002,11 @@ export default function HomePage() {
               position: "relative",
             }}
           >
-            <div style={{ fontSize: 48, marginBottom: 6 }}>🔒✨</div>
             <h2 style={{ color: "#475569", margin: "0 0 10px", fontSize: 21, fontWeight: 900 }}>
-              هذه الجزيرة مقفلة حالياً!
+              هذه الجزيرة مقفلة حالياً
             </h2>
             <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
-              يا بطل! عليك أولاً إكمال مغامرة <strong>{lockedNoticeZone.prevZone.title}</strong> لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong> السحرية! 🌟
+              يا بطل! عليك أولاً إكمال مغامرة <strong>{lockedNoticeZone.prevZone.title}</strong> لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong> السحرية!
             </p>
 
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
@@ -1029,7 +1028,7 @@ export default function HomePage() {
                   boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
                 }}
               >
-                الذهاب لـ {lockedNoticeZone.prevZone.title} 🚀
+                الذهاب إلى {lockedNoticeZone.prevZone.title}
               </button>
 
               <button
@@ -1045,7 +1044,7 @@ export default function HomePage() {
                   cursor: "pointer",
                 }}
               >
-                حسناً 👍
+                حسناً
               </button>
             </div>
           </div>
@@ -1071,24 +1070,23 @@ export default function HomePage() {
               position: "relative",
             }}
           >
-            <div style={{ fontSize: 56, marginBottom: 6 }}>🏆🎊⭐</div>
-            <h2 style={{ color: "#D97706", margin: "0 0 10px", fontSize: 23, fontWeight: 900 }}>
+            <h2 style={{ color: "#D97706", margin: "0 0 12px", fontSize: 23, fontWeight: 900 }}>
               أحسنت يا بطل! عمل رائع!
             </h2>
             <p style={{ color: "#4B5563", fontSize: 15, lineHeight: 1.6, marginBottom: 22 }}>
-              لقد أتممت مغامرة <strong>{celebrationModal.completedZone.title}</strong> بنجاح وحصلت على وسام الشجاعة! ⭐
+              لقد أتممت مغامرة <strong>{celebrationModal.completedZone.title}</strong> بنجاح وحصلت على وسام الشجاعة!
               {celebrationModal.nextZone ? (
                 <>
                   <br />
-                  <span style={{ color: "#059669", fontWeight: 800, display: "inline-block", marginTop: 6 }}>
-                    🔓 تم فتح جزيرة «{celebrationModal.nextZone.title}» الآن!
+                  <span style={{ color: "#059669", fontWeight: 800, display: "inline-block", marginTop: 8 }}>
+                    تم فتح جزيرة «{celebrationModal.nextZone.title}» الآن!
                   </span>
                 </>
               ) : (
                 <>
                   <br />
-                  <span style={{ color: "#7C3AED", fontWeight: 800, display: "inline-block", marginTop: 6 }}>
-                    👑 مبروك! لقد أنهيت جميع الجزر السحرية وأصبحت بطل المدار!
+                  <span style={{ color: "#7C3AED", fontWeight: 800, display: "inline-block", marginTop: 8 }}>
+                    مبروك! لقد أنهيت جميع الجزر السحرية وأصبحت بطل المدار!
                   </span>
                 </>
               )}
@@ -1114,7 +1112,7 @@ export default function HomePage() {
                     boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
                   }}
                 >
-                  انتقل لـ {celebrationModal.nextZone.title} 🚀
+                  انتقل إلى {celebrationModal.nextZone.title}
                 </button>
               ) : null}
 
@@ -1131,7 +1129,7 @@ export default function HomePage() {
                   cursor: "pointer",
                 }}
               >
-                العودة للخريطة 🗺️
+                العودة للخريطة
               </button>
             </div>
           </div>
