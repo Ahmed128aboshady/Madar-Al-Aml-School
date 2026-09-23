@@ -121,14 +121,25 @@ export default function LoginPage() {
           },
         });
         if (e) throw e;
+
+        // إذا كان البريد مسجل مسبقاً، ترجع سوبابيز identities فارغة
+        if (data?.user?.identities && data.user.identities.length === 0) {
+          setError("⚠️ هذا الإيميل مسجل لدينا بالفعل! اضغط على 'لديك حساب؟ سجّل دخولك' للدخول بكلمة المرور أو بزر Google.");
+          return;
+        }
+
         setOtpMode(true);
-        setError("✅ تم إنشاء الحساب وإرسال كود التحقق بنجاح! تفقد بريدك الوارد (Inbox) أو الرسائل غير الهامة (Spam).");
+        setError("✅ تم إرسال رسالة التأكيد والكود إلى بريدك! تفقد صندوق الوارد (Inbox) أو الرسائل غير الهامة (Spam).");
       } else {
         const { error: e } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (e) {
           if (e.message.toLowerCase().includes("email not confirmed")) {
             setOtpMode(true);
-            setError("⚠️ الحساب مسجل ولكن يحتاج لتأكيد البريد. تم إرسال كود التحقق، أدخله لتفعيل الحساب.");
+            setError("⚠️ الحساب مسجل ولكن بانتظار التأكيد. تم إرسال رسالة التأكيد، أدخل الكود أو اضغط رابط الإيميل.");
+            return;
+          }
+          if (e.message.toLowerCase().includes("invalid login credentials")) {
+            setError("❌ البريد الإلكتروني أو كلمة المرور غير صحيحة، أو ربما قمت بالتسجيل سابقاً عبر حساب Google.");
             return;
           }
           throw e;
