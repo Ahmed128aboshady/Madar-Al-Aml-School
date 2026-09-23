@@ -392,7 +392,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
         style={{
           position: "relative",
           zIndex: 60,
-          padding: deviceType === "mobile" ? "8px 12px" : "12px 24px",
+          padding: deviceType === "mobile" ? "8px 16px" : "12px 24px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -402,52 +402,30 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
           boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
         }}
       >
-        {/* Right side: Madar Al Amal Logo + Back to Map Button */}
-        <div style={{ display: "flex", alignItems: "center", gap: deviceType === "mobile" ? 6 : 10 }}>
-          <div
-            onClick={onBackToMap}
-            style={{
-              position: "relative",
-              width: deviceType === "mobile" ? 54 : 76,
-              height: deviceType === "mobile" ? 28 : 36,
-              cursor: "pointer",
-              flexShrink: 0,
-            }}
-            title="مدار الأمل - العودة للخريطة"
-          >
-            <Image src="/logo.png" alt="مدار الأمل" fill style={{ objectFit: "contain" }} priority />
-          </div>
-
-          <button
-            onClick={onBackToMap}
-            style={{
-              background: "#4F46E5",
-              color: "white",
-              border: "none",
-              borderRadius: "20px",
-              padding: deviceType === "mobile" ? "5px 11px" : "8px 20px",
-              fontSize: deviceType === "mobile" ? "11px" : "14px",
-              fontWeight: 800,
-              cursor: "pointer",
-              boxShadow: "0 4px 12px rgba(79, 70, 229, 0.3)",
-              transition: "transform 0.15s ease",
-              whiteSpace: "nowrap",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          >
-            خريطة الجزر
-          </button>
+        {/* Right side (RTL start): Madar Al Amal Logo */}
+        <div
+          onClick={onBackToMap}
+          style={{
+            position: "relative",
+            width: deviceType === "mobile" ? 64 : 88,
+            height: deviceType === "mobile" ? 32 : 44,
+            cursor: "pointer",
+            flexShrink: 0,
+          }}
+          title="مدار الأمل - العودة للخريطة"
+        >
+          <Image src="/logo.png" alt="مدار الأمل" fill style={{ objectFit: "contain" }} priority />
         </div>
 
-        {/* Island Title */}
-        <div style={{ textAlign: "center" }}>
+        {/* Left side (RTL end / "وعلي الشمال اسم الجزيرة"): Island Title */}
+        <div style={{ textAlign: "left" }}>
           <div
             style={{
               fontSize: deviceType === "mobile" ? "16px" : "20px",
               fontWeight: 900,
               color: "#E07820",
               textShadow: "0 1px 2px rgba(255,255,255,0.9)",
+              lineHeight: 1.2,
             }}
           >
             جزيرة الحيوانات
@@ -457,42 +435,10 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
               fontSize: deviceType === "mobile" ? "11px" : "13px",
               fontWeight: 700,
               color: "#6B7280",
-            }}
-          >
-            الحيوان {currentIndex + 1} من {ANIMALS_DATA.length}
-          </div>
-        </div>
-
-        {/* Score & Progress Badge */}
-        <div
-          style={{
-            background: "rgba(254, 243, 199, 0.95)",
-            border: "2px solid #F59E0B",
-            borderRadius: "20px",
-            padding: deviceType === "mobile" ? "4px 10px" : "6px 16px",
-            textAlign: "center",
-            boxShadow: "0 2px 8px rgba(245, 158, 11, 0.2)",
-          }}
-        >
-          <div
-            style={{
-              fontSize: deviceType === "mobile" ? "11px" : "13px",
-              fontWeight: 900,
-              color: "#B45309",
               lineHeight: 1.2,
             }}
           >
-            الدرجة: {completedAnimalIds.length} من {ANIMALS_DATA.length}
-          </div>
-          <div
-            style={{
-              fontSize: deviceType === "mobile" ? "9px" : "11px",
-              fontWeight: 800,
-              color: "#D97706",
-              lineHeight: 1.1,
-            }}
-          >
-            ({Math.round((completedAnimalIds.length / ANIMALS_DATA.length) * 100)}%)
+            الحيوان {currentIndex + 1} من {ANIMALS_DATA.length}
           </div>
         </div>
       </div>
@@ -976,6 +922,81 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
               );
             })()}
           </div>
+        </div>
+      </div>
+
+      {/* ── Bottom Bar: Map Button & Score ── */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 60,
+          background: "rgba(255, 255, 255, 0.92)",
+          backdropFilter: "blur(12px)",
+          borderTop: "1.5px solid rgba(226, 232, 240, 0.9)",
+          boxShadow: "0 -4px 16px rgba(0,0,0,0.06)",
+          padding: deviceType === "mobile" ? "8px 14px" : "10px 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexShrink: 0,
+        }}
+      >
+        {/* Right side (RTL start): Back to Map Button */}
+        <button
+          onClick={onBackToMap}
+          style={{
+            background: "#4F46E5",
+            color: "white",
+            border: "none",
+            borderRadius: "20px",
+            padding: deviceType === "mobile" ? "7px 16px" : "9px 22px",
+            fontSize: deviceType === "mobile" ? "12px" : "14px",
+            fontWeight: 800,
+            cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(79, 70, 229, 0.3)",
+            transition: "transform 0.15s ease",
+            whiteSpace: "nowrap",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.04)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        >
+          خريطة الكنز
+        </button>
+
+        {/* Left side (RTL end): Score Badge */}
+        <div
+          style={{
+            background: "rgba(254, 243, 199, 0.95)",
+            border: "1.5px solid #F59E0B",
+            borderRadius: "20px",
+            padding: deviceType === "mobile" ? "5px 12px" : "6px 18px",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            boxShadow: "0 2px 8px rgba(245, 158, 11, 0.2)",
+          }}
+        >
+          <span
+            style={{
+              fontSize: deviceType === "mobile" ? "12px" : "14px",
+              fontWeight: 900,
+              color: "#B45309",
+            }}
+          >
+            الدرجة: {completedAnimalIds.length} من {ANIMALS_DATA.length}
+          </span>
+          <span
+            style={{
+              fontSize: deviceType === "mobile" ? "10px" : "12px",
+              fontWeight: 800,
+              color: "#D97706",
+              background: "#FDE68A",
+              padding: "2px 7px",
+              borderRadius: "10px",
+            }}
+          >
+            {Math.round((completedAnimalIds.length / ANIMALS_DATA.length) * 100)}%
+          </span>
         </div>
       </div>
 
