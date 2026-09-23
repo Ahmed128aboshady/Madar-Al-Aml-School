@@ -500,9 +500,47 @@ export default function HomePage() {
                     ? zone.tabletHeight
                     : zone.desktopHeight,
                 cursor: "pointer",
-                filter: isUnlocked ? "none" : "brightness(0.92)",
+                borderRadius: "36px",
+                // تأثير تحويل الجزيرة المقفلة إلى الأبيض والأسود (بدون ألوان)
+                backdropFilter: !isUnlocked
+                  ? "grayscale(100%) contrast(0.85) brightness(0.82)"
+                  : "none",
+                WebkitBackdropFilter: !isUnlocked
+                  ? "grayscale(100%) contrast(0.85) brightness(0.82)"
+                  : "none",
+                backgroundColor: !isUnlocked ? "rgba(30, 41, 59, 0.22)" : "transparent",
+                boxShadow: !isUnlocked
+                  ? "inset 0 0 24px rgba(0, 0, 0, 0.25), 0 4px 16px rgba(0,0,0,0.15)"
+                  : "none",
+                transition: "all 0.5s ease",
               }}
             >
+              {/* Floating lock badge in center of locked island */}
+              {!isUnlocked && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "42%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    background: "rgba(15, 23, 42, 0.82)",
+                    border: "2.5px solid rgba(255, 255, 255, 0.8)",
+                    borderRadius: "50%",
+                    width: deviceType === "mobile" ? 38 : 52,
+                    height: deviceType === "mobile" ? 38 : 52,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: deviceType === "mobile" ? 20 : 26,
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.45)",
+                    pointerEvents: "none",
+                  }}
+                  title="جزيرة مقفلة"
+                >
+                  🔒
+                </div>
+              )}
+
               {/* Click to start tag / Locked tag / Completed tag */}
               <div
                 className="hotspot-tag"
