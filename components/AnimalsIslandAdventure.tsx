@@ -16,64 +16,134 @@ export interface AnimalItem {
 
 const ANIMALS_DATA: AnimalItem[] = [
   {
-    id: "lion",
-    name: "الأسد",
-    emoji: "🦁",
-    soundCue: "زئير الأسد القوي",
-    color: "#E07820",
-    fact: "الأسد هو ملك الغابة الشجاع، يعيش في مجموعات تسمى عائلة الأسود ويحب النوم تحت ظلال الأشجار!",
-    options: ["الأسد", "الفيل", "الزرافة"],
-    videoUrl: "/videos/animals/lion.mp4",
+    id: "cat",
+    name: "قطة",
+    emoji: "🐱",
+    soundCue: "مواء القطة اللطيف",
+    color: "#EA580C",
+    fact: "القطة حيوان أليف لطيف يحب اللعب بالكرات الصغيرة وينظف نفسه بلسانه!",
+    options: ["قطة", "كلب", "عصفور"],
+    videoUrl: "/videos/animals/cat.mp4",
   },
   {
-    id: "elephant",
-    name: "الفيل",
-    emoji: "🐘",
-    soundCue: "صوت خرطوم الفيل",
-    color: "#4F46E5",
-    fact: "الفيل هو أضخم حيوان يعيش على اليابسة، وخرطومه الطويل يساعده في الشرب وتناول أوراق الأشجار!",
-    options: ["الحصان", "الفيل", "الخروف"],
-    videoUrl: "/videos/animals/elephant.mp4",
-  },
-  {
-    id: "monkey",
-    name: "القرد",
-    emoji: "🐒",
-    soundCue: "ضحكات وصيحات القرد",
-    color: "#D97706",
-    fact: "القرد ذكي جداً ومرح، يحب القفز بين أغصان الأشجار وتناول الفواكه والموز اللذيذ!",
-    options: ["القرد", "الأسد", "القط"],
-    videoUrl: "/videos/animals/monkey.mp4",
-  },
-  {
-    id: "giraffe",
-    name: "الزرافة",
-    emoji: "🦒",
-    soundCue: "خطوات الزرافة اللطيفة",
-    color: "#CA8A04",
-    fact: "الزرافة هي أطول حيوان في العالم، وعنقها الطويل يمكنها من تناول أوراق أعلى قمم الأشجار!",
-    options: ["الفيل", "الزرافة", "الدب"],
-    videoUrl: "/videos/animals/giraffe.mp4",
+    id: "dog",
+    name: "كلب",
+    emoji: "🐶",
+    soundCue: "نباح الكلب الوفي",
+    color: "#B45309",
+    fact: "الكلب صديق وفي وذكي يحب مساعدة الإنسان وحراسة المنزل والمرح في الحديقة!",
+    options: ["خروف", "كلب", "حصان"],
+    videoUrl: "/videos/animals/dog.mp4",
   },
   {
     id: "horse",
-    name: "الحصان",
+    name: "حصان",
     emoji: "🐴",
     soundCue: "صهيل الحصان السريع",
     color: "#059669",
-    fact: "الحصان حيوان سريع ورشيق وصديق مخلص للإنسان منذ قديم الزمان، ويحب الجري في المروج الخضراء!",
-    options: ["الحصان", "النمر", "الثعلب"],
+    fact: "الحصان حيوان رشيق وسريع وله شعر ناعم، ويحب الجري في المروج الخضراء الواسعة!",
+    options: ["حصان", "بقرة", "أسد"],
     videoUrl: "/videos/animals/horse.mp4",
   },
   {
     id: "sheep",
-    name: "الخروف",
+    name: "خروف",
     emoji: "🐑",
     soundCue: "مأمأة الخروف الوديع",
     color: "#0284C7",
-    fact: "الخروف حيوان لطيف وهادئ، يعطينا الصوف الدافئ الجميل لصنع الملابس الشتوية!",
-    options: ["الخروف", "القرد", "الغزال"],
+    fact: "الخروف حيوان هادئ ولطيف يعطينا الصوف الدافئ الجميل لصنع الملابس الشتوية!",
+    options: ["بطة", "خروف", "دب"],
     videoUrl: "/videos/animals/sheep.mp4",
+  },
+  {
+    id: "cow",
+    name: "بقرة",
+    emoji: "🐮",
+    soundCue: "خوار البقرة المفيدة",
+    color: "#4F46E5",
+    fact: "البقرة تعيش في المزرعة الجميلة وتمنحنا الحليب الطازج اللذيذ لنصنع منه الجبن والزبادي!",
+    options: ["بقرة", "حصان", "زرافة"],
+    videoUrl: "/videos/animals/cow.mp4",
+  },
+  {
+    id: "duck",
+    name: "بطة",
+    emoji: "🦆",
+    soundCue: "بطبطة البطة في الماء",
+    color: "#0D9488",
+    fact: "البطة طائر مائي ماهر يحب السباحة في البحيرات مع صغارها اللطيفين وريشها لا يبتل بالماء!",
+    options: ["ديك", "بطة", "سمكة"],
+    videoUrl: "/videos/animals/duck.mp4",
+  },
+  {
+    id: "rooster",
+    name: "ديك",
+    emoji: "🐓",
+    soundCue: "صياح الديك النشيط في الصباح",
+    color: "#DC2626",
+    fact: "الديك طائر جميل ذو ريش ملون وعرف أحمر رائع، يستيقظ مبكراً ليوقظ المزرعة كلها بصياحه!",
+    options: ["عصفور", "ديك", "قطة"],
+    videoUrl: "/videos/animals/rooster.mp4",
+  },
+  {
+    id: "bird",
+    name: "عصفور",
+    emoji: "🐦",
+    soundCue: "تغريد وزقزقة العصفور العذبة",
+    color: "#2563EB",
+    fact: "العصفور طائر صغير مغرد يبني عشه الجميل فوق أغصان الأشجار ويطير بخفة ورشاقة في السماء!",
+    options: ["عصفور", "بطة", "سمكة"],
+    videoUrl: "/videos/animals/bird.mp4",
+  },
+  {
+    id: "fish",
+    name: "سمكة",
+    emoji: "🐟",
+    soundCue: "سباحة السمكة الهادئة",
+    color: "#06B6D4",
+    fact: "السمكة تعيش وتتنفس تحت الماء وتسبح باستخدام زعانفها الجميلة وألوانها تبهر الأنظار!",
+    options: ["سمكة", "دب", "نمر"],
+    videoUrl: "/videos/animals/fish.mp4",
+  },
+  {
+    id: "lion",
+    name: "أسد",
+    emoji: "🦁",
+    soundCue: "زئير الأسد القوي",
+    color: "#E07820",
+    fact: "الأسد هو ملك الغابة الشجاع ذو اللبدة الذهبية، قوي جداً ويعيش في البراري الواسعة!",
+    options: ["نمر", "أسد", "دب"],
+    videoUrl: "/videos/animals/lion.mp4",
+  },
+  {
+    id: "bear",
+    name: "دب",
+    emoji: "🐻",
+    soundCue: "زمجرة الدب الضخم",
+    color: "#78350F",
+    fact: "الدب حيوان قوي وضخم وله فرو كثيف دافئ، يحب صيد الأسماك وتناول العسل اللذيذ من خلايا النحل!",
+    options: ["دب", "أسد", "حصان"],
+    videoUrl: "/videos/animals/bear.mp4",
+  },
+  {
+    id: "tiger",
+    name: "نمر",
+    emoji: "🐯",
+    soundCue: "زئير النمر الرشيق",
+    color: "#D97706",
+    fact: "النمر حيوان سريع جداً ومخطط بخطوط برتقالية وسوداء مميزة، ويجيد السباحة وتسلق الأشجار!",
+    options: ["قطة", "نمر", "أسد"],
+    videoUrl: "/videos/animals/tiger.mp4",
+  },
+  {
+    id: "giraffe",
+    name: "زرافة",
+    emoji: "🦒",
+    soundCue: "خطوات الزرافة الرشيقة",
+    color: "#CA8A04",
+    fact: "الزرافة هي أطول كائن على الأرض، عنقها الطويل المزين ببقع ملونة يساعدها في الوصول لأعلى الأشجار!",
+    options: ["بقرة", "زرافة", "حصان"],
+    videoUrl: "/videos/animals/giraffe.mp4",
   },
 ];
 
@@ -177,7 +247,16 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const animalNavRef = useRef<HTMLDivElement>(null);
   const currentAnimal = ANIMALS_DATA[currentIndex];
+
+  // Auto-scroll active animal into view
+  useEffect(() => {
+    if (animalNavRef.current) {
+      const activeEl = animalNavRef.current.children[currentIndex] as HTMLElement | undefined;
+      activeEl?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, [currentIndex]);
 
   // Reset state when animal index changes
   useEffect(() => {
@@ -367,16 +446,21 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
 
       {/* ── Animal Step Navigator (حيوان حيوان) ── */}
       <div
+        ref={animalNavRef}
         style={{
           position: "relative",
           zIndex: 60,
-          padding: deviceType === "mobile" ? "6px 8px" : "8px 16px",
+          padding: deviceType === "mobile" ? "8px 12px" : "10px 20px",
           display: "flex",
-          justifyContent: "center",
-          gap: deviceType === "mobile" ? 6 : 10,
+          justifyContent: "flex-start",
+          alignItems: "center",
+          gap: deviceType === "mobile" ? 8 : 12,
           overflowX: "auto",
-          background: "rgba(255, 255, 255, 0.5)",
-          backdropFilter: "blur(6px)",
+          WebkitOverflowScrolling: "touch",
+          background: "rgba(255, 255, 255, 0.6)",
+          backdropFilter: "blur(8px)",
+          borderBottom: "1px solid rgba(226, 232, 240, 0.6)",
+          scrollbarWidth: "none",
         }}
       >
         {ANIMALS_DATA.map((animal, idx) => {
