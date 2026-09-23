@@ -192,6 +192,42 @@ function getIslandStatus(zoneId: string, completed: string[], animalsProgressCou
   return { index, isUnlocked, isCompleted, previousZone, nextZone };
 }
 
+const ANIMAL_NAMES_MAP: Record<string, string> = {
+  cat: "القطة",
+  dog: "الكلب",
+  horse: "الحصان",
+  sheep: "الخروف",
+  cow: "البقرة",
+  lion: "الأسد",
+  elephant: "الفيل",
+  monkey: "القرد",
+  rabbit: "الأرنب",
+  bird: "العصفور",
+  duck: "البطة",
+  giraffe: "الزرافة",
+  bear: "الدب",
+};
+
+export function calculateHeroCycle(animalIds: string[]) {
+  const uniqueIds = Array.from(new Set(animalIds || []));
+  const count = uniqueIds.length;
+  // 80% من جزيرة الحيوانات (10 من 13) لفتح الجزيرة التالية
+  const isAnimalsComplete = count >= 10;
+  const trueCompletedIslands = isAnimalsComplete ? ["animals"] : [];
+  const percent = Math.min(100, Math.round((count / 13) * 100));
+  const remainingForVegetables = Math.max(0, 10 - count);
+  const solvedNames = uniqueIds.map((id) => ANIMAL_NAMES_MAP[id] || id);
+  return {
+    uniqueIds,
+    count,
+    isAnimalsComplete,
+    trueCompletedIslands,
+    percent,
+    remainingForVegetables,
+    solvedNames,
+  };
+}
+
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<import("@supabase/supabase-js").User | null>(null);
   const [activeIsland, setActiveIsland] = useState<IslandZone | null>(null);
@@ -199,9 +235,10 @@ export default function HomePage() {
   const [deviceType, setDeviceType] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [checkingAuth, setCheckingAuth] = useState(true);
 
-  // نظام تقدم الجزر وفتحها بالتسلسل
+  // نظام دورة تقدم الجزر وتقدم البطل (Cycle)
   const [completedIslands, setCompletedIslands] = useState<string[]>([]);
   const [animalsProgressCount, setAnimalsProgressCount] = useState<number>(0);
+  const [animalsCompletedIds, setAnimalsCompletedIds] = useState<string[]>([]);
   const [lockedNoticeZone, setLockedNoticeZone] = useState<{ zone: IslandZone; prevZone: IslandZone } | null>(null);
   const [celebrationModal, setCelebrationModal] = useState<{ completedZone: IslandZone; nextZone: IslandZone | null } | null>(null);
 
@@ -214,25 +251,26 @@ export default function HomePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
-    // استرجاع تقدم الجزر وتقدم الحيوانات من الذاكرة المحلية أولاً
+    // 1. دورة حساب التقدم المحلي فور تشغيل المتصفح
+    let localAnimalIds: string[] = [];
     try {
-      if (localStorage.getItem("madar_lock_all_v4") !== "locked") {
-        localStorage.setItem("madar_lock_all_v4", "locked");
+      if (localStorage.getItem("madar_lock_v5") !== "active") {
+        localStorage.setItem("madar_lock_v5", "active");
         localStorage.removeItem("madar_completed_islands");
-        setCompletedIslands([]);
-      } else {
-        const saved = localStorage.getItem("madar_completed_islands");
-        if (saved) {
-          setCompletedIslands(JSON.parse(saved));
-        }
       }
       const savedAnimals = localStorage.getItem("madar_animals_completed_ids");
       if (savedAnimals) {
         const parsed = JSON.parse(savedAnimals);
-        if (Array.isArray(parsed)) {
-          setAnimalsProgressCount(parsed.length);
-        }
+        if (Array.isArray(parsed)) localAnimalIds = parsed;
       }
+    } catch {}
+
+    const initCycle = calculateHeroCycle(localAnimalIds);
+    setAnimalsCompletedIds(initCycle.uniqueIds);
+    setAnimalsProgressCount(initCycle.count);
+    setCompletedIslands(initCycle.trueCompletedIslands);
+    try {
+      localStorage.setItem("madar_completed_islands", JSON.stringify(initCycle.trueCompletedIslands));
     } catch {}
 
     function checkOrientation() {
@@ -263,37 +301,33 @@ export default function HomePage() {
           setParentPhone(meta.parent_phone || meta.phone || "");
           setParentCity(meta.parent_city || "");
 
-          // مزامنة تقدم الحيوانات بدقة بين المتصفح و Supabase
-          let curAnimalsCount = 0;
-          const savedAnimals = localStorage.getItem("madar_animals_completed_ids");
-          if (savedAnimals) {
-            try {
-              const parsed = JSON.parse(savedAnimals);
-              if (Array.isArray(parsed)) curAnimalsCount = parsed.length;
-            } catch {}
+          // 2. دورة حساب ومزامنة حساب المستخدم السحابي (Supabase Cycle)
+          let serverAnimalIds: string[] = [];
+          if (Array.isArray(meta.animals_completed_ids)) {
+            serverAnimalIds = meta.animals_completed_ids;
           }
-          if (typeof meta.animals_progress_count === "number" && meta.animals_progress_count > curAnimalsCount) {
-            curAnimalsCount = meta.animals_progress_count;
-            if (Array.isArray(meta.animals_completed_ids)) {
-              try {
-                localStorage.setItem("madar_animals_completed_ids", JSON.stringify(meta.animals_completed_ids));
-              } catch {}
-            }
-          }
-          setAnimalsProgressCount(curAnimalsCount);
+          // دمج الحيوانات المحلولة بدون تكرار
+          const mergedAnimalIds = Array.from(new Set([...localAnimalIds, ...serverAnimalIds]));
+          const accountCycle = calculateHeroCycle(mergedAnimalIds);
 
-          // استرجاع الجزر المكتملة مع التأكد من قفل جميع الجزر طالما لم ينجز 80% من الحيوانات
+          setAnimalsCompletedIds(accountCycle.uniqueIds);
+          setAnimalsProgressCount(accountCycle.count);
+          setCompletedIslands(accountCycle.trueCompletedIslands);
+
+          // تصحيح فوري وتحديث شامل في Supabase و localStorage
           try {
-            if (curAnimalsCount < 10) {
-              setCompletedIslands([]);
-              localStorage.removeItem("madar_completed_islands");
-              await supabase.auth.updateUser({
-                data: { completed_islands: [] },
-              });
-            } else if (Array.isArray(meta.completed_islands) && meta.completed_islands.length > 0) {
-              setCompletedIslands(meta.completed_islands);
-            }
-          } catch {}
+            localStorage.setItem("madar_animals_completed_ids", JSON.stringify(accountCycle.uniqueIds));
+            localStorage.setItem("madar_completed_islands", JSON.stringify(accountCycle.trueCompletedIslands));
+            await supabase.auth.updateUser({
+              data: {
+                animals_progress_count: accountCycle.count,
+                animals_completed_ids: accountCycle.uniqueIds,
+                completed_islands: accountCycle.trueCompletedIslands,
+              },
+            });
+          } catch (syncErr) {
+            console.error("Cycle sync error:", syncErr);
+          }
         } else {
           // If not logged in, redirect to login page
           window.location.href = "/login";
@@ -386,9 +420,10 @@ export default function HomePage() {
   }
 
   async function handleResetProgress() {
-    if (!confirm("هل تريد إعادة قفل الجزر من البداية للتجربة؟ ستفتح الجزيرة الأولى فقط.")) return;
+    if (!confirm("هل تريد إعادة قفل الجزر وبدء التقدم من الصفر للتجربة؟ ستفتح جزيرة الحيوانات فقط.")) return;
     setCompletedIslands([]);
     setAnimalsProgressCount(0);
+    setAnimalsCompletedIds([]);
     try {
       localStorage.removeItem("madar_completed_islands");
       localStorage.removeItem("madar_animals_completed_ids");
@@ -396,10 +431,12 @@ export default function HomePage() {
       await supabase.auth.updateUser({
         data: {
           completed_islands: [],
+          animals_progress_count: 0,
+          animals_completed_ids: [],
         },
       });
     } catch {}
-    alert("تمت إعادة تعيين الجزر بنجاح! جزيرة الحيوانات فقط مفتوحة وباقي الجزر مقفلة.");
+    alert("تمت إعادة تعيين التقدم بنجاح! جزيرة الحيوانات فقط مفتوحة وباقي الجزر مقفلة.");
   }
 
   if (checkingAuth) {
@@ -471,11 +508,11 @@ export default function HomePage() {
         <div
           style={{
             position: "absolute",
-            top: deviceType === "mobile" ? "8px" : deviceType === "tablet" ? "12px" : "18px",
+            top: deviceType === "mobile" ? "8px" : deviceType === "tablet" ? "12px" : "16px",
             left: "50%",
             transform: "translateX(-50%)",
-            width: deviceType === "mobile" ? "120px" : deviceType === "tablet" ? "170px" : "220px",
-            height: deviceType === "mobile" ? "42px" : deviceType === "tablet" ? "58px" : "75px",
+            width: deviceType === "mobile" ? "120px" : deviceType === "tablet" ? "220px" : "360px",
+            height: deviceType === "mobile" ? "42px" : deviceType === "tablet" ? "74px" : "120px",
             zIndex: 25,
             pointerEvents: "none",
             filter: "drop-shadow(0 4px 14px rgba(255, 255, 255, 0.85)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12))",
@@ -625,10 +662,10 @@ export default function HomePage() {
         <footer
           style={{
             position: "absolute",
-            bottom: deviceType === "mobile" ? "6px" : deviceType === "tablet" ? "14px" : "20px",
+            bottom: deviceType === "mobile" ? "6px" : deviceType === "tablet" ? "14px" : "18px",
             left: 0,
             right: 0,
-            height: deviceType === "mobile" ? "98px" : deviceType === "tablet" ? "145px" : "195px",
+            height: deviceType === "mobile" ? "98px" : deviceType === "tablet" ? "150px" : "240px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -641,7 +678,7 @@ export default function HomePage() {
             onClick={handleSignOut}
             style={{
               position: "absolute",
-              right: deviceType === "mobile" ? "10px" : deviceType === "tablet" ? "28px" : "48px",
+              right: deviceType === "mobile" ? "10px" : deviceType === "tablet" ? "24px" : "48px",
               bottom: deviceType === "mobile" ? "14px" : deviceType === "tablet" ? "22px" : "32px",
               fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
               background: "linear-gradient(135deg, #FF6584, #FF4568)",
@@ -649,7 +686,7 @@ export default function HomePage() {
               border: deviceType === "mobile" ? "2.5px solid white" : "3.5px solid white",
               borderRadius: deviceType === "mobile" ? "24px" : "36px",
               padding: deviceType === "mobile" ? "6px 14px" : deviceType === "tablet" ? "10px 24px" : "14px 34px",
-              fontSize: deviceType === "mobile" ? "13px" : deviceType === "tablet" ? "16px" : "20px",
+              fontSize: deviceType === "mobile" ? "13px" : deviceType === "tablet" ? "16px" : "21px",
               fontWeight: 800,
               cursor: "pointer",
               boxShadow: "0 6px 18px rgba(255, 69, 104, 0.4)",
@@ -671,14 +708,14 @@ export default function HomePage() {
                 deviceType === "mobile"
                   ? "clamp(240px, 66vw, 275px)"
                   : deviceType === "tablet"
-                  ? "380px"
-                  : "500px",
+                  ? "420px"
+                  : "740px",
               height:
                 deviceType === "mobile"
                   ? "94px"
                   : deviceType === "tablet"
-                  ? "130px"
-                  : "175px",
+                  ? "145px"
+                  : "235px",
               pointerEvents: "none",
               display: "flex",
               alignItems: "center",
@@ -701,7 +738,7 @@ export default function HomePage() {
                 alignItems: "center",
                 justifyContent: "center",
                 textAlign: "center",
-                paddingTop: deviceType === "mobile" ? "2px" : deviceType === "tablet" ? "6px" : "10px",
+                paddingTop: deviceType === "mobile" ? "2px" : deviceType === "tablet" ? "6px" : "14px",
               }}
             >
               <div
@@ -711,20 +748,20 @@ export default function HomePage() {
                     deviceType === "mobile"
                       ? "18px"
                       : deviceType === "tablet"
-                      ? "25px"
-                      : "34px",
+                      ? "26px"
+                      : "46px",
                   fontWeight: 900,
                   color: "#E11D48",
                   textShadow: `
-                    -2px -2px 0 #ffffff,
-                     2px -2px 0 #ffffff,
-                    -2px  2px 0 #ffffff,
-                     2px  2px 0 #ffffff,
-                     0px  3px 0 #ffffff,
-                     0px -3px 0 #ffffff,
-                    -3px  0px 0 #ffffff,
-                     3px  0px 0 #ffffff,
-                     0 5px 12px rgba(0, 0, 0, 0.22)
+                    -2.5px -2.5px 0 #ffffff,
+                     2.5px -2.5px 0 #ffffff,
+                    -2.5px  2.5px 0 #ffffff,
+                     2.5px  2.5px 0 #ffffff,
+                     0px  3.5px 0 #ffffff,
+                     0px -3.5px 0 #ffffff,
+                    -3.5px  0px 0 #ffffff,
+                     3.5px  0px 0 #ffffff,
+                     0 6px 14px rgba(0, 0, 0, 0.22)
                   `,
                   lineHeight: 1.15,
                   whiteSpace: "nowrap",
@@ -741,21 +778,21 @@ export default function HomePage() {
                       ? "13px"
                       : deviceType === "tablet"
                       ? "18px"
-                      : "24px",
+                      : "30px",
                   fontWeight: 900,
                   color: "#2563EB",
                   textShadow: `
-                    -1.5px -1.5px 0 #ffffff,
-                     1.5px -1.5px 0 #ffffff,
-                    -1.5px  1.5px 0 #ffffff,
-                     1.5px  1.5px 0 #ffffff,
-                     0px  2px 0 #ffffff,
-                     0px -2px 0 #ffffff,
-                     0 4px 10px rgba(0, 0, 0, 0.18)
+                    -2px -2px 0 #ffffff,
+                     2px -2px 0 #ffffff,
+                    -2px  2px 0 #ffffff,
+                     2px  2px 0 #ffffff,
+                     0px  2.5px 0 #ffffff,
+                     0px -2.5px 0 #ffffff,
+                     0 5px 12px rgba(0, 0, 0, 0.18)
                   `,
                   lineHeight: 1.15,
                   whiteSpace: "nowrap",
-                  marginTop: deviceType === "mobile" ? "1px" : "4px",
+                  marginTop: deviceType === "mobile" ? "1px" : "5px",
                   letterSpacing: "-0.2px",
                 }}
               >
@@ -769,7 +806,7 @@ export default function HomePage() {
             onClick={() => setShowProfileModal(true)}
             style={{
               position: "absolute",
-              left: deviceType === "mobile" ? "10px" : deviceType === "tablet" ? "28px" : "48px",
+              left: deviceType === "mobile" ? "10px" : deviceType === "tablet" ? "24px" : "48px",
               bottom: deviceType === "mobile" ? "14px" : deviceType === "tablet" ? "22px" : "32px",
               fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
               background: "rgba(255, 255, 255, 0.96)",
@@ -777,7 +814,7 @@ export default function HomePage() {
               borderRadius: deviceType === "mobile" ? "24px" : "36px",
               color: "#5B4FA8",
               fontWeight: 800,
-              fontSize: deviceType === "mobile" ? "13px" : deviceType === "tablet" ? "16px" : "20px",
+              fontSize: deviceType === "mobile" ? "13px" : deviceType === "tablet" ? "16px" : "21px",
               boxShadow: "0 6px 18px rgba(91, 79, 168, 0.28)",
               border: deviceType === "mobile" ? "2.5px solid #5B4FA8" : "3.5px solid #5B4FA8",
               cursor: "pointer",
@@ -987,35 +1024,68 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Progress and Reset Box */}
-            <div style={{ background: "#EEF2FF", border: "1px solid #C7D2FE", borderRadius: 16, padding: "12px 16px", marginBottom: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontWeight: 800, color: "#4338CA", fontSize: 13 }}>تقدم البطل في جزيرة الحيوانات:</span>
-                <span style={{ fontWeight: 900, color: "#4338CA", fontSize: 13 }}>
-                  {animalsProgressCount} من 13 حيوان ({Math.round((animalsProgressCount / 13) * 100)}%)
+            {/* Hero Progress Cycle Box */}
+            <div style={{ background: "#F8FAFC", border: "2px solid #E2E8F0", borderRadius: 20, padding: "14px 16px", marginBottom: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <span style={{ fontWeight: 900, color: "#1E293B", fontSize: 13 }}>
+                  دورة تقدم البطل (الحساب الفعلي):
                 </span>
-              </div>
-              <div style={{ height: 10, background: "#E0E7FF", borderRadius: 5, overflow: "hidden", marginBottom: 8 }}>
-                <div
-                  style={{
-                    height: "100%",
-                    width: `${Math.min(100, Math.round((animalsProgressCount / 13) * 100))}%`,
-                    background: "linear-gradient(90deg, #6366F1, #10B981)",
-                    transition: "width 0.4s",
-                  }}
-                />
-              </div>
-              <div style={{ fontSize: 12, color: animalsProgressCount >= 10 ? "#059669" : "#D97706", fontWeight: 800, textAlign: "center" }}>
-                {animalsProgressCount >= 10
-                  ? "أحسنت! أتممت نسبة 80% وتم فتح جزيرة الخضار بنجاح!"
-                  : `متبقي حل ${Math.max(0, 10 - animalsProgressCount)} حيوانات لفتح جزيرة الخضار (المطلوب 80%)`}
+                <span style={{
+                  background: completedIslands.length > 0 ? "#DCFCE7" : "#F1F5F9",
+                  color: completedIslands.length > 0 ? "#15803D" : "#475569",
+                  padding: "4px 10px",
+                  borderRadius: 12,
+                  fontSize: 12,
+                  fontWeight: 900,
+                  border: "1px solid #CBD5E1"
+                }}>
+                  {completedIslands.length} من {ISLAND_ZONES.length} جزر مكتملة
+                </span>
               </div>
 
-              <div style={{ marginTop: 10, paddingTop: 8, borderTop: "1px dashed #C7D2FE", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 12, color: "#64748B", fontWeight: 700 }}>الجزر المكتملة كلياً:</span>
-                <span style={{ fontSize: 12, color: "#4338CA", fontWeight: 900 }}>
-                  {completedIslands.length} من {ISLAND_ZONES.length}
-                </span>
+              {/* بطاقة جزيرة الحيوانات */}
+              <div style={{ background: "white", borderRadius: 14, padding: "12px 14px", border: "1.5px solid #FED7AA", boxShadow: "0 2px 8px rgba(0,0,0,0.03)", marginBottom: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 900, color: "#9A3412" }}>
+                    🐾 جزيرة الحيوانات (مفتوحة):
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 900, color: "#EA580C" }}>
+                    {animalsProgressCount} من 13 حيوان ({Math.min(100, Math.round((animalsProgressCount / 13) * 100))}%)
+                  </span>
+                </div>
+
+                <div style={{ height: 10, background: "#FFEDD5", borderRadius: 5, overflow: "hidden", marginBottom: 8 }}>
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${Math.min(100, Math.round((animalsProgressCount / 13) * 100))}%`,
+                      background: "linear-gradient(90deg, #F97316, #10B981)",
+                      transition: "width 0.4s",
+                    }}
+                  />
+                </div>
+
+                {animalsCompletedIds.length > 0 && (
+                  <div style={{ fontSize: 12, color: "#334155", fontWeight: 700, marginBottom: 6, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 4 }}>
+                    <span>تم حل بنجاح:</span>
+                    {animalsCompletedIds.map((id) => (
+                      <span key={id} style={{ background: "#ECFDF5", color: "#065F46", padding: "2px 8px", borderRadius: 8, border: "1px solid #A7F3D0", fontWeight: 800 }}>
+                        {ANIMAL_NAMES_MAP[id] || id}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div style={{ fontSize: 12, color: animalsProgressCount >= 10 ? "#059669" : "#D97706", fontWeight: 800 }}>
+                  {animalsProgressCount >= 10
+                    ? "أحسنت يا بطل! أتممت نسبة 80% وتم فتح جزيرة الخضار بنجاح! 🔓"
+                    : `متبقي حل ${Math.max(0, 10 - animalsProgressCount)} حيوانات للوصول إلى 80% وفتح جزيرة الخضار`}
+                </div>
+              </div>
+
+              {/* تنبيه حالة قفل الجزر التالية */}
+              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 700, textAlign: "center", background: "#F1F5F9", padding: "6px 10px", borderRadius: 10 }}>
+                🔒 باقي الجزر مقفلة تلقائياً وتفتح تباعاً بمجرد إكمال 80% من كل جزيرة
               </div>
 
               <button
@@ -1023,18 +1093,18 @@ export default function HomePage() {
                 style={{
                   background: "none",
                   border: "none",
-                  color: "#6B7280",
+                  color: "#94A3B8",
                   fontSize: 11,
                   fontWeight: 700,
                   cursor: "pointer",
-                  marginTop: 8,
+                  marginTop: 10,
                   textDecoration: "underline",
                   padding: 0,
                   width: "100%",
                   textAlign: "center",
                 }}
               >
-                إعادة قفل الجزر من البداية (للتجربة)
+                إعادة قفل الجزر وبدء التقدم من الصفر (للتجربة)
               </button>
             </div>
 
@@ -1081,13 +1151,16 @@ export default function HomePage() {
       {activeIsland?.id === "animals" && (
         <AnimalsIslandAdventure
           onBackToMap={() => {
-            // مزامنة أحدث إجابات تم حلها
+            // مزامنة دورة الإجابات والتقدم
             try {
               const savedAnimals = localStorage.getItem("madar_animals_completed_ids");
               if (savedAnimals) {
                 const parsed = JSON.parse(savedAnimals);
                 if (Array.isArray(parsed)) {
-                  setAnimalsProgressCount(parsed.length);
+                  const cycle = calculateHeroCycle(parsed);
+                  setAnimalsCompletedIds(cycle.uniqueIds);
+                  setAnimalsProgressCount(cycle.count);
+                  setCompletedIslands(cycle.trueCompletedIslands);
                 }
               }
             } catch {}
@@ -1095,13 +1168,19 @@ export default function HomePage() {
           }}
           onCompleteIsland={handleCompleteIsland}
           onProgressUpdate={async (count, total, ids) => {
-            setAnimalsProgressCount(count);
+            const cycle = calculateHeroCycle(ids || []);
+            setAnimalsCompletedIds(cycle.uniqueIds);
+            setAnimalsProgressCount(cycle.count);
+            setCompletedIslands(cycle.trueCompletedIslands);
             try {
+              localStorage.setItem("madar_animals_completed_ids", JSON.stringify(cycle.uniqueIds));
+              localStorage.setItem("madar_completed_islands", JSON.stringify(cycle.trueCompletedIslands));
               const { supabase } = await import("@/lib/supabase");
               await supabase.auth.updateUser({
                 data: {
-                  animals_progress_count: count,
-                  animals_completed_ids: ids || [],
+                  animals_progress_count: cycle.count,
+                  animals_completed_ids: cycle.uniqueIds,
+                  completed_islands: cycle.trueCompletedIslands,
                 },
               });
             } catch (err) {
