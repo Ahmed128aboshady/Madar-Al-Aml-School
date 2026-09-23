@@ -260,13 +260,13 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
     return completedAnimalIds.includes(ANIMALS_DATA[idx - 1].id);
   };
 
-  // Auto-scroll active animal into view (on desktop)
+  // Auto-scroll active animal into view in the carousel
   useEffect(() => {
-    if (animalNavRef.current && deviceType !== "mobile") {
+    if (animalNavRef.current) {
       const activeEl = animalNavRef.current.children[currentIndex] as HTMLElement | undefined;
       activeEl?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     }
-  }, [currentIndex, deviceType]);
+  }, [currentIndex]);
 
   // Reset state when animal index changes
   useEffect(() => {
@@ -480,33 +480,69 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
         </div>
       </div>
 
-      {/* ── Animal Step Navigator (حيوان حيوان) - Centered, Responsive & No-Cutoff ── */}
+      {/* ── Animal Step Carousel (كاروسيل أفقي يوفر المساحة الرأسية بالكامل على الموبايل) ── */}
       <div
-        ref={animalNavRef}
         style={{
           position: "relative",
           zIndex: 60,
-          padding: deviceType === "mobile" ? "6px 8px" : "10px 16px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          background: "rgba(255, 255, 255, 0.8)",
-          backdropFilter: "blur(8px)",
+          background: "rgba(255, 255, 255, 0.85)",
+          backdropFilter: "blur(10px)",
           borderBottom: "1px solid rgba(226, 232, 240, 0.8)",
           width: "100%",
           boxSizing: "border-box",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: deviceType === "mobile" ? "4px 8px" : "8px 16px",
+          gap: 6,
         }}
       >
+        {/* Right Arrow (RTL navigation / right) */}
+        {deviceType === "mobile" && (
+          <button
+            onClick={() => {
+              if (animalNavRef.current) {
+                animalNavRef.current.scrollBy({ left: 90, behavior: "smooth" });
+              }
+            }}
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              border: "1.5px solid #CBD5E1",
+              borderRadius: "50%",
+              width: "24px",
+              height: "24px",
+              minWidth: "24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: 900,
+              color: "#475569",
+              cursor: "pointer",
+              padding: 0,
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              userSelect: "none",
+            }}
+            aria-label="تمرير لليمين"
+          >
+            ›
+          </button>
+        )}
+
+        {/* Carousel Scroll Track */}
         <div
+          ref={animalNavRef}
           style={{
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
-            flexWrap: deviceType === "mobile" ? "wrap" : "nowrap",
-            gap: deviceType === "mobile" ? "4px 6px" : 8,
-            maxWidth: deviceType === "mobile" ? "360px" : "100%",
-            margin: "0 auto",
-            width: "100%",
+            flexWrap: "nowrap",
+            overflowX: "auto",
+            WebkitOverflowScrolling: "touch",
+            scrollbarWidth: "none",
+            gap: deviceType === "mobile" ? 6 : 8,
+            padding: deviceType === "mobile" ? "2px 2px" : "2px 6px",
+            scrollSnapType: "x proximity",
+            maxWidth: deviceType === "mobile" ? "calc(100% - 60px)" : "100%",
           }}
         >
           {ANIMALS_DATA.map((animal, idx) => {
@@ -541,10 +577,10 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                   color: color,
                   border: border,
                   borderRadius: "14px",
-                  padding: deviceType === "mobile" ? "4px 8px" : "7px 16px",
+                  padding: deviceType === "mobile" ? "5px 12px" : "7px 16px",
                   cursor: !isUnlocked ? "not-allowed" : "pointer",
                   fontWeight: 800,
-                  fontSize: deviceType === "mobile" ? "11px" : "13px",
+                  fontSize: deviceType === "mobile" ? "12px" : "13px",
                   transform: isActive ? "scale(1.06)" : "scale(1)",
                   transition: "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   boxShadow: isActive
@@ -552,6 +588,8 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                     : "0 1px 3px rgba(0,0,0,0.05)",
                   opacity: !isUnlocked ? 0.6 : 1,
                   whiteSpace: "nowrap",
+                  flexShrink: 0,
+                  scrollSnapAlign: "center",
                 }}
               >
                 {animal.name}
@@ -559,6 +597,38 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
             );
           })}
         </div>
+
+        {/* Left Arrow (RTL navigation / left) */}
+        {deviceType === "mobile" && (
+          <button
+            onClick={() => {
+              if (animalNavRef.current) {
+                animalNavRef.current.scrollBy({ left: -90, behavior: "smooth" });
+              }
+            }}
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              border: "1.5px solid #CBD5E1",
+              borderRadius: "50%",
+              width: "24px",
+              height: "24px",
+              minWidth: "24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: 900,
+              color: "#475569",
+              cursor: "pointer",
+              padding: 0,
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              userSelect: "none",
+            }}
+            aria-label="تمرير لليسار"
+          >
+            ‹
+          </button>
+        )}
       </div>
 
       {/* Gentle educational hint if child clicks locked animal */}
