@@ -61,6 +61,7 @@ export default function LoginPage() {
 
   /* ── Form state ── */
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -69,6 +70,16 @@ export default function LoginPage() {
   const [otpMode, setOtpMode] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const [resending, setResending] = useState(false);
+
+  /* ── Phone normalization helper ── */
+  function normalizePhone(val: string) {
+    const arabicDigits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+    let res = val;
+    arabicDigits.forEach((d, i) => {
+      res = res.replaceAll(d, String(i));
+    });
+    return res.replace(/[\s\-\(\)]/g, "");
+  }
 
   /* ── Supabase ── */
   const [supabase, setSupabase] = useState<import("@supabase/supabase-js").SupabaseClient | null>(null);
@@ -117,15 +128,34 @@ export default function LoginPage() {
       setError("من فضلك أدخل البريد الإلكتروني وكلمة المرور");
       return;
     }
+
+    if (isRegister) {
+      const cleanPhone = normalizePhone(phone);
+      if (!cleanPhone) {
+        setError("من فضلك أدخل رقم الجوال / الهاتف للتواصل");
+        return;
+      }
+      // التحقق من صحة رقم الجوال (سعودي أو دولي صحيح: من 9 إلى 15 رقماً وبدون أرقام وهمية مكررة)
+      if (!/^\+?[0-9]{9,15}$/.test(cleanPhone) || /^(\+?[0-9])\1{7,}$/.test(cleanPhone)) {
+        setError("يرجى إدخال رقم جوال صحيح للتواصل (مثال: 05xxxxxxxx أو +966...)");
+        return;
+      }
+    }
+
     setLoading(true);
     setError("");
     try {
       if (isRegister) {
+        const cleanPhone = normalizePhone(phone);
         const { data, error: e } = await supabase.auth.signUp({
           email: email.trim(),
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              phone: cleanPhone,
+              parent_phone: cleanPhone,
+            },
           },
         });
         if (e) throw e;
@@ -590,6 +620,22 @@ export default function LoginPage() {
                   />
                 </div>
 
+                {/* ─ Phone input required on register ─ */}
+                {isRegister && (
+                  <div style={{ position: "relative" }}>
+                    <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>📱</span>
+                    <input
+                      className="kid-input"
+                      type="tel"
+                      dir="ltr"
+                      placeholder="رقم الجوال للتواصل (مثال: 05xxxxxxxx)"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      style={{ paddingRight: 44, textAlign: "right" }}
+                    />
+                  </div>
+                )}
+
                 <div style={{ position: "relative" }}>
                   <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>🔒</span>
                   <input
@@ -621,7 +667,7 @@ export default function LoginPage() {
                 </div>
 
                 <button className="kid-btn-primary" onClick={handleEmailAuth} disabled={loading}>
-                  {loading ? "⏳ جارٍ التحميل..." : isRegister ? "✨ إنشاء الحساب وإرسال الكود" : "🚀 تسجيل الدخول"}
+                  {loading ? "⏳ جارٍ التحميل..." : isRegister ? "✨ إنشاء حساب جديد" : "🚀 تسجيل الدخول"}
                 </button>
               </div>
 
