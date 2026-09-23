@@ -512,8 +512,8 @@ export default function HomePage() {
               deviceType === "mobile"
                 ? "max(52px, calc(env(safe-area-inset-top, 0px) + 16px))"
                 : deviceType === "tablet"
-                ? "24px"
-                : "28px",
+                ? "36px"
+                : "68px",
             left: "50%",
             transform: "translateX(-50%)",
             width: deviceType === "mobile" ? "120px" : deviceType === "tablet" ? "220px" : "360px",
