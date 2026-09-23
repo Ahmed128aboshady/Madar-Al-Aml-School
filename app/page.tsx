@@ -583,50 +583,58 @@ export default function HomePage() {
           );
         })}
 
-        {/* ── Bottom Controls: خروج + سحابة العنوان + حسابي (بدون أيقونات) ── */}
+        {/* ── Bottom Controls: خروج + سحابة العنوان الموسعة + حسابي (بفونت أطفال كرتوني) ── */}
         <footer
           style={{
             position: "absolute",
-            bottom: deviceType === "mobile" ? "10px" : "18px",
-            left: deviceType === "mobile" ? "10px" : "24px",
-            right: deviceType === "mobile" ? "10px" : "24px",
+            bottom: deviceType === "mobile" ? "6px" : "14px",
+            left: 0,
+            right: 0,
+            height: deviceType === "mobile" ? "98px" : "145px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "center",
             zIndex: 35,
-            pointerEvents: "auto",
+            pointerEvents: "none",
           }}
         >
-          {/* Right side (RTL start): زر الخروج بدون أيقونة */}
+          {/* Right side (RTL start): زر الخروج */}
           <button
             onClick={handleSignOut}
             style={{
-              background: "#FF5E7E",
+              position: "absolute",
+              right: deviceType === "mobile" ? "10px" : "28px",
+              bottom: deviceType === "mobile" ? "14px" : "22px",
+              fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
+              background: "linear-gradient(135deg, #FF6584, #FF4568)",
               color: "white",
-              border: "2px solid white",
-              borderRadius: "20px",
+              border: "2.5px solid white",
+              borderRadius: "24px",
               padding: deviceType === "mobile" ? "6px 14px" : "8px 22px",
-              fontSize: deviceType === "mobile" ? "12px" : "14px",
+              fontSize: deviceType === "mobile" ? "13px" : "15px",
               fontWeight: 800,
               cursor: "pointer",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+              boxShadow: "0 4px 14px rgba(255, 69, 104, 0.35)",
               transition: "transform 0.2s",
               whiteSpace: "nowrap",
+              pointerEvents: "auto",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
             خروج
           </button>
 
-          {/* Center: سحابة العنوان مع الكتابة */}
+          {/* Center: سحابة العنوان الكبيرة مع الفونت الكرتوني المناسب للأطفال */}
           <div
             style={{
               position: "relative",
-              width: deviceType === "mobile" ? "190px" : deviceType === "tablet" ? "260px" : "310px",
-              height: deviceType === "mobile" ? "62px" : deviceType === "tablet" ? "78px" : "90px",
-              flexShrink: 0,
+              width: deviceType === "mobile" ? "clamp(240px, 66vw, 275px)" : deviceType === "tablet" ? "350px" : "420px",
+              height: deviceType === "mobile" ? "94px" : deviceType === "tablet" ? "120px" : "144px",
               pointerEvents: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <Image
@@ -645,39 +653,62 @@ export default function HomePage() {
                 alignItems: "center",
                 justifyContent: "center",
                 textAlign: "center",
-                paddingTop: deviceType === "mobile" ? "2px" : "4px",
+                paddingTop: deviceType === "mobile" ? "2px" : "6px",
               }}
             >
               <div
                 style={{
+                  fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
                   fontSize:
                     deviceType === "mobile"
-                      ? "12px"
+                      ? "18px"
                       : deviceType === "tablet"
-                      ? "15px"
-                      : "18px",
+                      ? "24px"
+                      : "28px",
                   fontWeight: 900,
-                  color: "#BE123C",
-                  textShadow: "0 1px 3px rgba(255,255,255,0.9)",
-                  lineHeight: 1.2,
+                  color: "#E11D48",
+                  textShadow: `
+                    -2px -2px 0 #ffffff,
+                     2px -2px 0 #ffffff,
+                    -2px  2px 0 #ffffff,
+                     2px  2px 0 #ffffff,
+                     0px  3px 0 #ffffff,
+                     0px -3px 0 #ffffff,
+                    -3px  0px 0 #ffffff,
+                     3px  0px 0 #ffffff,
+                     0 4px 10px rgba(0, 0, 0, 0.22)
+                  `,
+                  lineHeight: 1.15,
                   whiteSpace: "nowrap",
+                  letterSpacing: "-0.3px",
                 }}
               >
                 اختر جزيرتك السحرية
               </div>
               <div
                 style={{
+                  fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
                   fontSize:
                     deviceType === "mobile"
-                      ? "9px"
+                      ? "13px"
                       : deviceType === "tablet"
-                      ? "11px"
-                      : "13px",
-                  fontWeight: 800,
-                  color: "#1D4ED8",
-                  textShadow: "0 1px 2px rgba(255,255,255,0.9)",
-                  lineHeight: 1.2,
+                      ? "17px"
+                      : "20px",
+                  fontWeight: 900,
+                  color: "#2563EB",
+                  textShadow: `
+                    -1.5px -1.5px 0 #ffffff,
+                     1.5px -1.5px 0 #ffffff,
+                    -1.5px  1.5px 0 #ffffff,
+                     1.5px  1.5px 0 #ffffff,
+                     0px  2px 0 #ffffff,
+                     0px -2px 0 #ffffff,
+                     0 3px 8px rgba(0, 0, 0, 0.18)
+                  `,
+                  lineHeight: 1.15,
                   whiteSpace: "nowrap",
+                  marginTop: deviceType === "mobile" ? "1px" : "3px",
+                  letterSpacing: "-0.2px",
                 }}
               >
                 وابدأ اللعب والتعلم
@@ -685,23 +716,28 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Left side (RTL end): زر حسابي بدون أيقونات */}
+          {/* Left side (RTL end): زر حسابي */}
           <button
             onClick={() => setShowProfileModal(true)}
             style={{
-              background: "rgba(255, 255, 255, 0.95)",
+              position: "absolute",
+              left: deviceType === "mobile" ? "10px" : "28px",
+              bottom: deviceType === "mobile" ? "14px" : "22px",
+              fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
+              background: "rgba(255, 255, 255, 0.96)",
               padding: deviceType === "mobile" ? "6px 14px" : "8px 22px",
-              borderRadius: "20px",
+              borderRadius: "24px",
               color: "#5B4FA8",
               fontWeight: 800,
-              fontSize: deviceType === "mobile" ? "12px" : "14px",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
-              border: "2px solid #5B4FA8",
+              fontSize: deviceType === "mobile" ? "13px" : "15px",
+              boxShadow: "0 4px 14px rgba(91, 79, 168, 0.25)",
+              border: "2.5px solid #5B4FA8",
               cursor: "pointer",
               transition: "transform 0.2s, box-shadow 0.2s",
               whiteSpace: "nowrap",
+              pointerEvents: "auto",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
             {deviceType === "mobile" ? (childName ? childName : "حسابي") : "حسابي"}

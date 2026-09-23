@@ -19,6 +19,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800;900&family=Marhey:wght@700;800;900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className={`${geist.variable} antialiased`}>{children}</body>
     </html>
   );
