@@ -574,19 +574,31 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
             {/* Real HTML5 Video Player if videoUrl exists and loads */}
             {!videoError && currentAnimal.videoUrl ? (
               <video
+                key={currentAnimal.videoUrl}
                 ref={videoRef}
                 src={currentAnimal.videoUrl}
                 controls
                 playsInline
+                preload="metadata"
                 onError={() => setVideoError(true)}
-                onPlay={() => setIsPlayingVideo(true)}
-                onPause={() => setIsPlayingVideo(false)}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                onPlay={() => {
+                  setIsPlayingVideo(true);
+                  // Voiceover in clear Arabic since video has no audio
+                  speakArabic(`هذه هي ال${currentAnimal.name}. ${currentAnimal.fact}`);
+                }}
+                onPause={() => {
+                  setIsPlayingVideo(false);
+                  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+                }}
+                onEnded={() => {
+                  setIsPlayingVideo(false);
+                }}
+                style={{ width: "100%", height: "100%", objectFit: "contain", background: "#000" }}
               />
             ) : null}
 
-            {/* If video is not yet provided or failed to load, show clean educational player card */}
-            {(videoError || !currentAnimal.videoUrl || !isPlayingVideo) && (
+            {/* If video failed to load or has no video file yet */}
+            {(videoError || !currentAnimal.videoUrl) && (
               <div
                 style={{
                   position: "absolute",
@@ -602,12 +614,8 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                   cursor: "pointer",
                 }}
                 onClick={() => {
-                  if (videoRef.current && !videoError) {
-                    videoRef.current.play().catch(() => setVideoError(true));
-                  } else {
-                    speakArabic(`أنا ${currentAnimal.name}، ${currentAnimal.fact}`);
-                    playAudioTone("click");
-                  }
+                  speakArabic(`هذه هي ال${currentAnimal.name}. ${currentAnimal.fact}`);
+                  playAudioTone("click");
                 }}
               >
                 {/* Clean Animal Name Heading */}
@@ -643,23 +651,13 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="#1E293B">
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
-                  <span>تشغيل فيديو {currentAnimal.name}</span>
-                </div>
-
-                <div
-                  style={{
-                    marginTop: 8,
-                    fontSize: deviceType === "mobile" ? "10px" : "11px",
-                    color: "#94A3B8",
-                  }}
-                >
-                  (اضغط للاستماع أو المشاهدة)
+                  <span>استماع للشرح الصوتي لـ {currentAnimal.name}</span>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Quick Pronunciation & Sound Trigger */}
+          {/* Quick Pronunciation & Voiceover Controls */}
           <div
             style={{
               marginTop: 10,
@@ -689,7 +687,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
 
             <button
               onClick={() => {
-                speakArabic(currentAnimal.fact);
+                speakArabic(`هذه هي ال${currentAnimal.name}. ${currentAnimal.fact}`);
                 playAudioTone("click");
               }}
               style={{
@@ -703,7 +701,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 cursor: "pointer",
               }}
             >
-              معلومة عن الحيوان
+              تشغيل التعليق الصوتي
             </button>
           </div>
         </div>
