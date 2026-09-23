@@ -572,10 +572,10 @@ export default function HomePage() {
                 style={{
                   position: "relative",
                   width: "100%",
-                  height: "82%",
+                  height: "100%",
                   filter: isUnlocked
                     ? "drop-shadow(0 10px 18px rgba(0,0,0,0.18))"
-                    : "grayscale(100%) brightness(0.8) contrast(0.9) drop-shadow(0 6px 12px rgba(0,0,0,0.25))",
+                    : "grayscale(100%) brightness(0.82) contrast(0.9) drop-shadow(0 6px 12px rgba(0,0,0,0.25))",
                   opacity: isUnlocked ? 1 : 0.75,
                   transition: "filter 0.5s ease, opacity 0.5s ease",
                 }}
@@ -590,69 +590,6 @@ export default function HomePage() {
                     objectPosition: "center",
                   }}
                 />
-
-                {/* Floating Lock Badge directly over the character when locked */}
-                {!isUnlocked && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "45%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      background: "rgba(15, 23, 42, 0.82)",
-                      border: "2.5px solid rgba(255, 255, 255, 0.85)",
-                      borderRadius: "50%",
-                      width: deviceType === "mobile" ? 36 : 48,
-                      height: deviceType === "mobile" ? 36 : 48,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: deviceType === "mobile" ? 18 : 24,
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-                      pointerEvents: "none",
-                    }}
-                    title="جزيرة مقفلة"
-                  >
-                    🔒
-                  </div>
-                )}
-              </div>
-
-              {/* Status Tag Button directly under the wooden sign */}
-              <div
-                className="hotspot-tag"
-                style={{
-                  marginTop: "-5%",
-                  background: !isUnlocked
-                    ? "rgba(240, 243, 246, 0.98)"
-                    : isCompleted
-                    ? "rgba(240, 253, 244, 0.98)"
-                    : "rgba(255, 255, 255, 0.98)",
-                  color: !isUnlocked ? "#64748B" : isCompleted ? "#16A34A" : zone.themeColor,
-                  padding: deviceType === "mobile" ? "3px 10px" : "5px 16px",
-                  borderRadius: "18px",
-                  fontWeight: 900,
-                  fontSize: deviceType === "mobile" ? "11px" : "clamp(11px, 1vw, 14px)",
-                  border: !isUnlocked
-                    ? "2px dashed #94A3B8"
-                    : isCompleted
-                    ? "2px solid #16A34A"
-                    : `2px solid ${zone.themeColor}`,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
-                  whiteSpace: "nowrap",
-                  zIndex: 25,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 5,
-                }}
-              >
-                {!isUnlocked ? (
-                  <span>🔒 مقفلة</span>
-                ) : isCompleted ? (
-                  <span>⭐ مكتملة! أحسنت 🌟</span>
-                ) : (
-                  <span>اضغط للبدء ✨</span>
-                )}
               </div>
             </div>
           );
