@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import AnimalsIslandAdventure from "@/components/AnimalsIslandAdventure";
 
 interface IslandZone {
   id: string;
@@ -861,8 +862,17 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* ── Modal Pop-up on Island Click ── */}
-      {activeIsland && (
+      {/* ── Animals Island Interactive Adventure ── */}
+      {activeIsland?.id === "animals" && (
+        <AnimalsIslandAdventure
+          onBackToMap={() => setActiveIsland(null)}
+          onCompleteIsland={handleCompleteIsland}
+          deviceType={deviceType}
+        />
+      )}
+
+      {/* ── Modal Pop-up on other Islands Click ── */}
+      {activeIsland && activeIsland.id !== "animals" && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(10, 35, 70, 0.55)", backdropFilter: "blur(8px)" }}
