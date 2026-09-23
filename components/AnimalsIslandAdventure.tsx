@@ -378,42 +378,34 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
             color: "white",
             border: "none",
             borderRadius: "20px",
-            padding: deviceType === "mobile" ? "5px 12px" : "8px 18px",
+            padding: deviceType === "mobile" ? "6px 14px" : "8px 20px",
             fontSize: deviceType === "mobile" ? "12px" : "14px",
             fontWeight: 800,
             cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
             boxShadow: "0 4px 12px rgba(79, 70, 229, 0.3)",
             transition: "transform 0.15s ease",
           }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >
-          <span>⬅️ خريطة الجزر</span>
+          خريطة الجزر
         </button>
 
         {/* Island Title */}
         <div style={{ textAlign: "center" }}>
           <div
             style={{
-              fontSize: deviceType === "mobile" ? "15px" : "20px",
+              fontSize: deviceType === "mobile" ? "16px" : "20px",
               fontWeight: 900,
               color: "#E07820",
               textShadow: "0 1px 2px rgba(255,255,255,0.9)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
             }}
           >
-            <span>🦁</span>
-            <span>جزيرة الحيوانات السحرية</span>
+            جزيرة الحيوانات
           </div>
           <div
             style={{
-              fontSize: deviceType === "mobile" ? "10px" : "12px",
+              fontSize: deviceType === "mobile" ? "11px" : "13px",
               fontWeight: 700,
               color: "#6B7280",
             }}
@@ -422,99 +414,96 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
           </div>
         </div>
 
-        {/* Progress Stars Badge */}
+        {/* Progress Badge */}
         <div
           style={{
             background: "rgba(254, 243, 199, 0.95)",
             border: "2px solid #F59E0B",
             borderRadius: "20px",
-            padding: deviceType === "mobile" ? "4px 10px" : "6px 14px",
+            padding: deviceType === "mobile" ? "5px 12px" : "6px 16px",
             fontSize: deviceType === "mobile" ? "11px" : "13px",
             fontWeight: 900,
             color: "#B45309",
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
           }}
         >
-          <span>⭐</span>
-          <span>
-            {completedAnimalIds.length}/{ANIMALS_DATA.length}
-          </span>
+          المكتمل: {completedAnimalIds.length} من {ANIMALS_DATA.length}
         </div>
       </div>
 
-      {/* ── Animal Step Navigator (حيوان حيوان) ── */}
+      {/* ── Animal Step Navigator (حيوان حيوان) - Centered & Clean ── */}
       <div
         ref={animalNavRef}
         style={{
           position: "relative",
           zIndex: 60,
-          padding: deviceType === "mobile" ? "8px 12px" : "10px 20px",
+          padding: deviceType === "mobile" ? "8px 10px" : "10px 16px",
           display: "flex",
-          justifyContent: "flex-start",
+          justifyContent: "center",
           alignItems: "center",
-          gap: deviceType === "mobile" ? 8 : 12,
           overflowX: "auto",
           WebkitOverflowScrolling: "touch",
-          background: "rgba(255, 255, 255, 0.6)",
+          background: "rgba(255, 255, 255, 0.75)",
           backdropFilter: "blur(8px)",
-          borderBottom: "1px solid rgba(226, 232, 240, 0.6)",
+          borderBottom: "1px solid rgba(226, 232, 240, 0.8)",
+          width: "100%",
           scrollbarWidth: "none",
         }}
       >
-        {ANIMALS_DATA.map((animal, idx) => {
-          const isActive = idx === currentIndex;
-          const isDone = completedAnimalIds.includes(animal.id);
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: deviceType === "mobile" ? 6 : 8,
+            minWidth: "max-content",
+            margin: "0 auto",
+          }}
+        >
+          {ANIMALS_DATA.map((animal, idx) => {
+            const isActive = idx === currentIndex;
+            const isDone = completedAnimalIds.includes(animal.id);
 
-          return (
-            <button
-              key={animal.id}
-              onClick={() => {
-                playAudioTone("click");
-                setCurrentIndex(idx);
-              }}
-              style={{
-                background: isActive
-                  ? "white"
-                  : isDone
-                  ? "#ECFDF5"
-                  : "rgba(255, 255, 255, 0.8)",
-                border: isActive
-                  ? `3px solid ${animal.color}`
-                  : isDone
-                  ? "2px solid #10B981"
-                  : "2px solid #CBD5E1",
-                borderRadius: "16px",
-                padding: deviceType === "mobile" ? "4px 8px" : "6px 14px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                transform: isActive ? "scale(1.08)" : "scale(1)",
-                transition: "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                boxShadow: isActive
-                  ? `0 6px 16px ${animal.color}44`
-                  : "0 2px 6px rgba(0,0,0,0.06)",
-                whiteSpace: "nowrap",
-              }}
-            >
-              <span style={{ fontSize: deviceType === "mobile" ? "16px" : "20px" }}>
-                {animal.emoji}
-              </span>
-              <span
+            return (
+              <button
+                key={animal.id}
+                onClick={() => {
+                  playAudioTone("click");
+                  setCurrentIndex(idx);
+                }}
                 style={{
-                  fontSize: deviceType === "mobile" ? "11px" : "13px",
+                  background: isActive
+                    ? animal.color
+                    : isDone
+                    ? "#DCFCE7"
+                    : "white",
+                  color: isActive
+                    ? "white"
+                    : isDone
+                    ? "#15803D"
+                    : "#334155",
+                  border: isActive
+                    ? `2.5px solid ${animal.color}`
+                    : isDone
+                    ? "2px solid #86EFAC"
+                    : "1.5px solid #CBD5E1",
+                  borderRadius: "14px",
+                  padding: deviceType === "mobile" ? "5px 12px" : "7px 16px",
+                  cursor: "pointer",
                   fontWeight: 800,
-                  color: isActive ? animal.color : "#374151",
+                  fontSize: deviceType === "mobile" ? "12px" : "14px",
+                  transform: isActive ? "scale(1.05)" : "scale(1)",
+                  transition: "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  boxShadow: isActive
+                    ? `0 4px 12px ${animal.color}40`
+                    : "0 1px 3px rgba(0,0,0,0.05)",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {animal.name}
-              </span>
-              {isDone && <span style={{ fontSize: "12px" }}>⭐</span>}
-            </button>
-          );
-        })}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* ── Main Interactive Content Area ── */}
@@ -545,12 +534,6 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
             position: "relative",
           }}
         >
-          {/* Decorative Corner Leaf Accents */}
-          <div style={{ position: "absolute", top: -8, right: -8, fontSize: "22px" }}>🌿</div>
-          <div style={{ position: "absolute", top: -8, left: -8, fontSize: "22px" }}>🌴</div>
-          <div style={{ position: "absolute", bottom: -8, right: -8, fontSize: "22px" }}>🌸</div>
-          <div style={{ position: "absolute", bottom: -8, left: -8, fontSize: "22px" }}>🌺</div>
-
           {/* Top Banner on Frame */}
           <div
             style={{
@@ -559,30 +542,27 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: 8,
             }}
           >
-            <span style={{ fontSize: "14px" }}>✨</span>
             <span
               style={{
                 color: "#FEF3C7",
                 fontWeight: 900,
-                fontSize: deviceType === "mobile" ? "12px" : "14px",
+                fontSize: deviceType === "mobile" ? "13px" : "15px",
                 textShadow: "0 1px 3px rgba(0,0,0,0.6)",
               }}
             >
-              شاهد وتعرف على {currentAnimal.name} {currentAnimal.emoji}
+              شاهد وتعرف على {currentAnimal.name}
             </span>
-            <span style={{ fontSize: "14px" }}>✨</span>
           </div>
 
-          {/* Video Player / Interactive Animation Screen */}
+          {/* Video Player / Interactive Screen */}
           <div
             style={{
               position: "relative",
               width: "100%",
               aspectRatio: "16 / 9",
-              background: "#1E293B",
+              background: "#0F172A",
               borderRadius: "18px",
               overflow: "hidden",
               border: "3px solid #F59E0B",
@@ -605,13 +585,13 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
               />
             ) : null}
 
-            {/* If video is not yet provided or failed to load, show rich interactive cartoon placeholder */}
+            {/* If video is not yet provided or failed to load, show clean educational player card */}
             {(videoError || !currentAnimal.videoUrl || !isPlayingVideo) && (
               <div
                 style={{
                   position: "absolute",
                   inset: 0,
-                  background: `radial-gradient(circle at center, ${currentAnimal.color}33 0%, #0F172A 85%)`,
+                  background: `radial-gradient(circle at center, ${currentAnimal.color}25 0%, #0F172A 85%)`,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -630,46 +610,50 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                   }
                 }}
               >
-                {/* Big Animated Emoji Avatar */}
+                {/* Clean Animal Name Heading */}
                 <div
                   style={{
-                    fontSize: deviceType === "mobile" ? "64px" : "84px",
-                    filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.4))",
-                    animation: "bounce 2s infinite ease-in-out",
+                    fontSize: deviceType === "mobile" ? "32px" : "42px",
+                    fontWeight: 900,
+                    color: "white",
+                    marginBottom: 10,
+                    textShadow: `0 4px 16px ${currentAnimal.color}`,
                   }}
                 >
-                  {currentAnimal.emoji}
+                  {currentAnimal.name}
                 </div>
 
-                {/* Play Video / Speak Button */}
+                {/* Play Button */}
                 <div
                   style={{
-                    marginTop: 8,
+                    marginTop: 4,
                     background: "rgba(255, 255, 255, 0.95)",
                     color: "#1E293B",
                     borderRadius: "24px",
-                    padding: deviceType === "mobile" ? "6px 14px" : "8px 20px",
+                    padding: deviceType === "mobile" ? "7px 18px" : "9px 24px",
                     fontWeight: 900,
                     fontSize: deviceType === "mobile" ? "12px" : "14px",
                     display: "flex",
                     alignItems: "center",
-                    gap: 6,
+                    gap: 8,
                     boxShadow: "0 6px 18px rgba(0,0,0,0.3)",
                     border: `2px solid ${currentAnimal.color}`,
                   }}
                 >
-                  <span>▶️</span>
-                  <span>اضغط لمشاهدة الفيديو والاستماع</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#1E293B">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                  <span>تشغيل فيديو {currentAnimal.name}</span>
                 </div>
 
                 <div
                   style={{
-                    marginTop: 6,
-                    fontSize: deviceType === "mobile" ? "10px" : "12px",
+                    marginTop: 8,
+                    fontSize: deviceType === "mobile" ? "10px" : "11px",
                     color: "#94A3B8",
                   }}
                 >
-                  (سيعمل الفيديو فور وضع الملف في المسار)
+                  (اضغط للاستماع أو المشاهدة)
                 </div>
               </div>
             )}
@@ -681,7 +665,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
               marginTop: 10,
               display: "flex",
               justifyContent: "center",
-              gap: 8,
+              gap: 10,
             }}
           >
             <button
@@ -694,17 +678,13 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 color: "#78350F",
                 border: "2px solid #FDE68A",
                 borderRadius: "16px",
-                padding: "5px 14px",
+                padding: "6px 16px",
                 fontSize: "12px",
                 fontWeight: 800,
                 cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
               }}
             >
-              <span>🔊</span>
-              <span>نطق اسم الحيوان</span>
+              نطق اسم الحيوان
             </button>
 
             <button
@@ -717,17 +697,13 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 color: "#1E40AF",
                 border: "2px solid #BFDBFE",
                 borderRadius: "16px",
-                padding: "5px 14px",
+                padding: "6px 16px",
                 fontSize: "12px",
                 fontWeight: 800,
                 cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
               }}
             >
-              <span>💡</span>
-              <span>معلومة سريعة</span>
+              معلومة عن الحيوان
             </button>
           </div>
         </div>
@@ -754,11 +730,10 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: 8,
+              gap: 10,
               marginBottom: 14,
             }}
           >
-            <span style={{ fontSize: "20px" }}>🎯</span>
             <h3
               style={{
                 margin: 0,
@@ -767,20 +742,23 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 color: "#1F2937",
               }}
             >
-              ما هو اسم هذا الحيوان الجميل؟
+              ما هو اسم هذا الحيوان؟
             </h3>
             <button
-              onClick={() => speakArabic("ما هو اسم هذا الحيوان الجميل؟")}
+              onClick={() => speakArabic("ما هو اسم هذا الحيوان؟")}
               style={{
-                background: "none",
-                border: "none",
-                fontSize: "16px",
+                background: "#F1F5F9",
+                border: "1px solid #CBD5E1",
+                borderRadius: "12px",
+                padding: "4px 10px",
+                fontSize: "11px",
+                fontWeight: 800,
+                color: "#475569",
                 cursor: "pointer",
-                padding: 2,
               }}
               title="استمع للسؤال"
             >
-              🔊
+              استمع للسؤال
             </button>
           </div>
 
@@ -839,7 +817,6 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                   }}
                 >
                   {option}
-                  {isSelected && (isCorrect ? " ✅" : " ❌")}
                 </button>
               );
             })}
@@ -857,8 +834,8 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 color: "#166534",
               }}
             >
-              <div style={{ fontSize: "16px", fontWeight: 900, marginBottom: 4 }}>
-                🌟 رائع يا بطل! إجابة صحيحة! 👏
+              <div style={{ fontSize: "15px", fontWeight: 900, marginBottom: 4 }}>
+                ممتاز يا بطل! إجابة صحيحة.
               </div>
               <div style={{ fontSize: "12px", fontWeight: 700, color: "#15803D" }}>
                 {currentAnimal.fact}
@@ -879,7 +856,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 fontWeight: 800,
               }}
             >
-              😊 حاول مرة أخرى يا بطل! ركز في شكل الحيوان جيداً!
+              حاول مرة أخرى يا بطل! ركز في شكل الحيوان جيداً.
             </div>
           )}
 
@@ -900,13 +877,13 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 color: currentIndex === 0 ? "#94A3B8" : "#334155",
                 border: "none",
                 borderRadius: "14px",
-                padding: "8px 16px",
+                padding: "8px 18px",
                 fontSize: "12px",
                 fontWeight: 800,
                 cursor: currentIndex === 0 ? "not-allowed" : "pointer",
               }}
             >
-              ⬅️ السابق
+              السابق
             </button>
 
             <button
@@ -923,13 +900,9 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 fontWeight: 900,
                 cursor: "pointer",
                 boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
               }}
             >
-              <span>{currentIndex < ANIMALS_DATA.length - 1 ? "الحيوان التالي" : "إنهاء الجزيرة"}</span>
-              <span>➡️</span>
+              {currentIndex < ANIMALS_DATA.length - 1 ? "الحيوان التالي" : "إنهاء الجزيرة"}
             </button>
           </div>
         </div>
