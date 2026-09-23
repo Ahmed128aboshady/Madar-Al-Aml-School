@@ -402,7 +402,7 @@ export default function HomePage() {
           fontWeight: 800,
         }}
       >
-        <span>جاري تحميل الجزر السحرية... ☁️🎈</span>
+        <span>جاري تحميل الجزر السحرية...</span>
       </div>
     );
   }
@@ -421,75 +421,6 @@ export default function HomePage() {
         position: "relative",
       }}
     >
-      {/* ── Top Bar Controls ── */}
-      <header
-        style={{
-          position: "absolute",
-          top: deviceType === "mobile" ? "8px" : "12px",
-          left: deviceType === "mobile" ? "10px" : "16px",
-          right: deviceType === "mobile" ? "10px" : "16px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          zIndex: 40,
-        }}
-      >
-        {/* Sign Out Button (Goes to /login) */}
-        <button
-          onClick={handleSignOut}
-          style={{
-            background: "#FF5E7E",
-            color: "white",
-            border: "2px solid white",
-            borderRadius: "20px",
-            padding: deviceType === "mobile" ? "4px 10px" : "6px 16px",
-            fontSize: deviceType === "mobile" ? "11px" : "13px",
-            fontWeight: 800,
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-            transition: "transform 0.2s",
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-        >
-          <span>خروج</span>
-          <span>🚪</span>
-        </button>
-
-        {/* Profile Button / User Pill (Opens User Profile Modal) */}
-        <button
-          onClick={() => setShowProfileModal(true)}
-          style={{
-            background: "rgba(255, 255, 255, 0.95)",
-            padding: deviceType === "mobile" ? "4px 10px" : "6px 14px",
-            borderRadius: "20px",
-            color: "#5B4FA8",
-            fontWeight: 800,
-            fontSize: deviceType === "mobile" ? "11px" : "13px",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
-            border: "2px solid #5B4FA8",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            transition: "transform 0.2s, box-shadow 0.2s",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-        >
-          <span>👤 {deviceType === "mobile" ? (childName ? childName : "حسابي") : "مرحباً بك"}</span>
-          {deviceType !== "mobile" && currentUser?.email && (
-            <span style={{ direction: "ltr", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              ({currentUser.email.split("@")[0]})
-            </span>
-          )}
-          <span style={{ fontSize: deviceType === "mobile" ? 9 : 11 }}>ℹ️</span>
-        </button>
-      </header>
-
       {/* ── Interactive Viewport Canvas ── */}
       <div
         style={{
@@ -519,93 +450,6 @@ export default function HomePage() {
             objectFit: "cover",
             objectPosition: "center",
           }}
-        />
-
-        {/* ── Top Cloud Banner ("اختر جزيرتك السحرية") ── */}
-        <div
-          style={{
-            position: "absolute",
-            top: deviceType === "mobile" ? "6.5%" : deviceType === "tablet" ? "4%" : "6%",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: deviceType === "mobile" ? "74%" : deviceType === "tablet" ? "52%" : "48%",
-            height: deviceType === "mobile" ? "9.5%" : deviceType === "tablet" ? "18%" : "22%",
-            zIndex: 15,
-            pointerEvents: "none",
-          }}
-        >
-          <div style={{ position: "relative", width: "100%", height: "100%" }}>
-            <Image
-              src="/islands/cloud-banner.png"
-              alt="اختر جزيرتك السحرية"
-              fill
-              priority
-              style={{ objectFit: "contain" }}
-            />
-            {/* Playful Arabic Title Styled Crisp and Colorful */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                paddingTop: deviceType === "mobile" ? "0.5%" : "1%",
-                textAlign: "center",
-              }}
-            >
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize:
-                    deviceType === "mobile"
-                      ? "14px"
-                      : deviceType === "tablet"
-                      ? "22px"
-                      : "clamp(22px, 2.7vw, 40px)",
-                  fontWeight: 900,
-                  color: "#BE123C",
-                  textShadow: "0 2px 4px rgba(255,255,255,0.85)",
-                  lineHeight: 1.15,
-                }}
-              >
-                اختر جزيرتك السحرية
-              </h1>
-              <p
-                style={{
-                  margin: deviceType === "mobile" ? "1px 0 0" : "3px 0 0",
-                  fontSize:
-                    deviceType === "mobile"
-                      ? "10px"
-                      : deviceType === "tablet"
-                      ? "13px"
-                      : "clamp(13px, 1.5vw, 22px)",
-                  fontWeight: 800,
-                  color: "#1D4ED8",
-                  textShadow: "0 1px 2px rgba(255,255,255,0.85)",
-                }}
-              >
-                وابدأ اللعب والتعلم
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Built-in Header 'مرحباً بك' hotspot in the image for mobile & desktop ── */}
-        <div
-          onClick={() => setShowProfileModal(true)}
-          style={{
-            position: "absolute",
-            top: deviceType === "mobile" ? "1.5%" : deviceType === "tablet" ? "1.8%" : "2%",
-            left: deviceType === "mobile" ? "2.5%" : deviceType === "tablet" ? "1.8%" : "1.5%",
-            width: deviceType === "mobile" ? "24%" : "13%",
-            height: deviceType === "mobile" ? "4.5%" : "6%",
-            cursor: "pointer",
-            borderRadius: "20px",
-            zIndex: 35,
-          }}
-          title="عرض بيانات الحساب"
         />
 
         {/* ── SVG Connecting Stepping Paths Between Islands ("خطوات بين الجزر") ── */}
@@ -738,6 +582,131 @@ export default function HomePage() {
             </div>
           );
         })}
+
+        {/* ── Bottom Controls: خروج + سحابة العنوان + حسابي (بدون أيقونات) ── */}
+        <footer
+          style={{
+            position: "absolute",
+            bottom: deviceType === "mobile" ? "10px" : "18px",
+            left: deviceType === "mobile" ? "10px" : "24px",
+            right: deviceType === "mobile" ? "10px" : "24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            zIndex: 35,
+            pointerEvents: "auto",
+          }}
+        >
+          {/* Right side (RTL start): زر الخروج بدون أيقونة */}
+          <button
+            onClick={handleSignOut}
+            style={{
+              background: "#FF5E7E",
+              color: "white",
+              border: "2px solid white",
+              borderRadius: "20px",
+              padding: deviceType === "mobile" ? "6px 14px" : "8px 22px",
+              fontSize: deviceType === "mobile" ? "12px" : "14px",
+              fontWeight: 800,
+              cursor: "pointer",
+              boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+              transition: "transform 0.2s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            خروج
+          </button>
+
+          {/* Center: سحابة العنوان مع الكتابة */}
+          <div
+            style={{
+              position: "relative",
+              width: deviceType === "mobile" ? "190px" : deviceType === "tablet" ? "260px" : "310px",
+              height: deviceType === "mobile" ? "62px" : deviceType === "tablet" ? "78px" : "90px",
+              flexShrink: 0,
+              pointerEvents: "none",
+            }}
+          >
+            <Image
+              src="/islands/cloud-banner.png"
+              alt="اختر جزيرتك السحرية"
+              fill
+              priority
+              style={{ objectFit: "contain" }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                paddingTop: deviceType === "mobile" ? "2px" : "4px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize:
+                    deviceType === "mobile"
+                      ? "12px"
+                      : deviceType === "tablet"
+                      ? "15px"
+                      : "18px",
+                  fontWeight: 900,
+                  color: "#BE123C",
+                  textShadow: "0 1px 3px rgba(255,255,255,0.9)",
+                  lineHeight: 1.2,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                اختر جزيرتك السحرية
+              </div>
+              <div
+                style={{
+                  fontSize:
+                    deviceType === "mobile"
+                      ? "9px"
+                      : deviceType === "tablet"
+                      ? "11px"
+                      : "13px",
+                  fontWeight: 800,
+                  color: "#1D4ED8",
+                  textShadow: "0 1px 2px rgba(255,255,255,0.9)",
+                  lineHeight: 1.2,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                وابدأ اللعب والتعلم
+              </div>
+            </div>
+          </div>
+
+          {/* Left side (RTL end): زر حسابي بدون أيقونات */}
+          <button
+            onClick={() => setShowProfileModal(true)}
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              padding: deviceType === "mobile" ? "6px 14px" : "8px 22px",
+              borderRadius: "20px",
+              color: "#5B4FA8",
+              fontWeight: 800,
+              fontSize: deviceType === "mobile" ? "12px" : "14px",
+              boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
+              border: "2px solid #5B4FA8",
+              cursor: "pointer",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            {deviceType === "mobile" ? (childName ? childName : "حسابي") : "حسابي"}
+          </button>
+        </footer>
       </div>
 
       {/* ── User & Guardian Profile Modal ── */}
@@ -761,7 +730,6 @@ export default function HomePage() {
               position: "relative",
             }}
           >
-            <div style={{ fontSize: 40, marginBottom: 4 }}>👨‍👩‍👧‍👦🌟</div>
             <h2 style={{ color: "#5B4FA8", margin: "0 0 4px 0", fontSize: 20, fontWeight: 900 }}>
               بيانات الحساب وولي الأمر
             </h2>
@@ -785,16 +753,16 @@ export default function HomePage() {
               }}
             >
               <div>
-                <span style={{ color: "#718096", fontWeight: 700 }}>📧 الحساب المسجل: </span>
+                <span style={{ color: "#718096", fontWeight: 700 }}>الحساب المسجل: </span>
                 <span style={{ color: "#2D3748", fontWeight: 800, direction: "ltr", display: "inline-block" }}>
                   {currentUser?.email || "غير متوفر"}
                 </span>
               </div>
 
               <div>
-                <span style={{ color: "#718096", fontWeight: 700 }}>🔐 طريقة الدخول: </span>
+                <span style={{ color: "#718096", fontWeight: 700 }}>طريقة الدخول: </span>
                 <span style={{ color: "#2D3748", fontWeight: 800 }}>
-                  {currentUser?.app_metadata?.provider === "google" ? "حساب Google 🌐" : "البريد الإلكتروني ✉️"}
+                  {currentUser?.app_metadata?.provider === "google" ? "حساب Google" : "البريد الإلكتروني"}
                 </span>
               </div>
             </div>
@@ -811,7 +779,7 @@ export default function HomePage() {
               }}
             >
               <h3 style={{ color: "#166534", margin: "0 0 12px 0", fontSize: 15, fontWeight: 800, display: "flex", alignItems: "center", gap: 6 }}>
-                <span>📝 بيانات ولي الأمر والطفل</span>
+                <span>بيانات ولي الأمر والطفل</span>
               </h3>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -924,12 +892,12 @@ export default function HomePage() {
                     transition: "transform 0.2s",
                   }}
                 >
-                  {savingProfile ? "⏳ جارٍ الحفظ..." : "💾 حفظ وتحديث البيانات"}
+                  {savingProfile ? "جارٍ الحفظ..." : "حفظ وتحديث البيانات"}
                 </button>
 
                 {saveSuccess && (
                   <div style={{ color: "#15803D", fontSize: 13, fontWeight: 700, textAlign: "center", marginTop: 4 }}>
-                    ✅ تم حفظ وتحديث البيانات بنجاح في قاعدة البيانات!
+                    تم حفظ وتحديث البيانات بنجاح في قاعدة البيانات!
                   </div>
                 )}
               </div>
@@ -938,7 +906,7 @@ export default function HomePage() {
             {/* Progress and Reset Box */}
             <div style={{ background: "#EEF2FF", border: "1px solid #C7D2FE", borderRadius: 16, padding: "10px 14px", marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <span style={{ fontWeight: 800, color: "#4338CA", fontSize: 13 }}>⭐ تقدم البطل في الجزر:</span>
+                <span style={{ fontWeight: 800, color: "#4338CA", fontSize: 13 }}>تقدم البطل في الجزر:</span>
                 <span style={{ fontWeight: 900, color: "#4338CA", fontSize: 13 }}>{completedIslands.length} من {ISLAND_ZONES.length} مكتملة</span>
               </div>
               <div style={{ height: 8, background: "#E0E7FF", borderRadius: 4, overflow: "hidden" }}>
@@ -958,7 +926,7 @@ export default function HomePage() {
                   padding: 0,
                 }}
               >
-                🔄 إعادة قفل الجزر من البداية (للتجربة)
+                إعادة قفل الجزر من البداية (للتجربة)
               </button>
             </div>
 
@@ -994,7 +962,7 @@ export default function HomePage() {
                   cursor: "pointer",
                 }}
               >
-                تسجيل الخروج 🚪
+                تسجيل الخروج
               </button>
             </div>
           </div>
