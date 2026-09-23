@@ -508,7 +508,12 @@ export default function HomePage() {
         <div
           style={{
             position: "absolute",
-            top: deviceType === "mobile" ? "8px" : deviceType === "tablet" ? "12px" : "16px",
+            top:
+              deviceType === "mobile"
+                ? "max(52px, calc(env(safe-area-inset-top, 0px) + 16px))"
+                : deviceType === "tablet"
+                ? "24px"
+                : "28px",
             left: "50%",
             transform: "translateX(-50%)",
             width: deviceType === "mobile" ? "120px" : deviceType === "tablet" ? "220px" : "360px",
