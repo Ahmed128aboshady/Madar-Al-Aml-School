@@ -8,24 +8,22 @@ interface IslandZone {
   title: string;
   description: string;
   themeColor: string;
-  // Desktop 16:9 coordinates
+  imageSrc: string;
+  // Desktop coordinates
   desktopTop: string;
   desktopLeft: string;
   desktopWidth: string;
   desktopHeight: string;
-  desktopButtonTop: string;
-  // Tablet 4:3 coordinates
+  // Tablet coordinates
   tabletTop: string;
   tabletLeft: string;
   tabletWidth: string;
   tabletHeight: string;
-  tabletButtonTop: string;
-  // Mobile 9:16 coordinates
+  // Mobile coordinates
   mobileTop: string;
   mobileLeft: string;
   mobileWidth: string;
   mobileHeight: string;
-  mobileButtonTop: string;
 }
 
 const ISLAND_ZONES: IslandZone[] = [
@@ -34,105 +32,95 @@ const ISLAND_ZONES: IslandZone[] = [
     title: "تعرف على الحيوانات",
     description: "مرحباً بك في جزيرة الأسد والأصدقاء! سنكتشف سوياً أصوات الحيوانات وأشكالها الجميلة بطريقة سهلة وممتعة.",
     themeColor: "#E07820",
-    desktopTop: "19%",
-    desktopLeft: "13%",
-    desktopWidth: "25%",
-    desktopHeight: "34%",
-    desktopButtonTop: "74%",
-    tabletTop: "20%",
-    tabletLeft: "12%",
-    tabletWidth: "27%",
-    tabletHeight: "33%",
-    tabletButtonTop: "74%",
-    mobileTop: "19%",
-    mobileLeft: "5%",
-    mobileWidth: "44%",
-    mobileHeight: "22%",
-    mobileButtonTop: "75%",
+    imageSrc: "/islands/island-animals.png",
+    desktopTop: "17%",
+    desktopLeft: "12%",
+    desktopWidth: "26%",
+    desktopHeight: "36%",
+    tabletTop: "18%",
+    tabletLeft: "10%",
+    tabletWidth: "30%",
+    tabletHeight: "34%",
+    mobileTop: "16%",
+    mobileLeft: "3%",
+    mobileWidth: "47%",
+    mobileHeight: "24%",
   },
   {
     id: "fruits",
     title: "تعرف على الفواكه",
     description: "أهلاً بك في جزيرة الفواكه اللذيذة! هيا نتعرف على التفاح والموز والبرتقال وفوائدها لصحتنا وطاقتنا.",
     themeColor: "#D62246",
-    desktopTop: "24%",
+    imageSrc: "/islands/island-fruits.png",
+    desktopTop: "22%",
     desktopLeft: "58%",
     desktopWidth: "26%",
-    desktopHeight: "34%",
-    desktopButtonTop: "75%",
-    tabletTop: "24%",
-    tabletLeft: "57%",
-    tabletWidth: "28%",
-    tabletHeight: "33%",
-    tabletButtonTop: "75%",
-    mobileTop: "19.5%",
-    mobileLeft: "51%",
-    mobileWidth: "44%",
-    mobileHeight: "22%",
-    mobileButtonTop: "75%",
+    desktopHeight: "36%",
+    tabletTop: "22%",
+    tabletLeft: "58%",
+    tabletWidth: "30%",
+    tabletHeight: "34%",
+    mobileTop: "17%",
+    mobileLeft: "50%",
+    mobileWidth: "47%",
+    mobileHeight: "24%",
   },
   {
     id: "vegetables",
     title: "تعرف على الخضار",
     description: "جزيرة الخضار الطازجة! سنلعب مع الجزر والبروكلي اللطيف ونتعلم ألوانها وأهميتها لأجسامنا القوية.",
     themeColor: "#2E7D32",
-    desktopTop: "39%",
-    desktopLeft: "36%",
+    imageSrc: "/islands/island-vegetables.png",
+    desktopTop: "37%",
+    desktopLeft: "35%",
     desktopWidth: "27%",
-    desktopHeight: "36%",
-    desktopButtonTop: "74%",
-    tabletTop: "40%",
+    desktopHeight: "38%",
+    tabletTop: "38%",
     tabletLeft: "34%",
-    tabletWidth: "30%",
+    tabletWidth: "32%",
     tabletHeight: "35%",
-    tabletButtonTop: "74%",
-    mobileTop: "40%",
-    mobileLeft: "27%",
-    mobileWidth: "46%",
-    mobileHeight: "24%",
-    mobileButtonTop: "75%",
+    mobileTop: "38%",
+    mobileLeft: "26%",
+    mobileWidth: "49%",
+    mobileHeight: "25%",
   },
   {
     id: "vehicles",
     title: "تعرف على المواصلات",
     description: "أهلاً بك في جزيرة السيارات والطائرات! هيا نقود السيارة ونحلق بالطائرة ونتعرف على وسائل النقل السريعة.",
     themeColor: "#0077B6",
-    desktopTop: "57%",
-    desktopLeft: "7%",
-    desktopWidth: "26%",
-    desktopHeight: "34%",
-    desktopButtonTop: "75%",
-    tabletTop: "57%",
+    imageSrc: "/islands/island-vehicles.png",
+    desktopTop: "56%",
+    desktopLeft: "6%",
+    desktopWidth: "28%",
+    desktopHeight: "36%",
+    tabletTop: "56%",
     tabletLeft: "5%",
-    tabletWidth: "29%",
-    tabletHeight: "33%",
-    tabletButtonTop: "75%",
-    mobileTop: "63%",
-    mobileLeft: "5%",
-    mobileWidth: "44%",
+    tabletWidth: "32%",
+    tabletHeight: "34%",
+    mobileTop: "62%",
+    mobileLeft: "3%",
+    mobileWidth: "47%",
     mobileHeight: "24%",
-    mobileButtonTop: "75%",
   },
   {
     id: "daily-actions",
     title: "تعرف على الأفعال اليومية",
     description: "جزيرة الأفعال اليومية مع النجمة اللامعة! نتعلم كيف ننظف أسناننا، نغسل أيدينا، ونرتب كتبنا وألعابنا.",
     themeColor: "#5B4FA8",
-    desktopTop: "60%",
-    desktopLeft: "64%",
-    desktopWidth: "27%",
-    desktopHeight: "34%",
-    desktopButtonTop: "75%",
-    tabletTop: "59%",
+    imageSrc: "/islands/island-daily-actions.png",
+    desktopTop: "58%",
+    desktopLeft: "63%",
+    desktopWidth: "28%",
+    desktopHeight: "36%",
+    tabletTop: "58%",
     tabletLeft: "63%",
-    tabletWidth: "30%",
-    tabletHeight: "33%",
-    tabletButtonTop: "75%",
-    mobileTop: "63%",
-    mobileLeft: "51%",
-    mobileWidth: "44%",
+    tabletWidth: "32%",
+    tabletHeight: "34%",
+    mobileTop: "62%",
+    mobileLeft: "50%",
+    mobileWidth: "47%",
     mobileHeight: "24%",
-    mobileButtonTop: "75%",
   },
 ];
 
@@ -424,16 +412,10 @@ export default function HomePage() {
           overflow: "hidden",
         }}
       >
-        {/* The Exact Image Rendered to fill the screen */}
+        {/* Clean Background Map Image */}
         <Image
-          src={
-            deviceType === "mobile"
-              ? "/sky-map-mobile.png"
-              : deviceType === "tablet"
-              ? "/sky-map-tablet.png"
-              : "/sky-map.png"
-          }
-          alt="جزر مدار الأمل التعليمية السحرية"
+          src="/islands/map-background.png"
+          alt="خلفية جزر مدار الأمل التعليمية"
           fill
           priority
           sizes="100vw"
@@ -443,6 +425,67 @@ export default function HomePage() {
           }}
         />
 
+        {/* ── Top Cloud Banner ("اختر جزيرتك السحرية") ── */}
+        <div
+          style={{
+            position: "absolute",
+            top: deviceType === "mobile" ? "2%" : "2%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: deviceType === "mobile" ? "88%" : deviceType === "tablet" ? "54%" : "38%",
+            height: deviceType === "mobile" ? "12%" : deviceType === "tablet" ? "16%" : "17%",
+            zIndex: 15,
+            pointerEvents: "none",
+          }}
+        >
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            <Image
+              src="/islands/cloud-banner.png"
+              alt="اختر جزيرتك السحرية"
+              fill
+              priority
+              style={{ objectFit: "contain" }}
+            />
+            {/* Playful Arabic Title Styled Crisp and Colorful */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingTop: "2%",
+                textAlign: "center",
+              }}
+            >
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: deviceType === "mobile" ? "16px" : "clamp(18px, 2.2vw, 32px)",
+                  fontWeight: 900,
+                  color: "#BE123C",
+                  textShadow: "0 2px 4px rgba(255,255,255,0.85)",
+                  lineHeight: 1.1,
+                }}
+              >
+                اختر جزيرتك السحرية
+              </h1>
+              <p
+                style={{
+                  margin: "2px 0 0",
+                  fontSize: deviceType === "mobile" ? "11px" : "clamp(11px, 1.2vw, 17px)",
+                  fontWeight: 800,
+                  color: "#1D4ED8",
+                  textShadow: "0 1px 2px rgba(255,255,255,0.85)",
+                }}
+              >
+                وابدأ اللعب والتعلم
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* ── Built-in Header 'مرحباً بك' hotspot in the image for mobile & desktop ── */}
         <div
           onClick={() => setShowProfileModal(true)}
@@ -450,8 +493,8 @@ export default function HomePage() {
             position: "absolute",
             top: deviceType === "mobile" ? "1.5%" : deviceType === "tablet" ? "1.8%" : "2%",
             left: deviceType === "mobile" ? "2.5%" : deviceType === "tablet" ? "1.8%" : "1.5%",
-            width: deviceType === "mobile" ? "24%" : deviceType === "tablet" ? "16%" : "13%",
-            height: deviceType === "mobile" ? "4.5%" : deviceType === "tablet" ? "5.5%" : "6%",
+            width: deviceType === "mobile" ? "24%" : "13%",
+            height: deviceType === "mobile" ? "4.5%" : "6%",
             cursor: "pointer",
             borderRadius: "20px",
             zIndex: 35,
@@ -459,14 +502,23 @@ export default function HomePage() {
           title="عرض بيانات الحساب"
         />
 
-        {/* ── Interactive Hotspots locked strictly to each Island ── */}
+        {/* ── 5 Interactive Individual Island Assets ── */}
         {ISLAND_ZONES.map((zone) => {
           const { isUnlocked, isCompleted, previousZone } = getIslandStatus(zone.id, completedIslands);
+
+          const posTop =
+            deviceType === "mobile" ? zone.mobileTop : deviceType === "tablet" ? zone.tabletTop : zone.desktopTop;
+          const posLeft =
+            deviceType === "mobile" ? zone.mobileLeft : deviceType === "tablet" ? zone.tabletLeft : zone.desktopLeft;
+          const posWidth =
+            deviceType === "mobile" ? zone.mobileWidth : deviceType === "tablet" ? zone.tabletWidth : zone.desktopWidth;
+          const posHeight =
+            deviceType === "mobile" ? zone.mobileHeight : deviceType === "tablet" ? zone.tabletHeight : zone.desktopHeight;
 
           return (
             <div
               key={zone.id}
-              className="island-hotspot"
+              className="island-card"
               onClick={() => {
                 if (!isUnlocked && previousZone) {
                   setLockedNoticeZone({ zone, prevZone: previousZone });
@@ -475,90 +527,87 @@ export default function HomePage() {
                 }
               }}
               style={{
-                top:
-                  deviceType === "mobile"
-                    ? zone.mobileTop
-                    : deviceType === "tablet"
-                    ? zone.tabletTop
-                    : zone.desktopTop,
-                left:
-                  deviceType === "mobile"
-                    ? zone.mobileLeft
-                    : deviceType === "tablet"
-                    ? zone.tabletLeft
-                    : zone.desktopLeft,
-                width:
-                  deviceType === "mobile"
-                    ? zone.mobileWidth
-                    : deviceType === "tablet"
-                    ? zone.tabletWidth
-                    : zone.desktopWidth,
-                height:
-                  deviceType === "mobile"
-                    ? zone.mobileHeight
-                    : deviceType === "tablet"
-                    ? zone.tabletHeight
-                    : zone.desktopHeight,
+                position: "absolute",
+                top: posTop,
+                left: posLeft,
+                width: posWidth,
+                height: posHeight,
                 cursor: "pointer",
-                borderRadius: "36px",
-                // تأثير تحويل الجزيرة المقفلة إلى الأبيض والأسود (بدون ألوان)
-                backdropFilter: !isUnlocked
-                  ? "grayscale(100%) contrast(0.85) brightness(0.82)"
-                  : "none",
-                WebkitBackdropFilter: !isUnlocked
-                  ? "grayscale(100%) contrast(0.85) brightness(0.82)"
-                  : "none",
-                backgroundColor: !isUnlocked ? "rgba(30, 41, 59, 0.22)" : "transparent",
-                boxShadow: !isUnlocked
-                  ? "inset 0 0 24px rgba(0, 0, 0, 0.25), 0 4px 16px rgba(0,0,0,0.15)"
-                  : "none",
-                transition: "all 0.5s ease",
+                zIndex: 20,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              }}
+              onMouseEnter={(e) => {
+                if (isUnlocked) e.currentTarget.style.transform = "scale(1.05)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
               }}
             >
-              {/* Floating lock badge in center of locked island */}
-              {!isUnlocked && (
-                <div
+              {/* Island Image: Grayscale directly on the PNG when locked, Vibrant color when unlocked */}
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  height: "82%",
+                  filter: isUnlocked
+                    ? "drop-shadow(0 10px 18px rgba(0,0,0,0.18))"
+                    : "grayscale(100%) brightness(0.8) contrast(0.9) drop-shadow(0 6px 12px rgba(0,0,0,0.25))",
+                  opacity: isUnlocked ? 1 : 0.75,
+                  transition: "filter 0.5s ease, opacity 0.5s ease",
+                }}
+              >
+                <Image
+                  src={zone.imageSrc}
+                  alt={zone.title}
+                  fill
+                  priority
                   style={{
-                    position: "absolute",
-                    top: "42%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    background: "rgba(15, 23, 42, 0.82)",
-                    border: "2.5px solid rgba(255, 255, 255, 0.8)",
-                    borderRadius: "50%",
-                    width: deviceType === "mobile" ? 38 : 52,
-                    height: deviceType === "mobile" ? 38 : 52,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: deviceType === "mobile" ? 20 : 26,
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.45)",
-                    pointerEvents: "none",
+                    objectFit: "contain",
+                    objectPosition: "center",
                   }}
-                  title="جزيرة مقفلة"
-                >
-                  🔒
-                </div>
-              )}
+                />
 
-              {/* Click to start tag / Locked tag / Completed tag */}
+                {/* Floating Lock Badge directly over the character when locked */}
+                {!isUnlocked && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "45%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      background: "rgba(15, 23, 42, 0.82)",
+                      border: "2.5px solid rgba(255, 255, 255, 0.85)",
+                      borderRadius: "50%",
+                      width: deviceType === "mobile" ? 36 : 48,
+                      height: deviceType === "mobile" ? 36 : 48,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: deviceType === "mobile" ? 18 : 24,
+                      boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+                      pointerEvents: "none",
+                    }}
+                    title="جزيرة مقفلة"
+                  >
+                    🔒
+                  </div>
+                )}
+              </div>
+
+              {/* Status Tag Button directly under the wooden sign */}
               <div
                 className="hotspot-tag"
                 style={{
-                  position: "absolute",
-                  top:
-                    deviceType === "mobile"
-                      ? zone.mobileButtonTop
-                      : deviceType === "tablet"
-                      ? zone.tabletButtonTop
-                      : zone.desktopButtonTop,
-                  left: "50%",
-                  transform: "translateX(-50%)",
+                  marginTop: "-5%",
                   background: !isUnlocked
-                    ? "rgba(240, 243, 246, 0.96)"
+                    ? "rgba(240, 243, 246, 0.98)"
                     : isCompleted
                     ? "rgba(240, 253, 244, 0.98)"
-                    : "rgba(255, 255, 255, 0.96)",
+                    : "rgba(255, 255, 255, 0.98)",
                   color: !isUnlocked ? "#64748B" : isCompleted ? "#16A34A" : zone.themeColor,
                   padding: deviceType === "mobile" ? "3px 10px" : "5px 16px",
                   borderRadius: "18px",
@@ -571,7 +620,7 @@ export default function HomePage() {
                     : `2px solid ${zone.themeColor}`,
                   boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
                   whiteSpace: "nowrap",
-                  cursor: "pointer",
+                  zIndex: 25,
                   display: "flex",
                   alignItems: "center",
                   gap: 5,
