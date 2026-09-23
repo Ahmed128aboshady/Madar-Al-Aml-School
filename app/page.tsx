@@ -263,10 +263,28 @@ export default function HomePage() {
           setParentPhone(meta.parent_phone || meta.phone || "");
           setParentCity(meta.parent_city || "");
 
-          // استرجاع الجزر المكتملة مع التأكد من قفل جميع الجزر للمستخدم
+          // مزامنة تقدم الحيوانات بدقة بين المتصفح و Supabase
+          let curAnimalsCount = 0;
+          const savedAnimals = localStorage.getItem("madar_animals_completed_ids");
+          if (savedAnimals) {
+            try {
+              const parsed = JSON.parse(savedAnimals);
+              if (Array.isArray(parsed)) curAnimalsCount = parsed.length;
+            } catch {}
+          }
+          if (typeof meta.animals_progress_count === "number" && meta.animals_progress_count > curAnimalsCount) {
+            curAnimalsCount = meta.animals_progress_count;
+            if (Array.isArray(meta.animals_completed_ids)) {
+              try {
+                localStorage.setItem("madar_animals_completed_ids", JSON.stringify(meta.animals_completed_ids));
+              } catch {}
+            }
+          }
+          setAnimalsProgressCount(curAnimalsCount);
+
+          // استرجاع الجزر المكتملة مع التأكد من قفل جميع الجزر طالما لم ينجز 80% من الحيوانات
           try {
-            if (localStorage.getItem("madar_supabase_reset_v4") !== "done") {
-              localStorage.setItem("madar_supabase_reset_v4", "done");
+            if (curAnimalsCount < 10) {
               setCompletedIslands([]);
               localStorage.removeItem("madar_completed_islands");
               await supabase.auth.updateUser({
@@ -274,9 +292,6 @@ export default function HomePage() {
               });
             } else if (Array.isArray(meta.completed_islands) && meta.completed_islands.length > 0) {
               setCompletedIslands(meta.completed_islands);
-              try {
-                localStorage.setItem("madar_completed_islands", JSON.stringify(meta.completed_islands));
-              } catch {}
             }
           } catch {}
         } else {
@@ -452,6 +467,29 @@ export default function HomePage() {
           }}
         />
 
+        {/* ── Top Center: Madar Al Amal Logo in Sky (لوجو مدار الأمل في السماء) ── */}
+        <div
+          style={{
+            position: "absolute",
+            top: deviceType === "mobile" ? "8px" : deviceType === "tablet" ? "12px" : "18px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: deviceType === "mobile" ? "120px" : deviceType === "tablet" ? "170px" : "220px",
+            height: deviceType === "mobile" ? "42px" : deviceType === "tablet" ? "58px" : "75px",
+            zIndex: 25,
+            pointerEvents: "none",
+            filter: "drop-shadow(0 4px 14px rgba(255, 255, 255, 0.85)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12))",
+          }}
+        >
+          <Image
+            src="/logo.png"
+            alt="مدار الأمل"
+            fill
+            priority
+            style={{ objectFit: "contain" }}
+          />
+        </div>
+
         {/* ── SVG Connecting Stepping Paths Between Islands ("خطوات بين الجزر") ── */}
         <svg
           viewBox="0 0 100 100"
@@ -528,10 +566,10 @@ export default function HomePage() {
               key={zone.id}
               className="island-card"
               onClick={() => {
-                if (!isUnlocked && previousZone) {
-                  setLockedNoticeZone({ zone, prevZone: previousZone });
-                } else {
+                if (zone.id === "animals") {
                   setActiveIsland(zone);
+                } else {
+                  setLockedNoticeZone({ zone, prevZone: ISLAND_ZONES[0] });
                 }
               }}
               style={{
@@ -587,10 +625,10 @@ export default function HomePage() {
         <footer
           style={{
             position: "absolute",
-            bottom: deviceType === "mobile" ? "6px" : "14px",
+            bottom: deviceType === "mobile" ? "6px" : deviceType === "tablet" ? "14px" : "20px",
             left: 0,
             right: 0,
-            height: deviceType === "mobile" ? "98px" : "145px",
+            height: deviceType === "mobile" ? "98px" : deviceType === "tablet" ? "145px" : "195px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -603,18 +641,18 @@ export default function HomePage() {
             onClick={handleSignOut}
             style={{
               position: "absolute",
-              right: deviceType === "mobile" ? "10px" : "28px",
-              bottom: deviceType === "mobile" ? "14px" : "22px",
+              right: deviceType === "mobile" ? "10px" : deviceType === "tablet" ? "28px" : "48px",
+              bottom: deviceType === "mobile" ? "14px" : deviceType === "tablet" ? "22px" : "32px",
               fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
               background: "linear-gradient(135deg, #FF6584, #FF4568)",
               color: "white",
-              border: "2.5px solid white",
-              borderRadius: "24px",
-              padding: deviceType === "mobile" ? "6px 14px" : "8px 22px",
-              fontSize: deviceType === "mobile" ? "13px" : "15px",
+              border: deviceType === "mobile" ? "2.5px solid white" : "3.5px solid white",
+              borderRadius: deviceType === "mobile" ? "24px" : "36px",
+              padding: deviceType === "mobile" ? "6px 14px" : deviceType === "tablet" ? "10px 24px" : "14px 34px",
+              fontSize: deviceType === "mobile" ? "13px" : deviceType === "tablet" ? "16px" : "20px",
               fontWeight: 800,
               cursor: "pointer",
-              boxShadow: "0 4px 14px rgba(255, 69, 104, 0.35)",
+              boxShadow: "0 6px 18px rgba(255, 69, 104, 0.4)",
               transition: "transform 0.2s",
               whiteSpace: "nowrap",
               pointerEvents: "auto",
@@ -629,8 +667,18 @@ export default function HomePage() {
           <div
             style={{
               position: "relative",
-              width: deviceType === "mobile" ? "clamp(240px, 66vw, 275px)" : deviceType === "tablet" ? "350px" : "420px",
-              height: deviceType === "mobile" ? "94px" : deviceType === "tablet" ? "120px" : "144px",
+              width:
+                deviceType === "mobile"
+                  ? "clamp(240px, 66vw, 275px)"
+                  : deviceType === "tablet"
+                  ? "380px"
+                  : "500px",
+              height:
+                deviceType === "mobile"
+                  ? "94px"
+                  : deviceType === "tablet"
+                  ? "130px"
+                  : "175px",
               pointerEvents: "none",
               display: "flex",
               alignItems: "center",
@@ -653,7 +701,7 @@ export default function HomePage() {
                 alignItems: "center",
                 justifyContent: "center",
                 textAlign: "center",
-                paddingTop: deviceType === "mobile" ? "2px" : "6px",
+                paddingTop: deviceType === "mobile" ? "2px" : deviceType === "tablet" ? "6px" : "10px",
               }}
             >
               <div
@@ -663,8 +711,8 @@ export default function HomePage() {
                     deviceType === "mobile"
                       ? "18px"
                       : deviceType === "tablet"
-                      ? "24px"
-                      : "28px",
+                      ? "25px"
+                      : "34px",
                   fontWeight: 900,
                   color: "#E11D48",
                   textShadow: `
@@ -676,7 +724,7 @@ export default function HomePage() {
                      0px -3px 0 #ffffff,
                     -3px  0px 0 #ffffff,
                      3px  0px 0 #ffffff,
-                     0 4px 10px rgba(0, 0, 0, 0.22)
+                     0 5px 12px rgba(0, 0, 0, 0.22)
                   `,
                   lineHeight: 1.15,
                   whiteSpace: "nowrap",
@@ -692,8 +740,8 @@ export default function HomePage() {
                     deviceType === "mobile"
                       ? "13px"
                       : deviceType === "tablet"
-                      ? "17px"
-                      : "20px",
+                      ? "18px"
+                      : "24px",
                   fontWeight: 900,
                   color: "#2563EB",
                   textShadow: `
@@ -703,11 +751,11 @@ export default function HomePage() {
                      1.5px  1.5px 0 #ffffff,
                      0px  2px 0 #ffffff,
                      0px -2px 0 #ffffff,
-                     0 3px 8px rgba(0, 0, 0, 0.18)
+                     0 4px 10px rgba(0, 0, 0, 0.18)
                   `,
                   lineHeight: 1.15,
                   whiteSpace: "nowrap",
-                  marginTop: deviceType === "mobile" ? "1px" : "3px",
+                  marginTop: deviceType === "mobile" ? "1px" : "4px",
                   letterSpacing: "-0.2px",
                 }}
               >
@@ -721,17 +769,17 @@ export default function HomePage() {
             onClick={() => setShowProfileModal(true)}
             style={{
               position: "absolute",
-              left: deviceType === "mobile" ? "10px" : "28px",
-              bottom: deviceType === "mobile" ? "14px" : "22px",
+              left: deviceType === "mobile" ? "10px" : deviceType === "tablet" ? "28px" : "48px",
+              bottom: deviceType === "mobile" ? "14px" : deviceType === "tablet" ? "22px" : "32px",
               fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
               background: "rgba(255, 255, 255, 0.96)",
-              padding: deviceType === "mobile" ? "6px 14px" : "8px 22px",
-              borderRadius: "24px",
+              padding: deviceType === "mobile" ? "6px 14px" : deviceType === "tablet" ? "10px 24px" : "14px 34px",
+              borderRadius: deviceType === "mobile" ? "24px" : "36px",
               color: "#5B4FA8",
               fontWeight: 800,
-              fontSize: deviceType === "mobile" ? "13px" : "15px",
-              boxShadow: "0 4px 14px rgba(91, 79, 168, 0.25)",
-              border: "2.5px solid #5B4FA8",
+              fontSize: deviceType === "mobile" ? "13px" : deviceType === "tablet" ? "16px" : "20px",
+              boxShadow: "0 6px 18px rgba(91, 79, 168, 0.28)",
+              border: deviceType === "mobile" ? "2.5px solid #5B4FA8" : "3.5px solid #5B4FA8",
               cursor: "pointer",
               transition: "transform 0.2s, box-shadow 0.2s",
               whiteSpace: "nowrap",
@@ -940,14 +988,36 @@ export default function HomePage() {
             </div>
 
             {/* Progress and Reset Box */}
-            <div style={{ background: "#EEF2FF", border: "1px solid #C7D2FE", borderRadius: 16, padding: "10px 14px", marginBottom: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <span style={{ fontWeight: 800, color: "#4338CA", fontSize: 13 }}>تقدم البطل في الجزر:</span>
-                <span style={{ fontWeight: 900, color: "#4338CA", fontSize: 13 }}>{completedIslands.length} من {ISLAND_ZONES.length} مكتملة</span>
+            <div style={{ background: "#EEF2FF", border: "1px solid #C7D2FE", borderRadius: 16, padding: "12px 16px", marginBottom: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontWeight: 800, color: "#4338CA", fontSize: 13 }}>تقدم البطل في جزيرة الحيوانات:</span>
+                <span style={{ fontWeight: 900, color: "#4338CA", fontSize: 13 }}>
+                  {animalsProgressCount} من 13 حيوان ({Math.round((animalsProgressCount / 13) * 100)}%)
+                </span>
               </div>
-              <div style={{ height: 8, background: "#E0E7FF", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${(completedIslands.length / ISLAND_ZONES.length) * 100}%`, background: "linear-gradient(90deg, #6366F1, #10B981)", transition: "width 0.4s" }} />
+              <div style={{ height: 10, background: "#E0E7FF", borderRadius: 5, overflow: "hidden", marginBottom: 8 }}>
+                <div
+                  style={{
+                    height: "100%",
+                    width: `${Math.min(100, Math.round((animalsProgressCount / 13) * 100))}%`,
+                    background: "linear-gradient(90deg, #6366F1, #10B981)",
+                    transition: "width 0.4s",
+                  }}
+                />
               </div>
+              <div style={{ fontSize: 12, color: animalsProgressCount >= 10 ? "#059669" : "#D97706", fontWeight: 800, textAlign: "center" }}>
+                {animalsProgressCount >= 10
+                  ? "أحسنت! أتممت نسبة 80% وتم فتح جزيرة الخضار بنجاح!"
+                  : `متبقي حل ${Math.max(0, 10 - animalsProgressCount)} حيوانات لفتح جزيرة الخضار (المطلوب 80%)`}
+              </div>
+
+              <div style={{ marginTop: 10, paddingTop: 8, borderTop: "1px dashed #C7D2FE", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: 12, color: "#64748B", fontWeight: 700 }}>الجزر المكتملة كلياً:</span>
+                <span style={{ fontSize: 12, color: "#4338CA", fontWeight: 900 }}>
+                  {completedIslands.length} من {ISLAND_ZONES.length}
+                </span>
+              </div>
+
               <button
                 onClick={handleResetProgress}
                 style={{
@@ -957,9 +1027,11 @@ export default function HomePage() {
                   fontSize: 11,
                   fontWeight: 700,
                   cursor: "pointer",
-                  marginTop: 6,
+                  marginTop: 8,
                   textDecoration: "underline",
                   padding: 0,
+                  width: "100%",
+                  textAlign: "center",
                 }}
               >
                 إعادة قفل الجزر من البداية (للتجربة)
@@ -1008,126 +1080,39 @@ export default function HomePage() {
       {/* ── Animals Island Interactive Adventure ── */}
       {activeIsland?.id === "animals" && (
         <AnimalsIslandAdventure
-          onBackToMap={() => setActiveIsland(null)}
+          onBackToMap={() => {
+            // مزامنة أحدث إجابات تم حلها
+            try {
+              const savedAnimals = localStorage.getItem("madar_animals_completed_ids");
+              if (savedAnimals) {
+                const parsed = JSON.parse(savedAnimals);
+                if (Array.isArray(parsed)) {
+                  setAnimalsProgressCount(parsed.length);
+                }
+              }
+            } catch {}
+            setActiveIsland(null);
+          }}
           onCompleteIsland={handleCompleteIsland}
-          onProgressUpdate={(count) => setAnimalsProgressCount(count)}
+          onProgressUpdate={async (count, total, ids) => {
+            setAnimalsProgressCount(count);
+            try {
+              const { supabase } = await import("@/lib/supabase");
+              await supabase.auth.updateUser({
+                data: {
+                  animals_progress_count: count,
+                  animals_completed_ids: ids || [],
+                },
+              });
+            } catch (err) {
+              console.error("Failed to sync animals progress to supabase:", err);
+            }
+          }}
           deviceType={deviceType}
         />
       )}
 
-      {/* ── Modal Pop-up on other Islands Click ── */}
-      {activeIsland && activeIsland.id !== "animals" && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(10, 35, 70, 0.55)", backdropFilter: "blur(8px)" }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 32,
-              maxWidth: 440,
-              width: "100%",
-              padding: "30px 22px",
-              textAlign: "center",
-              boxShadow: "0 28px 56px rgba(0,0,0,0.35)",
-              border: `5px solid ${activeIsland.themeColor}`,
-              position: "relative",
-            }}
-          >
-            <h2
-              style={{
-                color: activeIsland.themeColor,
-                margin: "0 0 12px 0",
-                fontSize: 23,
-                fontWeight: 900,
-              }}
-            >
-              {activeIsland.title}
-            </h2>
-
-            <p
-              style={{
-                color: "#4A5568",
-                fontSize: 14,
-                lineHeight: 1.6,
-                marginBottom: 16,
-                fontWeight: 600,
-              }}
-            >
-              {activeIsland.description}
-            </p>
-
-            {completedIslands.includes(activeIsland.id) ? (
-              <div
-                style={{
-                  background: "#DCFCE7",
-                  color: "#15803D",
-                  borderRadius: 14,
-                  padding: "8px 12px",
-                  fontSize: 13,
-                  fontWeight: 800,
-                  marginBottom: 16,
-                  border: "1px solid #86EFAC",
-                }}
-              >
-                ⭐ هذه الجزيرة مكتملة ومفتوحة دائماً!
-              </div>
-            ) : (
-              <div
-                style={{
-                  background: "#FEF3C7",
-                  color: "#92400E",
-                  borderRadius: 14,
-                  padding: "8px 12px",
-                  fontSize: 12,
-                  fontWeight: 800,
-                  marginBottom: 16,
-                  border: "1px solid #FCD34D",
-                }}
-              >
-                🎯 أكمل مغامرة هذه الجزيرة لفتح الجزيرة التالية على الخريطة!
-              </div>
-            )}
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <button
-                onClick={() => handleCompleteIsland(activeIsland.id)}
-                style={{
-                  background: "linear-gradient(135deg, #16A34A 0%, #15803D 100%)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: 22,
-                  padding: "12px 20px",
-                  fontSize: 15,
-                  fontWeight: 900,
-                  cursor: "pointer",
-                  boxShadow: "0 6px 18px rgba(22, 163, 74, 0.35)",
-                }}
-              >
-                🎉 إكمال المغامرة وفتح الجزيرة التالية ⭐
-              </button>
-
-              <button
-                onClick={() => setActiveIsland(null)}
-                style={{
-                  background: "#EDF2F7",
-                  color: "#4A5568",
-                  border: "none",
-                  borderRadius: 22,
-                  padding: "10px 20px",
-                  fontSize: 14,
-                  fontWeight: 800,
-                  cursor: "pointer",
-                }}
-              >
-                إغلاق والعودة للخريطة ✖️
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Modal Pop-up on Locked Island Click ── */}
+      {/* ── Modal Pop-up on Locked Island Click (توجيه الطفل إلى جزيرة الحيوانات) ── */}
       {lockedNoticeZone && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -1153,7 +1138,7 @@ export default function HomePage() {
             {lockedNoticeZone.zone.id === "vegetables" ? (
               <>
                 <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
-                  يا بطل! عليك أولاً إكمال <strong>80% على الأقل</strong> من جزيرة الحيوانات (حل 10 حيوانات على الأقل) لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong>!
+                  يا بطل! عليك أولاً التوجه إلى <strong>جزيرة الحيوانات</strong> وإكمال <strong>80% على الأقل</strong> (حل 10 حيوانات على الأقل) لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong>!
                 </p>
                 <div
                   style={{
@@ -1172,30 +1157,29 @@ export default function HomePage() {
               </>
             ) : (
               <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
-                يا بطل! عليك أولاً إكمال مغامرة <strong>{lockedNoticeZone.prevZone.title}</strong> لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong> السحرية!
+                يا بطل! عليك أولاً التوجه إلى <strong>جزيرة الحيوانات</strong> وإنهاء متطلبات الجزر السابقة لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong> السحرية!
               </p>
             )}
 
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
               <button
                 onClick={() => {
-                  const target = lockedNoticeZone.prevZone;
                   setLockedNoticeZone(null);
-                  setActiveIsland(target);
+                  setActiveIsland(ISLAND_ZONES[0]); // توجيه مباشر إلى جزيرة الحيوانات
                 }}
                 style={{
-                  background: lockedNoticeZone.prevZone.themeColor,
+                  background: "#E07820",
                   color: "white",
                   border: "none",
                   borderRadius: 20,
-                  padding: "10px 20px",
+                  padding: "10px 22px",
                   fontSize: 14,
-                  fontWeight: 800,
+                  fontWeight: 900,
                   cursor: "pointer",
-                  boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+                  boxShadow: "0 4px 14px rgba(224, 120, 32, 0.35)",
                 }}
               >
-                الذهاب إلى {lockedNoticeZone.prevZone.title}
+                الذهاب إلى جزيرة الحيوانات
               </button>
 
               <button

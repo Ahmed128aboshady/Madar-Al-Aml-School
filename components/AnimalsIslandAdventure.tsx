@@ -220,7 +220,7 @@ function playAudioTone(type: "correct" | "wrong" | "click" | "fanfare") {
 interface Props {
   onBackToMap: () => void;
   onCompleteIsland: (islandId: string) => void;
-  onProgressUpdate?: (count: number, total: number) => void;
+  onProgressUpdate?: (count: number, total: number, ids?: string[]) => void;
   deviceType: "desktop" | "tablet" | "mobile";
 }
 
@@ -247,7 +247,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
           setCompletedAnimalIds(parsed);
-          onProgressUpdate?.(parsed.length, ANIMALS_DATA.length);
+          onProgressUpdate?.(parsed.length, ANIMALS_DATA.length, parsed);
         }
       }
     } catch {}
@@ -295,7 +295,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
         try {
           localStorage.setItem("madar_animals_completed_ids", JSON.stringify(nextCompleted));
         } catch {}
-        onProgressUpdate?.(nextCompleted.length, ANIMALS_DATA.length);
+        onProgressUpdate?.(nextCompleted.length, ANIMALS_DATA.length, nextCompleted);
 
         // Check if all animals are completed
         if (nextCompleted.length === ANIMALS_DATA.length) {
