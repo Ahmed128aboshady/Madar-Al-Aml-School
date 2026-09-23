@@ -125,11 +125,22 @@ const ISLAND_ZONES: IslandZone[] = [
   },
 ];
 
-function getIslandStatus(zoneId: string, completed: string[]) {
+function getIslandStatus(zoneId: string, completed: string[], animalsProgressCount: number = 0) {
   const index = ISLAND_ZONES.findIndex((z) => z.id === zoneId);
   const isCompleted = completed.includes(zoneId);
-  // الجزيرة الأولى (الحيوانات) مفتوحة دائماً، وباقي الجزر تفتح بالتسلسل عند إنهاء الجزيرة السابقة
-  const isUnlocked = index === 0 || completed.includes(ISLAND_ZONES[index - 1].id);
+  let isUnlocked = false;
+
+  if (zoneId === "animals") {
+    // الجزيرة الأولى (الحيوانات) مفتوحة دائماً كبداية
+    isUnlocked = true;
+  } else if (zoneId === "fruits") {
+    // جزيرة الفواكه لا تفتح إلا عند حل 80% على الأقل من جزيرة الحيوانات (10 من 13) أو إنهاء الجزيرة
+    isUnlocked = animalsProgressCount >= 10 || isCompleted || completed.includes("animals");
+  } else {
+    // باقي الجزر تفتح بالتسلسل عند إنهاء الجزيرة السابقة بالكامل
+    isUnlocked = completed.includes(ISLAND_ZONES[index - 1].id);
+  }
+
   const previousZone = index > 0 ? ISLAND_ZONES[index - 1] : null;
   const nextZone = index < ISLAND_ZONES.length - 1 ? ISLAND_ZONES[index + 1] : null;
 
@@ -145,6 +156,7 @@ export default function HomePage() {
 
   // نظام تقدم الجزر وفتحها بالتسلسل
   const [completedIslands, setCompletedIslands] = useState<string[]>([]);
+  const [animalsProgressCount, setAnimalsProgressCount] = useState<number>(0);
   const [lockedNoticeZone, setLockedNoticeZone] = useState<{ zone: IslandZone; prevZone: IslandZone } | null>(null);
   const [celebrationModal, setCelebrationModal] = useState<{ completedZone: IslandZone; nextZone: IslandZone | null } | null>(null);
 
@@ -157,11 +169,18 @@ export default function HomePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
-    // استرجاع تقدم الجزر من الذاكرة المحلية أولاً
+    // استرجاع تقدم الجزر وتقدم الحيوانات من الذاكرة المحلية أولاً
     try {
       const saved = localStorage.getItem("madar_completed_islands");
       if (saved) {
         setCompletedIslands(JSON.parse(saved));
+      }
+      const savedAnimals = localStorage.getItem("madar_animals_completed_ids");
+      if (savedAnimals) {
+        const parsed = JSON.parse(savedAnimals);
+        if (Array.isArray(parsed)) {
+          setAnimalsProgressCount(parsed.length);
+        }
       }
     } catch {}
 
@@ -285,7 +304,7 @@ export default function HomePage() {
       console.error("Save progress error:", err);
     }
 
-    const { nextZone } = getIslandStatus(zoneId, updated);
+    const { nextZone } = getIslandStatus(zoneId, updated, animalsProgressCount);
     const completedZone = ISLAND_ZONES.find((z) => z.id === zoneId)!;
     setActiveIsland(null);
     setCelebrationModal({ completedZone, nextZone });
@@ -294,8 +313,10 @@ export default function HomePage() {
   async function handleResetProgress() {
     if (!confirm("هل تريد إعادة قفل الجزر من البداية للتجربة؟ ستفتح الجزيرة الأولى فقط.")) return;
     setCompletedIslands([]);
+    setAnimalsProgressCount(0);
     try {
       localStorage.removeItem("madar_completed_islands");
+      localStorage.removeItem("madar_animals_completed_ids");
       const { supabase } = await import("@/lib/supabase");
       await supabase.auth.updateUser({
         data: {
@@ -303,7 +324,7 @@ export default function HomePage() {
         },
       });
     } catch {}
-    alert("تمت إعادة تعيين الجزر بنجاح! الجزيرة الأولى مفتوحة وباقي الجزر مقفلة.");
+    alert("تمت إعادة تعيين الجزر بنجاح! جزيرة الحيوانات فقط مفتوحة وباقي الجزر مقفلة.");
   }
 
   if (checkingAuth) {
@@ -529,7 +550,7 @@ export default function HomePage() {
 
         {/* ── 5 Interactive Individual Island Assets ── */}
         {ISLAND_ZONES.map((zone) => {
-          const { isUnlocked, isCompleted, previousZone } = getIslandStatus(zone.id, completedIslands);
+          const { isUnlocked, isCompleted, previousZone } = getIslandStatus(zone.id, completedIslands, animalsProgressCount);
 
           const posTop =
             deviceType === "mobile" ? zone.mobileTop : deviceType === "tablet" ? zone.tabletTop : zone.desktopTop;
@@ -867,6 +888,7 @@ export default function HomePage() {
         <AnimalsIslandAdventure
           onBackToMap={() => setActiveIsland(null)}
           onCompleteIsland={handleCompleteIsland}
+          onProgressUpdate={(count) => setAnimalsProgressCount(count)}
           deviceType={deviceType}
         />
       )}
@@ -1005,9 +1027,32 @@ export default function HomePage() {
             <h2 style={{ color: "#475569", margin: "0 0 10px", fontSize: 21, fontWeight: 900 }}>
               هذه الجزيرة مقفلة حالياً
             </h2>
-            <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
-              يا بطل! عليك أولاً إكمال مغامرة <strong>{lockedNoticeZone.prevZone.title}</strong> لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong> السحرية!
-            </p>
+
+            {lockedNoticeZone.zone.id === "fruits" ? (
+              <>
+                <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
+                  يا بطل! عليك أولاً إكمال <strong>80% على الأقل</strong> من جزيرة الحيوانات (حل 10 حيوانات على الأقل) لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong>!
+                </p>
+                <div
+                  style={{
+                    background: "#FEF3C7",
+                    border: "1.5px solid #F59E0B",
+                    borderRadius: "14px",
+                    padding: "8px 14px",
+                    color: "#B45309",
+                    fontSize: "13px",
+                    fontWeight: 800,
+                    marginBottom: 20,
+                  }}
+                >
+                  درجتك الحالية في الحيوانات: {animalsProgressCount} من 13 ({Math.round((animalsProgressCount / 13) * 100)}%)
+                </div>
+              </>
+            ) : (
+              <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
+                يا بطل! عليك أولاً إكمال مغامرة <strong>{lockedNoticeZone.prevZone.title}</strong> لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong> السحرية!
+              </p>
+            )}
 
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
               <button

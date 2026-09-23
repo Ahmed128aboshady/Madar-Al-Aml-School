@@ -233,10 +233,11 @@ function speakArabic(text: string) {
 interface Props {
   onBackToMap: () => void;
   onCompleteIsland: (islandId: string) => void;
+  onProgressUpdate?: (count: number, total: number) => void;
   deviceType: "desktop" | "tablet" | "mobile";
 }
 
-export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, deviceType }: Props) {
+export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, onProgressUpdate, deviceType }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [completedAnimalIds, setCompletedAnimalIds] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -245,18 +246,40 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
   const [showIslandCelebration, setShowIslandCelebration] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+  const [lockedHint, setLockedHint] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const animalNavRef = useRef<HTMLDivElement>(null);
   const currentAnimal = ANIMALS_DATA[currentIndex];
 
-  // Auto-scroll active animal into view
+  // Restore completed animals from localStorage
   useEffect(() => {
-    if (animalNavRef.current) {
+    try {
+      const saved = localStorage.getItem("madar_animals_completed_ids");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setCompletedAnimalIds(parsed);
+          onProgressUpdate?.(parsed.length, ANIMALS_DATA.length);
+        }
+      }
+    } catch {}
+  }, []);
+
+  // Check if an animal at idx is unlocked
+  const isAnimalUnlocked = (idx: number) => {
+    if (idx === 0) return true;
+    // An animal is unlocked only if the preceding animal has been solved
+    return completedAnimalIds.includes(ANIMALS_DATA[idx - 1].id);
+  };
+
+  // Auto-scroll active animal into view (on desktop)
+  useEffect(() => {
+    if (animalNavRef.current && deviceType !== "mobile") {
       const activeEl = animalNavRef.current.children[currentIndex] as HTMLElement | undefined;
       activeEl?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     }
-  }, [currentIndex]);
+  }, [currentIndex, deviceType]);
 
   // Reset state when animal index changes
   useEffect(() => {
@@ -264,6 +287,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
     setIsAnswerCorrect(null);
     setVideoError(false);
     setIsPlayingVideo(false);
+    setLockedHint(null);
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
     }
@@ -282,6 +306,10 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
       if (!completedAnimalIds.includes(currentAnimal.id)) {
         const nextCompleted = [...completedAnimalIds, currentAnimal.id];
         setCompletedAnimalIds(nextCompleted);
+        try {
+          localStorage.setItem("madar_animals_completed_ids", JSON.stringify(nextCompleted));
+        } catch {}
+        onProgressUpdate?.(nextCompleted.length, ANIMALS_DATA.length);
 
         // Check if all animals are completed
         if (nextCompleted.length === ANIMALS_DATA.length) {
@@ -301,7 +329,27 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
     }
   };
 
+  const handleSelectAnimalTab = (idx: number) => {
+    if (!isAnimalUnlocked(idx)) {
+      playAudioTone("wrong");
+      setLockedHint(`عليك حل سؤال «${ANIMALS_DATA[idx - 1].name}» أولاً لفتح هذا الحيوان!`);
+      speakArabic("عليك حل السؤال الحالي أولاً لفتح هذا الحيوان!");
+      return;
+    }
+    setLockedHint(null);
+    playAudioTone("click");
+    setCurrentIndex(idx);
+  };
+
   const handleNextAnimal = () => {
+    // Only proceed if current animal is solved
+    if (!completedAnimalIds.includes(currentAnimal.id)) {
+      playAudioTone("wrong");
+      setLockedHint("أجب عن السؤال بالشكل الصحيح أولاً لتنتقل للحيوان التالي!");
+      speakArabic("أجب عن السؤال أولاً يا بطل!");
+      return;
+    }
+    setLockedHint(null);
     playAudioTone("click");
     if (currentIndex < ANIMALS_DATA.length - 1) {
       setCurrentIndex((prev) => prev + 1);
@@ -312,6 +360,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
   };
 
   const handlePrevAnimal = () => {
+    setLockedHint(null);
     playAudioTone("click");
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
@@ -414,39 +463,55 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
           </div>
         </div>
 
-        {/* Progress Badge */}
+        {/* Score & Progress Badge */}
         <div
           style={{
             background: "rgba(254, 243, 199, 0.95)",
             border: "2px solid #F59E0B",
             borderRadius: "20px",
-            padding: deviceType === "mobile" ? "5px 12px" : "6px 16px",
-            fontSize: deviceType === "mobile" ? "11px" : "13px",
-            fontWeight: 900,
-            color: "#B45309",
+            padding: deviceType === "mobile" ? "4px 10px" : "6px 16px",
+            textAlign: "center",
+            boxShadow: "0 2px 8px rgba(245, 158, 11, 0.2)",
           }}
         >
-          المكتمل: {completedAnimalIds.length} من {ANIMALS_DATA.length}
+          <div
+            style={{
+              fontSize: deviceType === "mobile" ? "11px" : "13px",
+              fontWeight: 900,
+              color: "#B45309",
+              lineHeight: 1.2,
+            }}
+          >
+            الدرجة: {completedAnimalIds.length} من {ANIMALS_DATA.length}
+          </div>
+          <div
+            style={{
+              fontSize: deviceType === "mobile" ? "9px" : "11px",
+              fontWeight: 800,
+              color: "#D97706",
+              lineHeight: 1.1,
+            }}
+          >
+            ({Math.round((completedAnimalIds.length / ANIMALS_DATA.length) * 100)}%)
+          </div>
         </div>
       </div>
 
-      {/* ── Animal Step Navigator (حيوان حيوان) - Centered & Clean ── */}
+      {/* ── Animal Step Navigator (حيوان حيوان) - Centered, Responsive & No-Cutoff ── */}
       <div
         ref={animalNavRef}
         style={{
           position: "relative",
           zIndex: 60,
-          padding: deviceType === "mobile" ? "8px 10px" : "10px 16px",
+          padding: deviceType === "mobile" ? "6px 8px" : "10px 16px",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          overflowX: "auto",
-          WebkitOverflowScrolling: "touch",
-          background: "rgba(255, 255, 255, 0.75)",
+          background: "rgba(255, 255, 255, 0.8)",
           backdropFilter: "blur(8px)",
           borderBottom: "1px solid rgba(226, 232, 240, 0.8)",
           width: "100%",
-          scrollbarWidth: "none",
+          boxSizing: "border-box",
         }}
       >
         <div
@@ -454,48 +519,55 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            gap: deviceType === "mobile" ? 6 : 8,
-            minWidth: "max-content",
+            flexWrap: deviceType === "mobile" ? "wrap" : "nowrap",
+            gap: deviceType === "mobile" ? "4px 6px" : 8,
+            maxWidth: deviceType === "mobile" ? "360px" : "100%",
             margin: "0 auto",
+            width: "100%",
           }}
         >
           {ANIMALS_DATA.map((animal, idx) => {
             const isActive = idx === currentIndex;
             const isDone = completedAnimalIds.includes(animal.id);
+            const isUnlocked = isAnimalUnlocked(idx);
+
+            let bg = "white";
+            let color = "#334155";
+            let border = "1.5px solid #CBD5E1";
+
+            if (isActive) {
+              bg = animal.color;
+              color = "white";
+              border = `2.5px solid ${animal.color}`;
+            } else if (isDone) {
+              bg = "#DCFCE7";
+              color = "#15803D";
+              border = "2px solid #86EFAC";
+            } else if (!isUnlocked) {
+              bg = "#F1F5F9";
+              color = "#94A3B8";
+              border = "1.5px dashed #CBD5E1";
+            }
 
             return (
               <button
                 key={animal.id}
-                onClick={() => {
-                  playAudioTone("click");
-                  setCurrentIndex(idx);
-                }}
+                onClick={() => handleSelectAnimalTab(idx)}
                 style={{
-                  background: isActive
-                    ? animal.color
-                    : isDone
-                    ? "#DCFCE7"
-                    : "white",
-                  color: isActive
-                    ? "white"
-                    : isDone
-                    ? "#15803D"
-                    : "#334155",
-                  border: isActive
-                    ? `2.5px solid ${animal.color}`
-                    : isDone
-                    ? "2px solid #86EFAC"
-                    : "1.5px solid #CBD5E1",
+                  background: bg,
+                  color: color,
+                  border: border,
                   borderRadius: "14px",
-                  padding: deviceType === "mobile" ? "5px 12px" : "7px 16px",
-                  cursor: "pointer",
+                  padding: deviceType === "mobile" ? "4px 8px" : "7px 16px",
+                  cursor: !isUnlocked ? "not-allowed" : "pointer",
                   fontWeight: 800,
-                  fontSize: deviceType === "mobile" ? "12px" : "14px",
-                  transform: isActive ? "scale(1.05)" : "scale(1)",
+                  fontSize: deviceType === "mobile" ? "11px" : "13px",
+                  transform: isActive ? "scale(1.06)" : "scale(1)",
                   transition: "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   boxShadow: isActive
                     ? `0 4px 12px ${animal.color}40`
                     : "0 1px 3px rgba(0,0,0,0.05)",
+                  opacity: !isUnlocked ? 0.6 : 1,
                   whiteSpace: "nowrap",
                 }}
               >
@@ -505,6 +577,27 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
           })}
         </div>
       </div>
+
+      {/* Gentle educational hint if child clicks locked animal */}
+      {lockedHint && (
+        <div
+          style={{
+            position: "relative",
+            zIndex: 60,
+            background: "#FEF2F2",
+            borderBottom: "1px solid #FECACA",
+            color: "#991B1B",
+            padding: "6px 14px",
+            fontSize: deviceType === "mobile" ? "11px" : "13px",
+            fontWeight: 800,
+            textAlign: "center",
+            width: "100%",
+            boxSizing: "border-box",
+          }}
+        >
+          {lockedHint}
+        </div>
+      )}
 
       {/* ── Main Interactive Content Area ── */}
       <div
@@ -884,24 +977,37 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
               السابق
             </button>
 
-            <button
-              onClick={handleNextAnimal}
-              style={{
-                background: isAnswerCorrect
-                  ? "linear-gradient(135deg, #10B981, #059669)"
-                  : "linear-gradient(135deg, #E07820, #C2410C)",
-                color: "white",
-                border: "none",
-                borderRadius: "16px",
-                padding: deviceType === "mobile" ? "9px 20px" : "10px 26px",
-                fontSize: deviceType === "mobile" ? "13px" : "15px",
-                fontWeight: 900,
-                cursor: "pointer",
-                boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
-              }}
-            >
-              {currentIndex < ANIMALS_DATA.length - 1 ? "الحيوان التالي" : "إنهاء الجزيرة"}
-            </button>
+            {/* Sequential lock: Cannot advance if current question is not yet answered correctly */}
+            {(() => {
+              const isCurrentSolved = completedAnimalIds.includes(currentAnimal.id);
+              return (
+                <button
+                  onClick={handleNextAnimal}
+                  disabled={!isCurrentSolved}
+                  style={{
+                    background: !isCurrentSolved
+                      ? "#CBD5E1"
+                      : "linear-gradient(135deg, #10B981, #059669)",
+                    color: !isCurrentSolved ? "#64748B" : "white",
+                    border: "none",
+                    borderRadius: "16px",
+                    padding: deviceType === "mobile" ? "9px 18px" : "10px 26px",
+                    fontSize: deviceType === "mobile" ? "12px" : "15px",
+                    fontWeight: 900,
+                    cursor: !isCurrentSolved ? "not-allowed" : "pointer",
+                    boxShadow: !isCurrentSolved ? "none" : "0 6px 18px rgba(16, 185, 129, 0.3)",
+                    opacity: !isCurrentSolved ? 0.75 : 1,
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  {!isCurrentSolved
+                    ? "أجب أولاً للانتقال"
+                    : currentIndex < ANIMALS_DATA.length - 1
+                    ? "الحيوان التالي"
+                    : "إنهاء الجزيرة"}
+                </button>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -945,6 +1051,21 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
             >
               مبارك يا بطل الأبطال!
             </h2>
+            <div
+              style={{
+                background: "#FEF3C7",
+                border: "2px solid #F59E0B",
+                borderRadius: "18px",
+                padding: "8px 16px",
+                display: "inline-block",
+                marginBottom: 16,
+                fontWeight: 900,
+                color: "#B45309",
+                fontSize: "15px",
+              }}
+            >
+              درجتك النهائية: {completedAnimalIds.length} من {ANIMALS_DATA.length} (100%)
+            </div>
             <p
               style={{
                 fontSize: "15px",
@@ -954,7 +1075,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 marginBottom: 20,
               }}
             >
-              لقد أكملت جميع حيوانات <strong>جزيرة الحيوانات</strong> بنجاح!
+              لقد أتقنت جميع حيوانات <strong>جزيرة الحيوانات</strong> بنجاح!
               <br />
               تم فتح <strong>جزيرة الفواكه</strong> على الخريطة لتكمل مغامرتك!
             </p>
