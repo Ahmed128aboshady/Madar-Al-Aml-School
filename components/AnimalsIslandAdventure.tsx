@@ -589,42 +589,46 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
           zIndex: 60,
           flex: 1,
           overflowY: "auto",
-          padding: deviceType === "mobile" ? "10px 12px 30px" : "16px 24px 30px",
+          padding: deviceType === "mobile" ? "10px 12px 24px" : "16px 24px 30px",
           display: "flex",
-          flexDirection: "column",
+          flexDirection: deviceType === "desktop" ? "row" : "column",
           alignItems: "center",
-          justifyContent: "flex-start",
-          gap: deviceType === "mobile" ? 14 : 20,
+          justifyContent: "center",
+          gap: deviceType === "mobile" ? 12 : 24,
+          width: "100%",
+          boxSizing: "border-box",
         }}
       >
-        {/* ── Themed Video Frame ("اطار للفيديو") ── */}
+        {/* ── Themed Reel Video Frame ("اطار للفيديو بمقاس الرييل 9:16") ── */}
         <div
           style={{
-            width: "100%",
-            maxWidth: deviceType === "mobile" ? "380px" : deviceType === "tablet" ? "560px" : "640px",
+            width: deviceType === "mobile" ? "210px" : deviceType === "tablet" ? "240px" : "260px",
+            maxWidth: "90vw",
+            flexShrink: 0,
             background: "linear-gradient(135deg, #B45309 0%, #78350F 50%, #B45309 100%)",
             borderRadius: "28px",
-            padding: deviceType === "mobile" ? "10px" : "14px",
+            padding: deviceType === "mobile" ? "8px" : "10px",
             boxShadow: "0 18px 36px rgba(120, 53, 15, 0.35), 0 4px 12px rgba(0,0,0,0.15)",
             border: "4px solid #FDE68A",
             position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
           {/* Top Banner on Frame */}
           <div
             style={{
               textAlign: "center",
-              marginBottom: 8,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              marginBottom: 6,
+              width: "100%",
             }}
           >
             <span
               style={{
                 color: "#FEF3C7",
                 fontWeight: 900,
-                fontSize: deviceType === "mobile" ? "13px" : "15px",
+                fontSize: deviceType === "mobile" ? "12px" : "14px",
                 textShadow: "0 1px 3px rgba(0,0,0,0.6)",
               }}
             >
@@ -632,14 +636,14 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
             </span>
           </div>
 
-          {/* Video Player / Interactive Screen */}
+          {/* Video Player (9:16 Reel Aspect Ratio) */}
           <div
             style={{
               position: "relative",
               width: "100%",
-              aspectRatio: "16 / 9",
+              aspectRatio: "9 / 16",
               background: "#0F172A",
-              borderRadius: "18px",
+              borderRadius: "20px",
               overflow: "hidden",
               border: "3px solid #F59E0B",
               display: "flex",
@@ -683,13 +687,23 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 {/* Clean Animal Name Heading */}
                 <div
                   style={{
-                    fontSize: deviceType === "mobile" ? "36px" : "48px",
+                    fontSize: deviceType === "mobile" ? "32px" : "40px",
                     fontWeight: 900,
                     color: "white",
                     textShadow: `0 4px 16px ${currentAnimal.color}`,
+                    marginBottom: 6,
                   }}
                 >
                   {currentAnimal.name}
+                </div>
+                <div
+                  style={{
+                    fontSize: "12px",
+                    color: "#94A3B8",
+                    fontWeight: 700,
+                  }}
+                >
+                  فيديو ريل (9:16)
                 </div>
               </div>
             )}
@@ -701,11 +715,11 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
           key={shakeKey}
           style={{
             width: "100%",
-            maxWidth: deviceType === "mobile" ? "380px" : deviceType === "tablet" ? "560px" : "640px",
+            maxWidth: deviceType === "mobile" ? "360px" : deviceType === "tablet" ? "420px" : "460px",
             background: "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(12px)",
             borderRadius: "28px",
-            padding: deviceType === "mobile" ? "16px" : "22px",
+            padding: deviceType === "mobile" ? "14px" : "22px",
             boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
             border: `3px solid ${currentAnimal.color}44`,
             textAlign: "center",
