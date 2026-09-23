@@ -402,26 +402,43 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
           boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
         }}
       >
-        {/* Back Button */}
-        <button
-          onClick={onBackToMap}
-          style={{
-            background: "#4F46E5",
-            color: "white",
-            border: "none",
-            borderRadius: "20px",
-            padding: deviceType === "mobile" ? "6px 14px" : "8px 20px",
-            fontSize: deviceType === "mobile" ? "12px" : "14px",
-            fontWeight: 800,
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(79, 70, 229, 0.3)",
-            transition: "transform 0.15s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-        >
-          خريطة الجزر
-        </button>
+        {/* Right side: Madar Al Amal Logo + Back to Map Button */}
+        <div style={{ display: "flex", alignItems: "center", gap: deviceType === "mobile" ? 6 : 10 }}>
+          <div
+            onClick={onBackToMap}
+            style={{
+              position: "relative",
+              width: deviceType === "mobile" ? 54 : 76,
+              height: deviceType === "mobile" ? 28 : 36,
+              cursor: "pointer",
+              flexShrink: 0,
+            }}
+            title="مدار الأمل - العودة للخريطة"
+          >
+            <Image src="/logo.png" alt="مدار الأمل" fill style={{ objectFit: "contain" }} priority />
+          </div>
+
+          <button
+            onClick={onBackToMap}
+            style={{
+              background: "#4F46E5",
+              color: "white",
+              border: "none",
+              borderRadius: "20px",
+              padding: deviceType === "mobile" ? "5px 11px" : "8px 20px",
+              fontSize: deviceType === "mobile" ? "11px" : "14px",
+              fontWeight: 800,
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(79, 70, 229, 0.3)",
+              transition: "transform 0.15s ease",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            خريطة الجزر
+          </button>
+        </div>
 
         {/* Island Title */}
         <div style={{ textAlign: "center" }}>
