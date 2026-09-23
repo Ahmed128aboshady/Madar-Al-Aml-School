@@ -37,14 +37,14 @@ const ISLAND_ZONES: IslandZone[] = [
     desktopLeft: "12%",
     desktopWidth: "26%",
     desktopHeight: "36%",
-    tabletTop: "18%",
+    tabletTop: "17%",
     tabletLeft: "10%",
     tabletWidth: "30%",
-    tabletHeight: "34%",
-    mobileTop: "16%",
+    tabletHeight: "33%",
+    mobileTop: "17%",
     mobileLeft: "3%",
-    mobileWidth: "47%",
-    mobileHeight: "24%",
+    mobileWidth: "46%",
+    mobileHeight: "22%",
   },
   {
     id: "fruits",
@@ -59,11 +59,11 @@ const ISLAND_ZONES: IslandZone[] = [
     tabletTop: "22%",
     tabletLeft: "58%",
     tabletWidth: "30%",
-    tabletHeight: "34%",
-    mobileTop: "17%",
-    mobileLeft: "50%",
-    mobileWidth: "47%",
-    mobileHeight: "24%",
+    tabletHeight: "33%",
+    mobileTop: "18%",
+    mobileLeft: "51%",
+    mobileWidth: "46%",
+    mobileHeight: "22%",
   },
   {
     id: "vegetables",
@@ -78,11 +78,11 @@ const ISLAND_ZONES: IslandZone[] = [
     tabletTop: "38%",
     tabletLeft: "34%",
     tabletWidth: "32%",
-    tabletHeight: "35%",
-    mobileTop: "38%",
+    tabletHeight: "34%",
+    mobileTop: "39%",
     mobileLeft: "26%",
-    mobileWidth: "49%",
-    mobileHeight: "25%",
+    mobileWidth: "48%",
+    mobileHeight: "23%",
   },
   {
     id: "vehicles",
@@ -97,11 +97,11 @@ const ISLAND_ZONES: IslandZone[] = [
     tabletTop: "56%",
     tabletLeft: "5%",
     tabletWidth: "32%",
-    tabletHeight: "34%",
-    mobileTop: "62%",
+    tabletHeight: "33%",
+    mobileTop: "61%",
     mobileLeft: "3%",
-    mobileWidth: "47%",
-    mobileHeight: "24%",
+    mobileWidth: "46%",
+    mobileHeight: "22%",
   },
   {
     id: "daily-actions",
@@ -116,11 +116,11 @@ const ISLAND_ZONES: IslandZone[] = [
     tabletTop: "58%",
     tabletLeft: "63%",
     tabletWidth: "32%",
-    tabletHeight: "34%",
-    mobileTop: "62%",
-    mobileLeft: "50%",
-    mobileWidth: "47%",
-    mobileHeight: "24%",
+    tabletHeight: "33%",
+    mobileTop: "61%",
+    mobileLeft: "51%",
+    mobileWidth: "46%",
+    mobileHeight: "22%",
   },
 ];
 
@@ -179,6 +179,7 @@ export default function HomePage() {
     }
     checkOrientation();
     window.addEventListener("resize", checkOrientation);
+    window.addEventListener("orientationchange", checkOrientation);
 
     import("@/lib/supabase").then(async ({ supabase }) => {
       try {
@@ -212,7 +213,10 @@ export default function HomePage() {
       }
     });
 
-    return () => window.removeEventListener("resize", checkOrientation);
+    return () => {
+      window.removeEventListener("resize", checkOrientation);
+      window.removeEventListener("orientationchange", checkOrientation);
+    };
   }, []);
 
   async function handleSaveParentData() {
@@ -412,15 +416,21 @@ export default function HomePage() {
           overflow: "hidden",
         }}
       >
-        {/* Clean Background Map Image */}
+        {/* Responsive Clean Background Map Image */}
         <Image
-          src="/islands/map-background.png"
+          src={
+            deviceType === "mobile"
+              ? "/islands/map-background-mobile.png"
+              : deviceType === "tablet"
+              ? "/islands/map-background-tablet.png"
+              : "/islands/map-background.png"
+          }
           alt="خلفية جزر مدار الأمل التعليمية"
           fill
           priority
           sizes="100vw"
           style={{
-            objectFit: "fill",
+            objectFit: "cover",
             objectPosition: "center",
           }}
         />
@@ -429,11 +439,11 @@ export default function HomePage() {
         <div
           style={{
             position: "absolute",
-            top: deviceType === "mobile" ? "4%" : deviceType === "tablet" ? "5%" : "6%",
+            top: deviceType === "mobile" ? "4%" : deviceType === "tablet" ? "4%" : "6%",
             left: "50%",
             transform: "translateX(-50%)",
-            width: deviceType === "mobile" ? "92%" : deviceType === "tablet" ? "60%" : "48%",
-            height: deviceType === "mobile" ? "14%" : deviceType === "tablet" ? "20%" : "22%",
+            width: deviceType === "mobile" ? "84%" : deviceType === "tablet" ? "52%" : "48%",
+            height: deviceType === "mobile" ? "13%" : deviceType === "tablet" ? "18%" : "22%",
             zIndex: 15,
             pointerEvents: "none",
           }}
@@ -462,7 +472,12 @@ export default function HomePage() {
               <h1
                 style={{
                   margin: 0,
-                  fontSize: deviceType === "mobile" ? "18px" : "clamp(22px, 2.7vw, 40px)",
+                  fontSize:
+                    deviceType === "mobile"
+                      ? "16px"
+                      : deviceType === "tablet"
+                      ? "22px"
+                      : "clamp(22px, 2.7vw, 40px)",
                   fontWeight: 900,
                   color: "#BE123C",
                   textShadow: "0 2px 4px rgba(255,255,255,0.85)",
@@ -473,8 +488,13 @@ export default function HomePage() {
               </h1>
               <p
                 style={{
-                  margin: "4px 0 0",
-                  fontSize: deviceType === "mobile" ? "12px" : "clamp(13px, 1.5vw, 22px)",
+                  margin: "3px 0 0",
+                  fontSize:
+                    deviceType === "mobile"
+                      ? "11px"
+                      : deviceType === "tablet"
+                      ? "13px"
+                      : "clamp(13px, 1.5vw, 22px)",
                   fontWeight: 800,
                   color: "#1D4ED8",
                   textShadow: "0 1px 2px rgba(255,255,255,0.85)",
