@@ -175,15 +175,15 @@ function getIslandStatus(zoneId: string, completed: string[], animalsProgressCou
   let isUnlocked = false;
 
   if (zoneId === "animals") {
-    // 1. الجزيرة الأولى (الحيوانات) مفتوحة دائماً كبداية
+    // 1. الجزيرة الأولى (الحيوانات) فقط هي المفتوحة
     isUnlocked = true;
   } else if (zoneId === "vegetables") {
-    // 2. الجزيرة الثانية (الخضار) تفتح فقط عند حل 80% على الأقل من جزيرة الحيوانات (10 من 13) أو إنهاء الجزيرة
-    isUnlocked = animalsProgressCount >= 10 || isCompleted || completed.includes("animals");
+    // 2. الجزيرة الثانية (الخضار) مقفلة تماماً وتفتح فقط عند حل 80% على الأقل من جزيرة الحيوانات (10 من 13)
+    isUnlocked = animalsProgressCount >= 10;
   } else {
-    // 3. الفواكه، 4. الأفعال، 5. المواصلات: تفتح كل جزيرة بالتسلسل عند إنهاء الجزيرة السابقة
+    // 3. الفواكه، 4. الأفعال، 5. المواصلات: مقفلة تماماً وتفتح بالتسلسل فقط بعد 80% من الحيوانات وإنهاء الجزيرة السابقة
     const prevZoneId = index > 0 ? ISLAND_ZONES[index - 1].id : null;
-    isUnlocked = Boolean((prevZoneId && completed.includes(prevZoneId)) || isCompleted);
+    isUnlocked = Boolean(animalsProgressCount >= 10 && prevZoneId && completed.includes(prevZoneId));
   }
 
   const previousZone = index > 0 ? ISLAND_ZONES[index - 1] : null;
@@ -216,9 +216,15 @@ export default function HomePage() {
   useEffect(() => {
     // استرجاع تقدم الجزر وتقدم الحيوانات من الذاكرة المحلية أولاً
     try {
-      const saved = localStorage.getItem("madar_completed_islands");
-      if (saved) {
-        setCompletedIslands(JSON.parse(saved));
+      if (localStorage.getItem("madar_lock_all_v4") !== "locked") {
+        localStorage.setItem("madar_lock_all_v4", "locked");
+        localStorage.removeItem("madar_completed_islands");
+        setCompletedIslands([]);
+      } else {
+        const saved = localStorage.getItem("madar_completed_islands");
+        if (saved) {
+          setCompletedIslands(JSON.parse(saved));
+        }
       }
       const savedAnimals = localStorage.getItem("madar_animals_completed_ids");
       if (savedAnimals) {
@@ -257,13 +263,22 @@ export default function HomePage() {
           setParentPhone(meta.parent_phone || meta.phone || "");
           setParentCity(meta.parent_city || "");
 
-          // استرجاع الجزر المكتملة من قاعدة البيانات
-          if (Array.isArray(meta.completed_islands) && meta.completed_islands.length > 0) {
-            setCompletedIslands(meta.completed_islands);
-            try {
-              localStorage.setItem("madar_completed_islands", JSON.stringify(meta.completed_islands));
-            } catch {}
-          }
+          // استرجاع الجزر المكتملة مع التأكد من قفل جميع الجزر للمستخدم
+          try {
+            if (localStorage.getItem("madar_supabase_reset_v4") !== "done") {
+              localStorage.setItem("madar_supabase_reset_v4", "done");
+              setCompletedIslands([]);
+              localStorage.removeItem("madar_completed_islands");
+              await supabase.auth.updateUser({
+                data: { completed_islands: [] },
+              });
+            } else if (Array.isArray(meta.completed_islands) && meta.completed_islands.length > 0) {
+              setCompletedIslands(meta.completed_islands);
+              try {
+                localStorage.setItem("madar_completed_islands", JSON.stringify(meta.completed_islands));
+              } catch {}
+            }
+          } catch {}
         } else {
           // If not logged in, redirect to login page
           window.location.href = "/login";
