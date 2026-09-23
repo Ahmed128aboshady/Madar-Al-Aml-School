@@ -217,19 +217,6 @@ function playAudioTone(type: "correct" | "wrong" | "click" | "fanfare") {
   } catch {}
 }
 
-// ── Arabic Speech Synthesizer for Kids ──
-function speakArabic(text: string) {
-  try {
-    if (!("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "ar-SA";
-    utterance.rate = 0.9;
-    utterance.pitch = 1.1;
-    window.speechSynthesis.speak(utterance);
-  } catch {}
-}
-
 interface Props {
   onBackToMap: () => void;
   onCompleteIsland: (islandId: string) => void;
@@ -301,7 +288,6 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
       // Correct!
       setIsAnswerCorrect(true);
       playAudioTone("correct");
-      speakArabic(`أحسنت! إجابة صحيحة! هذا هو ${currentAnimal.name}`);
 
       if (!completedAnimalIds.includes(currentAnimal.id)) {
         const nextCompleted = [...completedAnimalIds, currentAnimal.id];
@@ -325,7 +311,6 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
       setIsAnswerCorrect(false);
       setShakeKey((prev) => prev + 1);
       playAudioTone("wrong");
-      speakArabic("حاول مرة أخرى يا بطل!");
     }
   };
 
@@ -333,7 +318,6 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
     if (!isAnimalUnlocked(idx)) {
       playAudioTone("wrong");
       setLockedHint(`عليك حل سؤال «${ANIMALS_DATA[idx - 1].name}» أولاً لفتح هذا الحيوان!`);
-      speakArabic("عليك حل السؤال الحالي أولاً لفتح هذا الحيوان!");
       return;
     }
     setLockedHint(null);
@@ -346,7 +330,6 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
     if (!completedAnimalIds.includes(currentAnimal.id)) {
       playAudioTone("wrong");
       setLockedHint("أجب عن السؤال بالشكل الصحيح أولاً لتنتقل للحيوان التالي!");
-      speakArabic("أجب عن السؤال أولاً يا بطل!");
       return;
     }
     setLockedHint(null);
@@ -674,18 +657,9 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                 playsInline
                 preload="metadata"
                 onError={() => setVideoError(true)}
-                onPlay={() => {
-                  setIsPlayingVideo(true);
-                  // Voiceover in clear Arabic since video has no audio
-                  speakArabic(`هذه هي ال${currentAnimal.name}. ${currentAnimal.fact}`);
-                }}
-                onPause={() => {
-                  setIsPlayingVideo(false);
-                  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-                }}
-                onEnded={() => {
-                  setIsPlayingVideo(false);
-                }}
+                onPlay={() => setIsPlayingVideo(true)}
+                onPause={() => setIsPlayingVideo(false)}
+                onEnded={() => setIsPlayingVideo(false)}
                 style={{ width: "100%", height: "100%", objectFit: "contain", background: "#000" }}
               />
             ) : null}
@@ -704,98 +678,21 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                   color: "white",
                   padding: 16,
                   textAlign: "center",
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  speakArabic(`هذه هي ال${currentAnimal.name}. ${currentAnimal.fact}`);
-                  playAudioTone("click");
                 }}
               >
                 {/* Clean Animal Name Heading */}
                 <div
                   style={{
-                    fontSize: deviceType === "mobile" ? "32px" : "42px",
+                    fontSize: deviceType === "mobile" ? "36px" : "48px",
                     fontWeight: 900,
                     color: "white",
-                    marginBottom: 10,
                     textShadow: `0 4px 16px ${currentAnimal.color}`,
                   }}
                 >
                   {currentAnimal.name}
                 </div>
-
-                {/* Play Button */}
-                <div
-                  style={{
-                    marginTop: 4,
-                    background: "rgba(255, 255, 255, 0.95)",
-                    color: "#1E293B",
-                    borderRadius: "24px",
-                    padding: deviceType === "mobile" ? "7px 18px" : "9px 24px",
-                    fontWeight: 900,
-                    fontSize: deviceType === "mobile" ? "12px" : "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    boxShadow: "0 6px 18px rgba(0,0,0,0.3)",
-                    border: `2px solid ${currentAnimal.color}`,
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#1E293B">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                  </svg>
-                  <span>استماع للشرح الصوتي لـ {currentAnimal.name}</span>
-                </div>
               </div>
             )}
-          </div>
-
-          {/* Quick Pronunciation & Voiceover Controls */}
-          <div
-            style={{
-              marginTop: 10,
-              display: "flex",
-              justifyContent: "center",
-              gap: 10,
-            }}
-          >
-            <button
-              onClick={() => {
-                speakArabic(currentAnimal.name);
-                playAudioTone("click");
-              }}
-              style={{
-                background: "rgba(255, 255, 255, 0.95)",
-                color: "#78350F",
-                border: "2px solid #FDE68A",
-                borderRadius: "16px",
-                padding: "6px 16px",
-                fontSize: "12px",
-                fontWeight: 800,
-                cursor: "pointer",
-              }}
-            >
-              نطق اسم الحيوان
-            </button>
-
-            <button
-              onClick={() => {
-                speakArabic(`هذه هي ال${currentAnimal.name}. ${currentAnimal.fact}`);
-                playAudioTone("click");
-              }}
-              style={{
-                background: "rgba(255, 255, 255, 0.95)",
-                color: "#1E40AF",
-                border: "2px solid #BFDBFE",
-                borderRadius: "16px",
-                padding: "6px 16px",
-                fontSize: "12px",
-                fontWeight: 800,
-                cursor: "pointer",
-              }}
-            >
-              تشغيل التعليق الصوتي
-            </button>
           </div>
         </div>
 
@@ -821,36 +718,19 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: 10,
               marginBottom: 14,
             }}
           >
             <h3
               style={{
                 margin: 0,
-                fontSize: deviceType === "mobile" ? "16px" : "19px",
+                fontSize: deviceType === "mobile" ? "17px" : "20px",
                 fontWeight: 900,
                 color: "#1F2937",
               }}
             >
               ما هو اسم هذا الحيوان؟
             </h3>
-            <button
-              onClick={() => speakArabic("ما هو اسم هذا الحيوان؟")}
-              style={{
-                background: "#F1F5F9",
-                border: "1px solid #CBD5E1",
-                borderRadius: "12px",
-                padding: "4px 10px",
-                fontSize: "11px",
-                fontWeight: 800,
-                color: "#475569",
-                cursor: "pointer",
-              }}
-              title="استمع للسؤال"
-            >
-              استمع للسؤال
-            </button>
           </div>
 
           {/* Multiple-Choice Buttons */}
