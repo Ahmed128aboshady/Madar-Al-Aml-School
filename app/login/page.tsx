@@ -81,10 +81,18 @@ export default function LoginPage() {
         const { data } = await m.supabase.auth.getSession();
         if (data?.session) {
           window.location.href = "/";
+          return;
         }
       } catch (err) {
         console.error("Auth session check error:", err);
       }
+
+      // Listen for instant confirmation when user clicks email link
+      m.supabase.auth.onAuthStateChange((event, session) => {
+        if (session?.user) {
+          window.location.href = "/";
+        }
+      });
     });
 
     // 2. Smooth animation timing
@@ -397,7 +405,7 @@ export default function LoginPage() {
           </div>
 
           {otpMode ? (
-            /* ─ OTP Verification View ─ */
+            /* ─ Verification View (Direct Link & OTP) ─ */
             <div>
               <h2
                 style={{
@@ -408,7 +416,7 @@ export default function LoginPage() {
                   fontWeight: 800,
                 }}
               >
-                🔐 تأكيد كود الحساب
+                📩 تفعيل الحساب والدخول
               </h2>
 
               <p
@@ -416,11 +424,11 @@ export default function LoginPage() {
                   textAlign: "center",
                   color: "#555",
                   fontSize: 13,
-                  margin: "0 0 14px",
+                  margin: "0 0 12px",
                   lineHeight: 1.5,
                 }}
               >
-                تم إرسال رمز التحقق (الكود) إلى بريدك الإلكتروني:
+                تم إرسال رسالة التفعيل إلى بريدك الإلكتروني:
                 <br />
                 <strong style={{ color: "#5B4FA8", wordBreak: "break-all" }}>{email}</strong>
               </p>
@@ -433,7 +441,7 @@ export default function LoginPage() {
                     border: `2px solid ${error.startsWith("✅") ? "#6AAD3D" : "#dc3545"}`,
                     borderRadius: 16,
                     padding: "8px 14px",
-                    marginBottom: 14,
+                    marginBottom: 12,
                     color: error.startsWith("✅") ? "#4a7a28" : "#c0392b",
                     fontSize: 13,
                     textAlign: "center",
@@ -443,8 +451,32 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {/* ─ OTP Input Field ─ */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {/* ─ Direct Link Highlight Box ─ */}
+              <div
+                style={{
+                  background: "linear-gradient(135deg, rgba(91,79,168,0.1) 0%, rgba(58,181,200,0.1) 100%)",
+                  border: "2px dashed #5B4FA8",
+                  borderRadius: 18,
+                  padding: "12px 14px",
+                  marginBottom: 14,
+                  textAlign: "center",
+                }}
+              >
+                <div style={{ fontSize: 22, marginBottom: 2 }}>⚡</div>
+                <div style={{ color: "#5B4FA8", fontWeight: 800, fontSize: 14, marginBottom: 4 }}>
+                  أسهل وأسرع طريقة للدخول:
+                </div>
+                <div style={{ color: "#444", fontSize: 12, lineHeight: 1.5 }}>
+                  افتح بريدك واضغط على زر <strong>«Confirm email address»</strong> الموجود بالرسالة، وسيدخل حسابك فوراً تلقائياً!
+                </div>
+              </div>
+
+              {/* ─ OTP Code Alternative ─ */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#666", textAlign: "center" }}>
+                  أو أدخل كود التحقق الرقمي (إذا وصلك كود):
+                </div>
+
                 <div style={{ position: "relative" }}>
                   <input
                     className="kid-input"
@@ -452,12 +484,12 @@ export default function LoginPage() {
                     inputMode="numeric"
                     autoComplete="one-time-code"
                     maxLength={8}
-                    placeholder="أدخل الكود (6 أرقام)"
+                    placeholder="كود الـ 6 أرقام"
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value)}
                     style={{
                       textAlign: "center",
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: 900,
                       letterSpacing: "4px",
                       color: "#5B4FA8",
@@ -486,7 +518,7 @@ export default function LoginPage() {
                       padding: 0,
                     }}
                   >
-                    {resending ? "⏳ جارٍ الإرسال..." : "🔄 إعادة إرسال الكود"}
+                    {resending ? "⏳ جارٍ الإرسال..." : "🔄 إعادة إرسال الرسالة"}
                   </button>
 
                   <button
@@ -508,21 +540,6 @@ export default function LoginPage() {
                   >
                     ✏️ تعديل البريد
                   </button>
-                </div>
-
-                <div
-                  style={{
-                    background: "rgba(91,79,168,0.06)",
-                    borderRadius: 14,
-                    padding: "10px 12px",
-                    marginTop: 8,
-                    fontSize: 11,
-                    color: "#5B4FA8",
-                    lineHeight: 1.5,
-                    textAlign: "center",
-                  }}
-                >
-                  💡 <strong>ملاحظة:</strong> يمكنك أيضاً النقر على رابط التفعيل الموجود داخل رسالة الإيميل مباشرة لتسجيل الدخول الفوري.
                 </div>
               </div>
             </div>
