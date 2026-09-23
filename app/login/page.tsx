@@ -162,22 +162,22 @@ export default function LoginPage() {
 
         // إذا كان البريد مسجل مسبقاً، ترجع سوبابيز identities فارغة
         if (data?.user?.identities && data.user.identities.length === 0) {
-          setError("⚠️ هذا الإيميل مسجل لدينا بالفعل! اضغط على 'لديك حساب؟ سجّل دخولك' للدخول بكلمة المرور أو بزر Google.");
+          setError("هذا الإيميل مسجل لدينا بالفعل! اضغط على 'لديك حساب؟ سجّل دخولك' للدخول بكلمة المرور أو بزر Google.");
           return;
         }
 
         setOtpMode(true);
-        setError("✅ تم إرسال رسالة التأكيد والكود إلى بريدك! تفقد صندوق الوارد (Inbox) أو الرسائل غير الهامة (Spam).");
+        setError("تم إرسال رسالة التأكيد والكود إلى بريدك! تفقد صندوق الوارد (Inbox) أو الرسائل غير الهامة (Spam).");
       } else {
         const { error: e } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (e) {
           if (e.message.toLowerCase().includes("email not confirmed")) {
             setOtpMode(true);
-            setError("⚠️ الحساب مسجل ولكن بانتظار التأكيد. تم إرسال رسالة التأكيد، أدخل الكود أو اضغط رابط الإيميل.");
+            setError("الحساب مسجل ولكن بانتظار التأكيد. تم إرسال رسالة التأكيد، أدخل الكود أو اضغط رابط الإيميل.");
             return;
           }
           if (e.message.toLowerCase().includes("invalid login credentials")) {
-            setError("❌ البريد الإلكتروني أو كلمة المرور غير صحيحة، أو ربما قمت بالتسجيل سابقاً عبر حساب Google.");
+            setError("البريد الإلكتروني أو كلمة المرور غير صحيحة، أو ربما قمت بالتسجيل سابقاً عبر حساب Google.");
             return;
           }
           throw e;
@@ -446,7 +446,7 @@ export default function LoginPage() {
                   fontWeight: 800,
                 }}
               >
-                📩 تفعيل الحساب والدخول
+                تفعيل الحساب والدخول
               </h2>
 
               <p
@@ -467,12 +467,12 @@ export default function LoginPage() {
               {error && (
                 <div
                   style={{
-                    background: error.startsWith("✅") ? "rgba(106,173,61,0.15)" : "rgba(220,53,69,0.12)",
-                    border: `2px solid ${error.startsWith("✅") ? "#6AAD3D" : "#dc3545"}`,
+                    background: error.includes("تم إرسال") ? "rgba(106,173,61,0.15)" : "rgba(220,53,69,0.12)",
+                    border: `2px solid ${error.includes("تم إرسال") ? "#6AAD3D" : "#dc3545"}`,
                     borderRadius: 16,
                     padding: "8px 14px",
                     marginBottom: 12,
-                    color: error.startsWith("✅") ? "#4a7a28" : "#c0392b",
+                    color: error.includes("تم إرسال") ? "#4a7a28" : "#c0392b",
                     fontSize: 13,
                     textAlign: "center",
                   }}
@@ -492,7 +492,6 @@ export default function LoginPage() {
                   textAlign: "center",
                 }}
               >
-                <div style={{ fontSize: 22, marginBottom: 2 }}>⚡</div>
                 <div style={{ color: "#5B4FA8", fontWeight: 800, fontSize: 14, marginBottom: 4 }}>
                   أسهل وأسرع طريقة للدخول:
                 </div>
@@ -529,7 +528,7 @@ export default function LoginPage() {
                 </div>
 
                 <button className="kid-btn-primary" onClick={handleVerifyOtp} disabled={loading}>
-                  {loading ? "⏳ جارٍ التحقق..." : "🚀 تأكيد الكود والدخول"}
+                  {loading ? "جارٍ التحقق..." : "تأكيد الكود والدخول"}
                 </button>
 
                 {/* Resend and Edit buttons */}
@@ -548,7 +547,7 @@ export default function LoginPage() {
                       padding: 0,
                     }}
                   >
-                    {resending ? "⏳ جارٍ الإرسال..." : "🔄 إعادة إرسال الرسالة"}
+                    {resending ? "جارٍ الإرسال..." : "إعادة إرسال الرسالة"}
                   </button>
 
                   <button
@@ -568,7 +567,7 @@ export default function LoginPage() {
                       padding: 0,
                     }}
                   >
-                    ✏️ تعديل البريد
+                    تعديل البريد
                   </button>
                 </div>
               </div>
@@ -585,19 +584,19 @@ export default function LoginPage() {
                   fontWeight: 800,
                 }}
               >
-                {isRegister ? "✨ إنشاء حساب جديد" : "👋 أهلاً بك!"}
+                {isRegister ? "إنشاء حساب جديد" : "أهلاً بك!"}
               </h2>
 
               {/* Error message */}
               {error && (
                 <div
                   style={{
-                    background: error.startsWith("✅") ? "rgba(106,173,61,0.15)" : "rgba(220,53,69,0.12)",
-                    border: `2px solid ${error.startsWith("✅") ? "#6AAD3D" : "#dc3545"}`,
+                    background: error.includes("تم إرسال") ? "rgba(106,173,61,0.15)" : "rgba(220,53,69,0.12)",
+                    border: `2px solid ${error.includes("تم إرسال") ? "#6AAD3D" : "#dc3545"}`,
                     borderRadius: 16,
                     padding: "8px 14px",
                     marginBottom: 14,
-                    color: error.startsWith("✅") ? "#4a7a28" : "#c0392b",
+                    color: error.includes("تم إرسال") ? "#4a7a28" : "#c0392b",
                     fontSize: 13,
                     textAlign: "center",
                   }}
@@ -608,22 +607,19 @@ export default function LoginPage() {
 
               {/* ─ Email Form ─ */}
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>📧</span>
+                <div>
                   <input
                     className="kid-input"
                     type="email"
                     placeholder="البريد الإلكتروني"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    style={{ paddingRight: 44 }}
                   />
                 </div>
 
                 {/* ─ Phone input required on register ─ */}
                 {isRegister && (
-                  <div style={{ position: "relative" }}>
-                    <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>📱</span>
+                  <div>
                     <input
                       className="kid-input"
                       type="tel"
@@ -631,25 +627,25 @@ export default function LoginPage() {
                       placeholder="رقم الجوال للتواصل (مثال: 05xxxxxxxx)"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      style={{ paddingRight: 44, textAlign: "right" }}
+                      style={{ textAlign: "right" }}
                     />
                   </div>
                 )}
 
                 <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 17 }}>🔒</span>
                   <input
                     className="kid-input"
                     type={showPass ? "text" : "password"}
                     placeholder="كلمة المرور"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    style={{ paddingRight: 44, paddingLeft: 44 }}
+                    style={{ paddingLeft: 44 }}
                     onKeyDown={(e) => e.key === "Enter" && handleEmailAuth()}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPass(!showPass)}
+                    aria-label={showPass ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
                     style={{
                       position: "absolute",
                       left: 14,
@@ -658,16 +654,28 @@ export default function LoginPage() {
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      fontSize: 17,
-                      padding: 0,
+                      padding: 4,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    {showPass ? "🙈" : "👁️"}
+                    {showPass ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
                   </button>
                 </div>
 
                 <button className="kid-btn-primary" onClick={handleEmailAuth} disabled={loading}>
-                  {loading ? "⏳ جارٍ التحميل..." : isRegister ? "✨ إنشاء حساب جديد" : "🚀 تسجيل الدخول"}
+                  {loading ? "جارٍ التحميل..." : isRegister ? "إنشاء حساب جديد" : "تسجيل الدخول"}
                 </button>
               </div>
 
@@ -719,11 +727,6 @@ export default function LoginPage() {
               </div>
             </>
           )}
-
-          {/* Footer decoration */}
-          <div style={{ textAlign: "center", marginTop: 12, fontSize: 18, letterSpacing: 5 }}>
-            ⭐🌙✨🌟💫
-          </div>
         </div>
       )}
     </div>
