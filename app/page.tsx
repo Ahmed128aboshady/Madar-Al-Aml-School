@@ -48,25 +48,6 @@ const ISLAND_ZONES: IslandZone[] = [
     mobileHeight: "20%",
   },
   {
-    id: "fruits",
-    title: "تعرف على الفواكه",
-    description: "أهلاً بك في جزيرة الفواكه اللذيذة! هيا نتعرف على التفاح والموز والبرتقال وفوائدها لصحتنا وطاقتنا.",
-    themeColor: "#D62246",
-    imageSrc: "/islands/island-fruits.png",
-    desktopTop: "22%",
-    desktopLeft: "58%",
-    desktopWidth: "26%",
-    desktopHeight: "36%",
-    tabletTop: "22%",
-    tabletLeft: "58%",
-    tabletWidth: "30%",
-    tabletHeight: "33%",
-    mobileTop: "20%",
-    mobileLeft: "52%",
-    mobileWidth: "44%",
-    mobileHeight: "20%",
-  },
-  {
     id: "vegetables",
     title: "تعرف على الخضار",
     description: "جزيرة الخضار الطازجة! سنلعب مع الجزر والبروكلي اللطيف ونتعلم ألوانها وأهميتها لأجسامنا القوية.",
@@ -86,21 +67,21 @@ const ISLAND_ZONES: IslandZone[] = [
     mobileHeight: "21%",
   },
   {
-    id: "vehicles",
-    title: "تعرف على المواصلات",
-    description: "أهلاً بك في جزيرة السيارات والطائرات! هيا نقود السيارة ونحلق بالطائرة ونتعرف على وسائل النقل السريعة.",
-    themeColor: "#0077B6",
-    imageSrc: "/islands/island-vehicles.png",
-    desktopTop: "56%",
-    desktopLeft: "6%",
-    desktopWidth: "28%",
+    id: "fruits",
+    title: "تعرف على الفواكه",
+    description: "أهلاً بك في جزيرة الفواكه اللذيذة! هيا نتعرف على التفاح والموز والبرتقال وفوائدها لصحتنا وطاقتنا.",
+    themeColor: "#D62246",
+    imageSrc: "/islands/island-fruits.png",
+    desktopTop: "22%",
+    desktopLeft: "58%",
+    desktopWidth: "26%",
     desktopHeight: "36%",
-    tabletTop: "56%",
-    tabletLeft: "5%",
-    tabletWidth: "32%",
+    tabletTop: "22%",
+    tabletLeft: "58%",
+    tabletWidth: "30%",
     tabletHeight: "33%",
-    mobileTop: "65%",
-    mobileLeft: "4%",
+    mobileTop: "20%",
+    mobileLeft: "52%",
     mobileWidth: "44%",
     mobileHeight: "20%",
   },
@@ -123,6 +104,69 @@ const ISLAND_ZONES: IslandZone[] = [
     mobileWidth: "44%",
     mobileHeight: "20%",
   },
+  {
+    id: "vehicles",
+    title: "تعرف على المواصلات",
+    description: "أهلاً بك في جزيرة السيارات والطائرات! هيا نقود السيارة ونحلق بالطائرة ونتعرف على وسائل النقل السريعة.",
+    themeColor: "#0077B6",
+    imageSrc: "/islands/island-vehicles.png",
+    desktopTop: "56%",
+    desktopLeft: "6%",
+    desktopWidth: "28%",
+    desktopHeight: "36%",
+    tabletTop: "56%",
+    tabletLeft: "5%",
+    tabletWidth: "32%",
+    tabletHeight: "33%",
+    mobileTop: "65%",
+    mobileLeft: "4%",
+    mobileWidth: "44%",
+    mobileHeight: "20%",
+  },
+];
+
+interface PathSegment {
+  fromId: string;
+  toId: string;
+  desktopD: string;
+  tabletD: string;
+  mobileD: string;
+}
+
+// خطوط ومسارات الخطوات بين كل جزيرة والتالية حسب الترتيب المحدد
+const ISLAND_PATHS: PathSegment[] = [
+  // 1. الحيوانات (أعلى اليسار) -> 2. الخضار (الوسط)
+  {
+    fromId: "animals",
+    toId: "vegetables",
+    desktopD: "M 25 46 Q 32 58 45 56",
+    tabletD: "M 25 44 Q 33 58 45 56",
+    mobileD: "M 26 38 Q 32 50 44 51",
+  },
+  // 2. الخضار (الوسط) -> 3. الفواكه (أعلى اليمين)
+  {
+    fromId: "vegetables",
+    toId: "fruits",
+    desktopD: "M 52 53 Q 63 50 68 44",
+    tabletD: "M 53 53 Q 63 48 70 42",
+    mobileD: "M 54 48 Q 67 44 70 38",
+  },
+  // 3. الفواكه (أعلى اليمين) -> 4. الأفعال اليومية (أسفل اليمين)
+  {
+    fromId: "fruits",
+    toId: "daily-actions",
+    desktopD: "M 71 47 Q 78 60 76 72",
+    tabletD: "M 72 47 Q 80 62 78 72",
+    mobileD: "M 74 38 Q 80 56 74 72",
+  },
+  // 4. الأفعال اليومية (أسفل اليمين) -> 5. المواصلات (أسفل اليسار)
+  {
+    fromId: "daily-actions",
+    toId: "vehicles",
+    desktopD: "M 70 78 Q 48 85 24 77",
+    tabletD: "M 70 78 Q 48 85 24 76",
+    mobileD: "M 66 77 Q 48 83 28 77",
+  },
 ];
 
 function getIslandStatus(zoneId: string, completed: string[], animalsProgressCount: number = 0) {
@@ -131,14 +175,15 @@ function getIslandStatus(zoneId: string, completed: string[], animalsProgressCou
   let isUnlocked = false;
 
   if (zoneId === "animals") {
-    // الجزيرة الأولى (الحيوانات) مفتوحة دائماً كبداية
+    // 1. الجزيرة الأولى (الحيوانات) مفتوحة دائماً كبداية
     isUnlocked = true;
-  } else if (zoneId === "fruits") {
-    // جزيرة الفواكه لا تفتح إلا عند حل 80% على الأقل من جزيرة الحيوانات (10 من 13) أو إنهاء الجزيرة
+  } else if (zoneId === "vegetables") {
+    // 2. الجزيرة الثانية (الخضار) تفتح فقط عند حل 80% على الأقل من جزيرة الحيوانات (10 من 13) أو إنهاء الجزيرة
     isUnlocked = animalsProgressCount >= 10 || isCompleted || completed.includes("animals");
   } else {
-    // باقي الجزر تفتح بالتسلسل عند إنهاء الجزيرة السابقة بالكامل
-    isUnlocked = completed.includes(ISLAND_ZONES[index - 1].id);
+    // 3. الفواكه، 4. الأفعال، 5. المواصلات: تفتح كل جزيرة بالتسلسل عند إنهاء الجزيرة السابقة
+    const prevZoneId = index > 0 ? ISLAND_ZONES[index - 1].id : null;
+    isUnlocked = Boolean((prevZoneId && completed.includes(prevZoneId)) || isCompleted);
   }
 
   const previousZone = index > 0 ? ISLAND_ZONES[index - 1] : null;
@@ -547,6 +592,64 @@ export default function HomePage() {
           }}
           title="عرض بيانات الحساب"
         />
+
+        {/* ── SVG Connecting Stepping Paths Between Islands ("خطوات بين الجزر") ── */}
+        <svg
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 18,
+            pointerEvents: "none",
+          }}
+        >
+          <defs>
+            <filter id="pathShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#0F172A" floodOpacity="0.25" />
+            </filter>
+          </defs>
+
+          {ISLAND_PATHS.map((seg) => {
+            const pathD =
+              deviceType === "mobile"
+                ? seg.mobileD
+                : deviceType === "tablet"
+                ? seg.tabletD
+                : seg.desktopD;
+
+            // Target island status
+            const targetStatus = getIslandStatus(seg.toId, completedIslands, animalsProgressCount);
+            const isPathActive = targetStatus.isUnlocked;
+
+            return (
+              <g key={`path-${seg.fromId}-${seg.toId}`} filter="url(#pathShadow)">
+                {/* Underlayer Soft Cloud Glow */}
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke="rgba(255, 255, 255, 0.9)"
+                  strokeWidth="7"
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+
+                {/* Dotted Stepping Stones Path */}
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke={isPathActive ? "#F59E0B" : "rgba(148, 163, 184, 0.75)"}
+                  strokeWidth={isPathActive ? "5" : "4"}
+                  strokeDasharray="2 10"
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </g>
+            );
+          })}
+        </svg>
 
         {/* ── 5 Interactive Individual Island Assets ── */}
         {ISLAND_ZONES.map((zone) => {
@@ -1028,7 +1131,7 @@ export default function HomePage() {
               هذه الجزيرة مقفلة حالياً
             </h2>
 
-            {lockedNoticeZone.zone.id === "fruits" ? (
+            {lockedNoticeZone.zone.id === "vegetables" ? (
               <>
                 <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
                   يا بطل! عليك أولاً إكمال <strong>80% على الأقل</strong> من جزيرة الحيوانات (حل 10 حيوانات على الأقل) لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong>!

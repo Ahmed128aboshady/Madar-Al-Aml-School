@@ -971,7 +971,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
             >
               لقد أتقنت جميع حيوانات <strong>جزيرة الحيوانات</strong> بنجاح!
               <br />
-              تم فتح <strong>جزيرة الفواكه</strong> على الخريطة لتكمل مغامرتك!
+              تم فتح <strong>جزيرة الخضار</strong> على الخريطة لتكمل مغامرتك!
             </p>
 
             <div
@@ -996,7 +996,7 @@ export default function AnimalsIslandAdventure({ onBackToMap, onCompleteIsland, 
                   boxShadow: "0 8px 20px rgba(16, 185, 129, 0.4)",
                 }}
               >
-                العودة للخريطة لاستكشاف الفواكه
+                العودة للخريطة لاستكشاف الخضار
               </button>
             </div>
           </div>
