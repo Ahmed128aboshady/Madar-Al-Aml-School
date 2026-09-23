@@ -41,10 +41,10 @@ const ISLAND_ZONES: IslandZone[] = [
     tabletLeft: "10%",
     tabletWidth: "30%",
     tabletHeight: "33%",
-    mobileTop: "17%",
-    mobileLeft: "3%",
-    mobileWidth: "46%",
-    mobileHeight: "22%",
+    mobileTop: "20%",
+    mobileLeft: "4%",
+    mobileWidth: "44%",
+    mobileHeight: "20%",
   },
   {
     id: "fruits",
@@ -60,10 +60,10 @@ const ISLAND_ZONES: IslandZone[] = [
     tabletLeft: "58%",
     tabletWidth: "30%",
     tabletHeight: "33%",
-    mobileTop: "18%",
-    mobileLeft: "51%",
-    mobileWidth: "46%",
-    mobileHeight: "22%",
+    mobileTop: "20%",
+    mobileLeft: "52%",
+    mobileWidth: "44%",
+    mobileHeight: "20%",
   },
   {
     id: "vegetables",
@@ -79,10 +79,10 @@ const ISLAND_ZONES: IslandZone[] = [
     tabletLeft: "34%",
     tabletWidth: "32%",
     tabletHeight: "34%",
-    mobileTop: "39%",
-    mobileLeft: "26%",
-    mobileWidth: "48%",
-    mobileHeight: "23%",
+    mobileTop: "42%",
+    mobileLeft: "27%",
+    mobileWidth: "46%",
+    mobileHeight: "21%",
   },
   {
     id: "vehicles",
@@ -98,10 +98,10 @@ const ISLAND_ZONES: IslandZone[] = [
     tabletLeft: "5%",
     tabletWidth: "32%",
     tabletHeight: "33%",
-    mobileTop: "61%",
-    mobileLeft: "3%",
-    mobileWidth: "46%",
-    mobileHeight: "22%",
+    mobileTop: "65%",
+    mobileLeft: "4%",
+    mobileWidth: "44%",
+    mobileHeight: "20%",
   },
   {
     id: "daily-actions",
@@ -117,10 +117,10 @@ const ISLAND_ZONES: IslandZone[] = [
     tabletLeft: "63%",
     tabletWidth: "32%",
     tabletHeight: "33%",
-    mobileTop: "61%",
-    mobileLeft: "51%",
-    mobileWidth: "46%",
-    mobileHeight: "22%",
+    mobileTop: "65%",
+    mobileLeft: "52%",
+    mobileWidth: "44%",
+    mobileHeight: "20%",
   },
 ];
 
@@ -343,9 +343,9 @@ export default function HomePage() {
       <header
         style={{
           position: "absolute",
-          top: "10px",
-          left: "14px",
-          right: "14px",
+          top: deviceType === "mobile" ? "8px" : "12px",
+          left: deviceType === "mobile" ? "10px" : "16px",
+          right: deviceType === "mobile" ? "10px" : "16px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -360,17 +360,21 @@ export default function HomePage() {
             color: "white",
             border: "2px solid white",
             borderRadius: "20px",
-            padding: "6px 16px",
-            fontSize: "13px",
+            padding: deviceType === "mobile" ? "4px 10px" : "6px 16px",
+            fontSize: deviceType === "mobile" ? "11px" : "13px",
             fontWeight: 800,
             cursor: "pointer",
             boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
             transition: "transform 0.2s",
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
           }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >
-          خروج 🚪
+          <span>خروج</span>
+          <span>🚪</span>
         </button>
 
         {/* Profile Button / User Pill (Opens User Profile Modal) */}
@@ -378,29 +382,29 @@ export default function HomePage() {
           onClick={() => setShowProfileModal(true)}
           style={{
             background: "rgba(255, 255, 255, 0.95)",
-            padding: "6px 14px",
+            padding: deviceType === "mobile" ? "4px 10px" : "6px 14px",
             borderRadius: "20px",
             color: "#5B4FA8",
             fontWeight: 800,
-            fontSize: "13px",
+            fontSize: deviceType === "mobile" ? "11px" : "13px",
             boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
             border: "2px solid #5B4FA8",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
-            gap: 6,
+            gap: 5,
             transition: "transform 0.2s, box-shadow 0.2s",
           }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >
-          <span>👤 مرحباً بك</span>
-          {currentUser?.email && (
+          <span>👤 {deviceType === "mobile" ? (childName ? childName : "حسابي") : "مرحباً بك"}</span>
+          {deviceType !== "mobile" && currentUser?.email && (
             <span style={{ direction: "ltr", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               ({currentUser.email.split("@")[0]})
             </span>
           )}
-          <span style={{ fontSize: 11 }}>ℹ️</span>
+          <span style={{ fontSize: deviceType === "mobile" ? 9 : 11 }}>ℹ️</span>
         </button>
       </header>
 
@@ -439,11 +443,11 @@ export default function HomePage() {
         <div
           style={{
             position: "absolute",
-            top: deviceType === "mobile" ? "4%" : deviceType === "tablet" ? "4%" : "6%",
+            top: deviceType === "mobile" ? "6.5%" : deviceType === "tablet" ? "4%" : "6%",
             left: "50%",
             transform: "translateX(-50%)",
-            width: deviceType === "mobile" ? "84%" : deviceType === "tablet" ? "52%" : "48%",
-            height: deviceType === "mobile" ? "13%" : deviceType === "tablet" ? "18%" : "22%",
+            width: deviceType === "mobile" ? "74%" : deviceType === "tablet" ? "52%" : "48%",
+            height: deviceType === "mobile" ? "9.5%" : deviceType === "tablet" ? "18%" : "22%",
             zIndex: 15,
             pointerEvents: "none",
           }}
@@ -465,7 +469,7 @@ export default function HomePage() {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                paddingTop: "1%",
+                paddingTop: deviceType === "mobile" ? "0.5%" : "1%",
                 textAlign: "center",
               }}
             >
@@ -474,7 +478,7 @@ export default function HomePage() {
                   margin: 0,
                   fontSize:
                     deviceType === "mobile"
-                      ? "16px"
+                      ? "14px"
                       : deviceType === "tablet"
                       ? "22px"
                       : "clamp(22px, 2.7vw, 40px)",
@@ -488,10 +492,10 @@ export default function HomePage() {
               </h1>
               <p
                 style={{
-                  margin: "3px 0 0",
+                  margin: deviceType === "mobile" ? "1px 0 0" : "3px 0 0",
                   fontSize:
                     deviceType === "mobile"
-                      ? "11px"
+                      ? "10px"
                       : deviceType === "tablet"
                       ? "13px"
                       : "clamp(13px, 1.5vw, 22px)",
