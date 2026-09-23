@@ -429,11 +429,11 @@ export default function HomePage() {
         <div
           style={{
             position: "absolute",
-            top: deviceType === "mobile" ? "2%" : "2%",
+            top: deviceType === "mobile" ? "4%" : deviceType === "tablet" ? "5%" : "6%",
             left: "50%",
             transform: "translateX(-50%)",
-            width: deviceType === "mobile" ? "88%" : deviceType === "tablet" ? "54%" : "38%",
-            height: deviceType === "mobile" ? "12%" : deviceType === "tablet" ? "16%" : "17%",
+            width: deviceType === "mobile" ? "92%" : deviceType === "tablet" ? "60%" : "48%",
+            height: deviceType === "mobile" ? "14%" : deviceType === "tablet" ? "20%" : "22%",
             zIndex: 15,
             pointerEvents: "none",
           }}
@@ -455,26 +455,26 @@ export default function HomePage() {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                paddingTop: "2%",
+                paddingTop: "1%",
                 textAlign: "center",
               }}
             >
               <h1
                 style={{
                   margin: 0,
-                  fontSize: deviceType === "mobile" ? "16px" : "clamp(18px, 2.2vw, 32px)",
+                  fontSize: deviceType === "mobile" ? "18px" : "clamp(22px, 2.7vw, 40px)",
                   fontWeight: 900,
                   color: "#BE123C",
                   textShadow: "0 2px 4px rgba(255,255,255,0.85)",
-                  lineHeight: 1.1,
+                  lineHeight: 1.15,
                 }}
               >
                 اختر جزيرتك السحرية
               </h1>
               <p
                 style={{
-                  margin: "2px 0 0",
-                  fontSize: deviceType === "mobile" ? "11px" : "clamp(11px, 1.2vw, 17px)",
+                  margin: "4px 0 0",
+                  fontSize: deviceType === "mobile" ? "12px" : "clamp(13px, 1.5vw, 22px)",
                   fontWeight: 800,
                   color: "#1D4ED8",
                   textShadow: "0 1px 2px rgba(255,255,255,0.85)",
