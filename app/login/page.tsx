@@ -121,6 +121,15 @@ export default function LoginPage() {
     };
   }, []);
 
+  function handleGuestLogin() {
+    try {
+      localStorage.setItem("madar_guest_mode", "true");
+      localStorage.setItem("madar_parent_name", "ولي الأمر");
+      localStorage.setItem("madar_child_name", "بطل مدار الأمل");
+    } catch {}
+    window.location.href = "/";
+  }
+
   /* ── Handlers ── */
   async function handleEmailAuth() {
     if (!supabase) return;
@@ -705,6 +714,31 @@ export default function LoginPage() {
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
                 الدخول بـ Google
+              </button>
+
+              {/* ─ Guest Demo Mode Button ─ */}
+              <button
+                type="button"
+                onClick={handleGuestLogin}
+                style={{
+                  width: "100%",
+                  marginTop: 10,
+                  padding: "12px 16px",
+                  background: "linear-gradient(135deg, #10B981, #059669)",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: 14,
+                  fontSize: 14,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  boxShadow: "0 4px 14px rgba(16, 185, 129, 0.35)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+              >
+                ✨ دخول مباشر للتجربة (بدون تسجيل)
               </button>
 
               {/* ─ Switch Register / Login ─ */}

@@ -292,10 +292,19 @@ export default function HomePage() {
 
     import("@/lib/supabase").then(async ({ supabase }) => {
       try {
-        const { data } = await supabase.auth.getUser();
-        if (data?.user) {
-          setCurrentUser(data.user);
-          const meta = data.user.user_metadata || {};
+        let user = null;
+        try {
+          const { data } = await supabase.auth.getUser();
+          user = data?.user || null;
+        } catch (authFetchErr) {
+          console.warn("Supabase auth unreachable:", authFetchErr);
+        }
+
+        const isGuest = typeof window !== "undefined" && localStorage.getItem("madar_guest_mode") === "true";
+
+        if (user) {
+          setCurrentUser(user);
+          const meta = user.user_metadata || {};
           setParentName(meta.parent_name || "");
           setChildName(meta.child_name || "");
           setParentPhone(meta.parent_phone || meta.phone || "");
@@ -328,15 +337,42 @@ export default function HomePage() {
           } catch (syncErr) {
             console.error("Cycle sync error:", syncErr);
           }
+        } else if (isGuest) {
+          // Guest mode session
+          const guestUser = {
+            id: "guest-hero",
+            email: "guest@madar-al-amal.com",
+            user_metadata: {
+              parent_name: localStorage.getItem("madar_parent_name") || "ولي الأمر",
+              child_name: localStorage.getItem("madar_child_name") || "بطل مدار الأمل",
+            },
+          };
+          setCurrentUser(guestUser as any);
+          setParentName(guestUser.user_metadata.parent_name);
+          setChildName(guestUser.user_metadata.child_name);
+
+          const accountCycle = calculateHeroCycle(localAnimalIds);
+          setAnimalsCompletedIds(accountCycle.uniqueIds);
+          setAnimalsProgressCount(accountCycle.count);
+          setCompletedIslands(accountCycle.trueCompletedIslands);
         } else {
-          // If not logged in, redirect to login page
+          // If not logged in and not guest, redirect to login page
           window.location.href = "/login";
           return;
         }
       } catch (err) {
-        console.error("Auth check error:", err);
-        window.location.href = "/login";
-        return;
+        console.error("Auth check error, falling back to guest mode:", err);
+        const guestUser = {
+          id: "guest-hero",
+          email: "guest@madar-al-amal.com",
+          user_metadata: {
+            parent_name: "ولي الأمر",
+            child_name: "بطل مدار الأمل",
+          },
+        };
+        setCurrentUser(guestUser as any);
+        setParentName("ولي الأمر");
+        setChildName("بطل مدار الأمل");
       } finally {
         setCheckingAuth(false);
       }
@@ -351,6 +387,18 @@ export default function HomePage() {
   async function handleSaveParentData() {
     setSavingProfile(true);
     setSaveSuccess(false);
+
+    if (typeof window !== "undefined" && localStorage.getItem("madar_guest_mode") === "true") {
+      try {
+        localStorage.setItem("madar_parent_name", parentName);
+        localStorage.setItem("madar_child_name", childName);
+      } catch {}
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+      setSavingProfile(false);
+      return;
+    }
+
     try {
       const { supabase } = await import("@/lib/supabase");
       const { data, error } = await supabase.auth.updateUser({
@@ -389,8 +437,11 @@ export default function HomePage() {
   }
 
   async function handleSignOut() {
-    const { supabase } = await import("@/lib/supabase");
-    await supabase.auth.signOut();
+    try {
+      localStorage.removeItem("madar_guest_mode");
+      const { supabase } = await import("@/lib/supabase");
+      await supabase.auth.signOut();
+    } catch {}
     window.location.href = "/login";
   }
 
