@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import NumbersIslandAdventure from "@/components/NumbersIslandAdventure";
 import LettersIslandAdventure from "@/components/LettersIslandAdventure";
+import EnglishColoringIsland from "@/components/EnglishColoringIsland";
 
 interface IslandZone {
   id: string;
@@ -68,11 +69,11 @@ const ISLAND_ZONES: IslandZone[] = [
     mobileHeight: "21%",
   },
   {
-    id: "fruits",
-    title: "تعرف على الفواكه",
-    description: "أهلاً بك في جزيرة الفواكه اللذيذة! هيا نتعرف على التفاح والموز والبرتقال وفوائدها لصحتنا وطاقتنا.",
-    themeColor: "#D62246",
-    imageSrc: "/islands/island-fruits.png",
+    id: "english",
+    title: "تلوين الحروف الإنجليزية",
+    description: "استوديو تلوين الحروف الإنجليزية السحري! لوّن حروف A إلى Z بأجمل الألوان والنجوم وتعلم نطق الكلمات الإنجليزية.",
+    themeColor: "#EC4899",
+    imageSrc: "/islands/island-english.png",
     desktopTop: "22%",
     desktopLeft: "58%",
     desktopWidth: "26%",
@@ -144,17 +145,17 @@ const ISLAND_PATHS: PathSegment[] = [
     tabletD: "M 25 44 Q 33 58 45 56",
     mobileD: "M 26 38 Q 32 50 44 51",
   },
-  // 2. الحروف (الوسط) -> 3. الفواكه (أعلى اليمين)
+  // 2. الحروف (الوسط) -> 3. تلوين الحروف الإنجليزية (أعلى اليمين)
   {
     fromId: "letters",
-    toId: "fruits",
+    toId: "english",
     desktopD: "M 52 53 Q 63 50 68 44",
     tabletD: "M 53 53 Q 63 48 70 42",
     mobileD: "M 54 48 Q 67 44 70 38",
   },
-  // 3. الفواكه (أعلى اليمين) -> 4. الأفعال اليومية (أسفل اليمين)
+  // 3. الإنجليزية (أعلى اليمين) -> 4. الأفعال اليومية (أسفل اليمين)
   {
-    fromId: "fruits",
+    fromId: "english",
     toId: "daily-actions",
     desktopD: "M 71 47 Q 78 60 76 72",
     tabletD: "M 72 47 Q 80 62 78 72",
@@ -175,8 +176,8 @@ function getIslandStatus(zoneId: string, completed: string[], numbersProgressCou
   const isCompleted = completed.includes(zoneId);
   let isUnlocked = false;
 
-  if (zoneId === "numbers" || zoneId === "letters") {
-    // 1. جزيرة الأرقام و 2. جزيرة الحروف مفتوحتان للتعلم واللعب المباشر
+  if (zoneId === "numbers" || zoneId === "letters" || zoneId === "english") {
+    // 1. الأرقام، 2. الحروف، 3. تلوين الإنجليزية مفتوحة للتعلم واللعب المباشر
     isUnlocked = true;
   } else {
     // 3. الفواكه، 4. الأفعال، 5. المواصلات: مقفلة وتفتح بالتسلسل بعد إتمام الجزر السابقة
@@ -653,7 +654,7 @@ export default function HomePage() {
               key={zone.id}
               className="island-card"
               onClick={() => {
-                if (zone.id === "numbers" || zone.id === "letters") {
+                if (zone.id === "numbers" || zone.id === "letters" || zone.id === "english") {
                   setActiveIsland(zone);
                 } else {
                   setLockedNoticeZone({ zone, prevZone: ISLAND_ZONES[0] });
@@ -1243,6 +1244,14 @@ export default function HomePage() {
       {/* ── Letters Island Interactive Adventure ── */}
       {activeIsland?.id === "letters" && (
         <LettersIslandAdventure
+          onBackToMap={() => setActiveIsland(null)}
+          onCompleteIsland={handleCompleteIsland}
+        />
+      )}
+
+      {/* ── English Coloring Island Studio ── */}
+      {activeIsland?.id === "english" && (
+        <EnglishColoringIsland
           onBackToMap={() => setActiveIsland(null)}
           onCompleteIsland={handleCompleteIsland}
         />
