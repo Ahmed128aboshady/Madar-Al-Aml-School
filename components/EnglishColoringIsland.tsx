@@ -524,15 +524,16 @@ export default function EnglishColoringIsland({
                   borderRadius: 18,
                   background: currentItem.accent,
                   color: "#FFF",
-                  fontSize: 32,
+                  fontSize: 28,
                   fontWeight: 900,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: "pointer",
+                  letterSpacing: 1,
                 }}
               >
-                {currentItem.icon}
+                {currentItem.upper}{currentItem.lower}
               </div>
               <div dir="ltr" style={{ textAlign: "left" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -544,7 +545,7 @@ export default function EnglishColoringIsland({
                   </span>
                 </div>
                 <div dir="rtl" style={{ fontSize: 14, fontWeight: 800, color: "#475569", textAlign: "right" }}>
-                  المعنى بالعربية: <strong>{currentItem.arabicWord}</strong> — لوّن الحرف بالألوان التي تحبها!
+                  المعنى بالعربية: <strong>{currentItem.arabicWord}</strong> — لوّن الحرف بالألوان التي تحبها
                 </div>
               </div>
             </div>
@@ -561,9 +562,17 @@ export default function EnglishColoringIsland({
                   fontWeight: 800,
                   fontSize: 13,
                   cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
                 }}
               >
-                🔊 اسمع النطق بالإنجليزية
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                </svg>
+                اسمع النطق بالإنجليزية
               </button>
               <button
                 onClick={handleDownloadArtwork}
@@ -576,9 +585,17 @@ export default function EnglishColoringIsland({
                   fontWeight: 800,
                   fontSize: 13,
                   cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
                 }}
               >
-                💾 حفظ اللوحة
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                حفظ اللوحة
               </button>
             </div>
           </div>
@@ -601,31 +618,82 @@ export default function EnglishColoringIsland({
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", flexWrap: "wrap", gap: 8 }}>
               {/* Tool Buttons */}
               <div style={{ display: "flex", gap: 6 }}>
-                {[
-                  { id: "brush", label: "🖌️ فرشاة" },
-                  { id: "fill", label: "🪣 تعبئة سريعة" },
-                  { id: "stamp", label: "⭐ نجوم" },
-                ].map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => {
-                      playStudioSound("click");
-                      setTool(t.id as "brush" | "fill" | "stamp");
-                    }}
-                    style={{
-                      padding: "6px 14px",
-                      borderRadius: 14,
-                      border: tool === t.id ? "2.5px solid #1E293B" : "2px solid #E2E8F0",
-                      background: tool === t.id ? "linear-gradient(135deg, #F59E0B, #EC4899)" : "#F8FAFC",
-                      color: tool === t.id ? "#FFF" : "#334155",
-                      fontWeight: 800,
-                      fontSize: 13,
-                      cursor: "pointer",
-                    }}
-                  >
-                    {t.label}
-                  </button>
-                ))}
+                <button
+                  onClick={() => {
+                    playStudioSound("click");
+                    setTool("brush");
+                  }}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 14,
+                    border: tool === "brush" ? "2.5px solid #1E293B" : "2px solid #E2E8F0",
+                    background: tool === "brush" ? "linear-gradient(135deg, #F59E0B, #EC4899)" : "#F8FAFC",
+                    color: tool === "brush" ? "#FFF" : "#334155",
+                    fontWeight: 800,
+                    fontSize: 13,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z" />
+                    <path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7" />
+                  </svg>
+                  فرشاة
+                </button>
+                <button
+                  onClick={() => {
+                    playStudioSound("click");
+                    setTool("fill");
+                  }}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 14,
+                    border: tool === "fill" ? "2.5px solid #1E293B" : "2px solid #E2E8F0",
+                    background: tool === "fill" ? "linear-gradient(135deg, #F59E0B, #EC4899)" : "#F8FAFC",
+                    color: tool === "fill" ? "#FFF" : "#334155",
+                    fontWeight: 800,
+                    fontSize: 13,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z" />
+                    <path d="m5 2 5 5" />
+                    <path d="M2 13h15" />
+                    <path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4Z" />
+                  </svg>
+                  تعبئة سريعة
+                </button>
+                <button
+                  onClick={() => {
+                    playStudioSound("click");
+                    setTool("stamp");
+                  }}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 14,
+                    border: tool === "stamp" ? "2.5px solid #1E293B" : "2px solid #E2E8F0",
+                    background: tool === "stamp" ? "linear-gradient(135deg, #F59E0B, #EC4899)" : "#F8FAFC",
+                    color: tool === "stamp" ? "#FFF" : "#334155",
+                    fontWeight: 800,
+                    fontSize: 13,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                  نجوم
+                </button>
               </div>
 
               {/* Brush Sizes */}
@@ -677,9 +745,16 @@ export default function EnglishColoringIsland({
                     fontWeight: 800,
                     fontSize: 13,
                     cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
                   }}
                 >
-                  🗑️ مسح
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                  مسح
                 </button>
                 <button
                   onClick={handleCompleteLetter}
@@ -694,9 +769,15 @@ export default function EnglishColoringIsland({
                     fontSize: 13,
                     cursor: strokeCount > 0 ? "pointer" : "not-allowed",
                     boxShadow: strokeCount > 0 ? "0 4px 12px rgba(16,185,129,0.4)" : "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
                   }}
                 >
-                  ✨ أنهيت التلوين!
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  أنهيت التلوين
                 </button>
               </div>
             </div>
@@ -753,7 +834,7 @@ export default function EnglishColoringIsland({
                     whiteSpace: "nowrap",
                   }}
                 >
-                  <span>فنان رائع! 🎨 لوّنت حرف {currentItem.upper} بإبداع!</span>
+                  <span>فنان رائع! لوّنت حرف {currentItem.upper} بإبداع</span>
                   {currentIndex < ENGLISH_LETTERS.length - 1 ? (
                     <button
                       onClick={() => setCurrentIndex((i) => i + 1)}
@@ -767,7 +848,7 @@ export default function EnglishColoringIsland({
                         cursor: "pointer",
                       }}
                     >
-                      الحرف التالي ({ENGLISH_LETTERS[currentIndex + 1].upper}) ⬅
+                      الحرف التالي ({ENGLISH_LETTERS[currentIndex + 1].upper})
                     </button>
                   ) : (
                     <button
@@ -782,7 +863,7 @@ export default function EnglishColoringIsland({
                         cursor: "pointer",
                       }}
                     >
-                      إنهاء الجزيرة! 🏆
+                      إنهاء الجزيرة
                     </button>
                   )}
                 </div>
@@ -821,7 +902,7 @@ export default function EnglishColoringIsland({
                       fontSize: 16,
                     }}
                   >
-                    {isRainbow ? "🌈" : ""}
+                    {isRainbow ? "" : ""}
                   </button>
                 );
               })}

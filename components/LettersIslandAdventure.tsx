@@ -1226,9 +1226,16 @@ function MarioLetterRunnerCanvas({
           boxShadow: "0 8px 20px rgba(239,68,68,0.4)",
           touchAction: "manipulation",
           userSelect: "none",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
         }}
       >
-        ⬆️ اقفز يا بطل! (اضغط مرتين للقفزة العالية)
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="19" x2="12" y2="5" />
+          <polyline points="5 12 12 5 19 12" />
+        </svg>
+        اقفز يا بطل! (اضغط مرتين للقفزة العالية)
       </button>
     </div>
   );
@@ -1570,7 +1577,7 @@ export default function LettersIslandAdventure({
                         fontWeight: 900,
                       }}
                     >
-                      {currentLevel.icon} {currentLevel.word}
+                      {currentLevel.word}
                     </span>
                     <button
                       onClick={() => speakArabicLetter(`حرف ${currentLevel.name}. ${currentLevel.chant}`)}
@@ -1699,8 +1706,7 @@ export default function LettersIslandAdventure({
                           animation: isWrong ? "marioWordShake 0.45s ease" : "none",
                         }}
                       >
-                        <span style={{ fontSize: 44, lineHeight: 1 }}>{opt.icon}</span>
-                        <span style={{ fontSize: 22, fontWeight: 900 }}>{opt.word}</span>
+                        <span style={{ fontSize: 26, fontWeight: 900 }}>{opt.word}</span>
                       </button>
                     );
                   })}
@@ -1742,7 +1748,7 @@ export default function LettersIslandAdventure({
                   {currentLevel.letter}
                 </div>
                 <h2 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: "#059669" }}>
-                  بطل المغامرة! أتقنت حرف {currentLevel.name} ({currentLevel.icon} {currentLevel.word})
+                  بطل المغامرة! أتقنت حرف {currentLevel.name} ({currentLevel.word})
                 </h2>
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
                   <button
@@ -1781,7 +1787,7 @@ export default function LettersIslandAdventure({
                         cursor: "pointer",
                       }}
                     >
-                      المرحلة التالية ({LETTERS_DATA[currentIndex + 1].letter} - {LETTERS_DATA[currentIndex + 1].name}) ⬅
+                      المرحلة التالية ({LETTERS_DATA[currentIndex + 1].letter} - {LETTERS_DATA[currentIndex + 1].name})
                     </button>
                   ) : (
                     <button
@@ -1839,7 +1845,7 @@ export default function LettersIslandAdventure({
                 </div>
                 <div>
                   <div style={{ fontSize: 19, fontWeight: 900, color: "#065F46" }}>
-                    اجمع عملة حرف: {arcadeLevel.name} ({arcadeLevel.letter}) {arcadeLevel.icon}
+                    اجمع عملة حرف: {arcadeLevel.name} ({arcadeLevel.letter})
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#64748B" }}>
                     {runnerHint || "اجرِ واقفز فوق المنصات لجمع العملة الذهبية الصحيحة!"}

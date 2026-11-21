@@ -1098,7 +1098,7 @@ export default function HomePage() {
               <div style={{ background: "white", borderRadius: 14, padding: "12px 14px", border: "1.5px solid #FBCFE8", boxShadow: "0 2px 8px rgba(0,0,0,0.03)", marginBottom: 10 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                   <span style={{ fontSize: 13, fontWeight: 900, color: "#9D174D" }}>
-                    🎈 جزيرة الأرقام (مفتوحة):
+                    جزيرة الأرقام (مفتوحة):
                   </span>
                   <span style={{ fontSize: 13, fontWeight: 900, color: "#E11D48" }}>
                     {animalsProgressCount} من 10 أرقام ({Math.min(100, Math.round((animalsProgressCount / 10) * 100))}%)
@@ -1129,14 +1129,14 @@ export default function HomePage() {
 
                 <div style={{ fontSize: 12, color: animalsProgressCount >= 8 ? "#059669" : "#D97706", fontWeight: 800 }}>
                   {animalsProgressCount >= 8
-                    ? "أحسنت يا بطل! أتممت نسبة 80% وتم فتح جزيرة الخضار بنجاح! 🔓"
-                    : `متبقي إتقان ${Math.max(0, 8 - animalsProgressCount)} أرقام للوصول إلى 80% وفتح جزيرة الخضار`}
+                    ? "أحسنت يا بطل! أتممت نسبة 80% وتم فتح الجزيرة التالية بنجاح"
+                    : `متبقي إتقان ${Math.max(0, 8 - animalsProgressCount)} أرقام للوصول إلى 80%`}
                 </div>
               </div>
 
               {/* تنبيه حالة قفل الجزر التالية */}
               <div style={{ fontSize: 11, color: "#64748B", fontWeight: 700, textAlign: "center", background: "#F1F5F9", padding: "6px 10px", borderRadius: 10 }}>
-                🔒 باقي الجزر مقفلة تلقائياً وتفتح تباعاً بمجرد إكمال 80% من كل جزيرة
+                باقي الجزر مقفلة تلقائياً وتفتح تباعاً بمجرد إكمال 80% من كل جزيرة
               </div>
 
               <button

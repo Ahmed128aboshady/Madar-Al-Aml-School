@@ -738,7 +738,7 @@ export default function LoginPage() {
                   gap: 8,
                 }}
               >
-                ✨ دخول مباشر للتجربة (بدون تسجيل)
+                دخول مباشر للتجربة (بدون تسجيل)
               </button>
 
               {/* ─ Switch Register / Login ─ */}

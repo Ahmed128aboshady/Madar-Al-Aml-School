@@ -1422,7 +1422,7 @@ export default function NumbersIslandAdventure({
                         boxShadow: "0 8px 18px rgba(16,185,129,0.4)",
                       }}
                     >
-                      الرقم التالي ({NUMBERS_DATA[currentIndex + 1].word}) ⬅
+                      الرقم التالي ({NUMBERS_DATA[currentIndex + 1].word})
                     </button>
                   ) : (
                     <button
