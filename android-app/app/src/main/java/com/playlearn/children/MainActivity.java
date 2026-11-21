@@ -19,6 +19,9 @@ import android.window.OnBackInvokedDispatcher;
 
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Hosts the Play & Learn Next.js static app offline from assets/www and exposes Updater bridge. */
 public class MainActivity extends Activity {
@@ -103,7 +106,9 @@ public class MainActivity extends Activity {
             for (String assetPath : candidates) {
                 try {
                     InputStream is = getAssets().open(assetPath);
-                    return new WebResourceResponse(guessMime(assetPath), "UTF-8", is);
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Access-Control-Allow-Origin", "*");
+                    return new WebResourceResponse(guessMime(assetPath), "UTF-8", 200, "OK", headers, is);
                 } catch (Exception ignored) {
                 }
             }
