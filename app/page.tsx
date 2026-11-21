@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import NumbersIslandAdventure from "@/components/NumbersIslandAdventure";
+import LettersIslandAdventure from "@/components/LettersIslandAdventure";
 
 interface IslandZone {
   id: string;
@@ -48,11 +49,11 @@ const ISLAND_ZONES: IslandZone[] = [
     mobileHeight: "20%",
   },
   {
-    id: "vegetables",
-    title: "تعرف على الخضار",
-    description: "جزيرة الخضار الطازجة! سنلعب مع الجزر والبروكلي اللطيف ونتعلم ألوانها وأهميتها لأجسامنا القوية.",
-    themeColor: "#2E7D32",
-    imageSrc: "/islands/island-vegetables.png",
+    id: "letters",
+    title: "تعرف على الحروف",
+    description: "جزيرة الحروف السحرية! هيا نفرقع بالونات الحروف العربية من الألف إلى الياء ونتعلم الكلمات والأصوات بأجمل الألوان.",
+    themeColor: "#9333EA",
+    imageSrc: "/islands/island-letters.png",
     desktopTop: "37%",
     desktopLeft: "35%",
     desktopWidth: "27%",
@@ -135,17 +136,17 @@ interface PathSegment {
 
 // خطوط ومسارات الخطوات بين كل جزيرة والتالية حسب الترتيب المحدد
 const ISLAND_PATHS: PathSegment[] = [
-  // 1. الأرقام (أعلى اليسار) -> 2. الخضار (الوسط)
+  // 1. الأرقام (أعلى اليسار) -> 2. الحروف (الوسط)
   {
     fromId: "numbers",
-    toId: "vegetables",
+    toId: "letters",
     desktopD: "M 25 46 Q 32 58 45 56",
     tabletD: "M 25 44 Q 33 58 45 56",
     mobileD: "M 26 38 Q 32 50 44 51",
   },
-  // 2. الخضار (الوسط) -> 3. الفواكه (أعلى اليمين)
+  // 2. الحروف (الوسط) -> 3. الفواكه (أعلى اليمين)
   {
-    fromId: "vegetables",
+    fromId: "letters",
     toId: "fruits",
     desktopD: "M 52 53 Q 63 50 68 44",
     tabletD: "M 53 53 Q 63 48 70 42",
@@ -174,14 +175,11 @@ function getIslandStatus(zoneId: string, completed: string[], numbersProgressCou
   const isCompleted = completed.includes(zoneId);
   let isUnlocked = false;
 
-  if (zoneId === "numbers") {
-    // 1. الجزيرة الأولى (الأرقام) فقط هي المفتوحة
+  if (zoneId === "numbers" || zoneId === "letters") {
+    // 1. جزيرة الأرقام و 2. جزيرة الحروف مفتوحتان للتعلم واللعب المباشر
     isUnlocked = true;
-  } else if (zoneId === "vegetables") {
-    // 2. الجزيرة الثانية (الخضار) مقفلة تماماً وتفتح فقط عند حل 80% على الأقل من جزيرة الأرقام (8 من 10)
-    isUnlocked = numbersProgressCount >= 8;
   } else {
-    // 3. الفواكه، 4. الأفعال، 5. المواصلات: مقفلة تماماً وتفتح بالتسلسل فقط بعد 80% من الأرقام وإنهاء الجزيرة السابقة
+    // 3. الفواكه، 4. الأفعال، 5. المواصلات: مقفلة وتفتح بالتسلسل بعد إتمام الجزر السابقة
     const prevZoneId = index > 0 ? ISLAND_ZONES[index - 1].id : null;
     isUnlocked = Boolean(numbersProgressCount >= 8 && prevZoneId && completed.includes(prevZoneId));
   }
@@ -655,7 +653,7 @@ export default function HomePage() {
               key={zone.id}
               className="island-card"
               onClick={() => {
-                if (zone.id === "numbers") {
+                if (zone.id === "numbers" || zone.id === "letters") {
                   setActiveIsland(zone);
                 } else {
                   setLockedNoticeZone({ zone, prevZone: ISLAND_ZONES[0] });
@@ -1239,6 +1237,14 @@ export default function HomePage() {
               console.error("Failed to sync numbers progress to supabase:", err);
             }
           }}
+        />
+      )}
+
+      {/* ── Letters Island Interactive Adventure ── */}
+      {activeIsland?.id === "letters" && (
+        <LettersIslandAdventure
+          onBackToMap={() => setActiveIsland(null)}
+          onCompleteIsland={handleCompleteIsland}
         />
       )}
 
