@@ -287,93 +287,92 @@ export default function HomePage() {
     window.addEventListener("resize", checkOrientation);
     window.addEventListener("orientationchange", checkOrientation);
 
-    import("@/lib/supabase").then(async ({ supabase }) => {
+    // Helper to activate instant guest session (works offline / without Supabase)
+    const activateGuestSession = () => {
+      const guestUser = {
+        id: "guest-hero",
+        email: "guest@madar-al-amal.com",
+        user_metadata: {
+          parent_name: (typeof window !== "undefined" && localStorage.getItem("madar_parent_name")) || "ولي الأمر",
+          child_name: (typeof window !== "undefined" && localStorage.getItem("madar_child_name")) || "بطل مدار الأمل",
+        },
+      };
       try {
-        let user = null;
-        try {
-          const { data } = await supabase.auth.getUser();
-          user = data?.user || null;
-        } catch (authFetchErr) {
-          console.warn("Supabase auth unreachable:", authFetchErr);
-        }
+        localStorage.setItem("madar_guest_mode", "true");
+      } catch {}
+      setCurrentUser(guestUser as any);
+      setParentName(guestUser.user_metadata.parent_name);
+      setChildName(guestUser.user_metadata.child_name);
 
-        const isGuest = typeof window !== "undefined" && localStorage.getItem("madar_guest_mode") === "true";
+      const accountCycle = calculateHeroCycle(localAnimalIds);
+      setAnimalsCompletedIds(accountCycle.uniqueIds);
+      setAnimalsProgressCount(accountCycle.count);
+      setCompletedIslands(accountCycle.trueCompletedIslands);
+      setCheckingAuth(false);
+    };
 
-        if (user) {
-          setCurrentUser(user);
-          const meta = user.user_metadata || {};
-          setParentName(meta.parent_name || "");
-          setChildName(meta.child_name || "");
-          setParentPhone(meta.parent_phone || meta.phone || "");
-          setParentCity(meta.parent_city || "");
-
-          // 2. دورة حساب ومزامنة حساب المستخدم السحابي (Supabase Cycle)
-          let serverAnimalIds: string[] = [];
-          if (Array.isArray(meta.numbers_completed_ids)) {
-            serverAnimalIds = meta.numbers_completed_ids;
-          }
-          // دمج الأرقام المحلولة بدون تكرار
-          const mergedAnimalIds = Array.from(new Set([...localAnimalIds, ...serverAnimalIds]));
-          const accountCycle = calculateHeroCycle(mergedAnimalIds);
-
-          setAnimalsCompletedIds(accountCycle.uniqueIds);
-          setAnimalsProgressCount(accountCycle.count);
-          setCompletedIslands(accountCycle.trueCompletedIslands);
-
-          // تصحيح فوري وتحديث شامل في Supabase و localStorage
+    // 1. Instant path if already in guest mode (0ms wait!)
+    if (typeof window !== "undefined" && localStorage.getItem("madar_guest_mode") === "true") {
+      activateGuestSession();
+    } else {
+      // 2. Try Supabase with a strict 1.5s timeout; fallback seamlessly to guest mode if unreachable
+      import("@/lib/supabase")
+        .then(async ({ supabase }) => {
           try {
-            localStorage.setItem("madar_numbers_completed_ids", JSON.stringify(accountCycle.uniqueIds));
-            localStorage.setItem("madar_completed_islands", JSON.stringify(accountCycle.trueCompletedIslands));
-            await supabase.auth.updateUser({
-              data: {
-                numbers_progress_count: accountCycle.count,
-                numbers_completed_ids: accountCycle.uniqueIds,
-                completed_islands: accountCycle.trueCompletedIslands,
-              },
-            });
-          } catch (syncErr) {
-            console.error("Cycle sync error:", syncErr);
-          }
-        } else if (isGuest) {
-          // Guest mode session
-          const guestUser = {
-            id: "guest-hero",
-            email: "guest@madar-al-amal.com",
-            user_metadata: {
-              parent_name: localStorage.getItem("madar_parent_name") || "ولي الأمر",
-              child_name: localStorage.getItem("madar_child_name") || "بطل مدار الأمل",
-            },
-          };
-          setCurrentUser(guestUser as any);
-          setParentName(guestUser.user_metadata.parent_name);
-          setChildName(guestUser.user_metadata.child_name);
+            const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500));
+            const authPromise = supabase.auth
+              .getUser()
+              .then(({ data }) => data?.user || null)
+              .catch(() => null);
 
-          const accountCycle = calculateHeroCycle(localAnimalIds);
-          setAnimalsCompletedIds(accountCycle.uniqueIds);
-          setAnimalsProgressCount(accountCycle.count);
-          setCompletedIslands(accountCycle.trueCompletedIslands);
-        } else {
-          // If not logged in and not guest, redirect to login page
-          window.location.href = "/login";
-          return;
-        }
-      } catch (err) {
-        console.error("Auth check error, falling back to guest mode:", err);
-        const guestUser = {
-          id: "guest-hero",
-          email: "guest@madar-al-amal.com",
-          user_metadata: {
-            parent_name: "ولي الأمر",
-            child_name: "بطل مدار الأمل",
-          },
-        };
-        setCurrentUser(guestUser as any);
-        setParentName("ولي الأمر");
-        setChildName("بطل مدار الأمل");
-      } finally {
-        setCheckingAuth(false);
-      }
-    });
+            const user = await Promise.race([authPromise, timeoutPromise]);
+
+            if (user) {
+              setCurrentUser(user);
+              const meta = user.user_metadata || {};
+              setParentName(meta.parent_name || "");
+              setChildName(meta.child_name || "");
+              setParentPhone(meta.parent_phone || meta.phone || "");
+              setParentCity(meta.parent_city || "");
+
+              let serverAnimalIds: string[] = [];
+              if (Array.isArray(meta.numbers_completed_ids)) {
+                serverAnimalIds = meta.numbers_completed_ids;
+              }
+              const mergedAnimalIds = Array.from(new Set([...localAnimalIds, ...serverAnimalIds]));
+              const accountCycle = calculateHeroCycle(mergedAnimalIds);
+
+              setAnimalsCompletedIds(accountCycle.uniqueIds);
+              setAnimalsProgressCount(accountCycle.count);
+              setCompletedIslands(accountCycle.trueCompletedIslands);
+
+              try {
+                localStorage.setItem("madar_numbers_completed_ids", JSON.stringify(accountCycle.uniqueIds));
+                localStorage.setItem("madar_completed_islands", JSON.stringify(accountCycle.trueCompletedIslands));
+                await supabase.auth.updateUser({
+                  data: {
+                    numbers_progress_count: accountCycle.count,
+                    numbers_completed_ids: accountCycle.uniqueIds,
+                    completed_islands: accountCycle.trueCompletedIslands,
+                  },
+                });
+              } catch (syncErr) {
+                console.error("Cycle sync error:", syncErr);
+              }
+              setCheckingAuth(false);
+            } else {
+              // No active Supabase session or Supabase unavailable -> enter directly in guest mode!
+              activateGuestSession();
+            }
+          } catch (err) {
+            console.warn("Auth check error, activating guest mode:", err);
+            activateGuestSession();
+          }
+        })
+        .catch(() => {
+          activateGuestSession();
+        });
+    }
 
     return () => {
       window.removeEventListener("resize", checkOrientation);
