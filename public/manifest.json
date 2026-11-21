@@ -1,0 +1,25 @@
+{
+  "name": "العب واتعلم - Play & Learn",
+  "short_name": "العب واتعلم",
+  "description": "تطبيق تعليمي وتفاعلي للأطفال لتعلم الأرقام والحروف العربية والإنجليزية باللعب والتلوين",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fcfaf7",
+  "theme_color": "#58a6d8",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

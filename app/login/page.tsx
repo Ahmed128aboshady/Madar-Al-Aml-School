@@ -374,14 +374,14 @@ export default function LoginPage() {
           <div
             className="logo-reveal"
             style={{
-              width: phase === "login" ? 120 : 190,
-              height: phase === "login" ? 75 : 115,
+              width: phase === "login" ? 110 : 170,
+              height: phase === "login" ? 110 : 170,
               position: "relative",
               filter: "drop-shadow(0 8px 24px rgba(91,79,168,0.4))",
               transition: "all 0.5s ease",
             }}
           >
-            <Image src="/logo.png" alt="Orbit of Hope" fill style={{ objectFit: "contain" }} priority />
+            <Image src="/logo.png" alt="العب واتعلم" fill style={{ objectFit: "contain" }} priority />
           </div>
 
           {/* School name */}

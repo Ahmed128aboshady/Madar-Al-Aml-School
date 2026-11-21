@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import { readProgress } from "@/lib/learning-progress";
+import LearningAudioControls from "./LearningAudioControls";
+import { speakLearningText, isLearningSoundEnabled } from "@/lib/learning-audio";
 
 export interface EnglishLetterItem {
   id: string;
@@ -57,6 +60,7 @@ const PAINT_COLORS = [
 ];
 
 function playStudioSound(type: "pop" | "sparkle" | "fanfare" | "fill" | "click") {
+  if (!isLearningSoundEnabled()) return;
   try {
     const AudioCtx =
       window.AudioContext ||
@@ -120,15 +124,7 @@ function playStudioSound(type: "pop" | "sparkle" | "fanfare" | "fill" | "click")
 }
 
 function speakEnglish(text: string) {
-  try {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "en-US";
-    utter.rate = 0.85;
-    utter.pitch = 1.1;
-    window.speechSynthesis.speak(utter);
-  } catch {}
+  speakLearningText(text, "en-US");
 }
 
 interface EnglishColoringIslandProps {
@@ -141,7 +137,7 @@ export default function EnglishColoringIsland({
   onCompleteIsland,
 }: EnglishColoringIslandProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [completedIds, setCompletedIds] = useState<string[]>([]);
+  const [completedIds, setCompletedIds] = useState<string[]>(() => readProgress("english"));
   const [selectedColor, setSelectedColor] = useState<string>("#FF4D6D");
   const [tool, setTool] = useState<"brush" | "fill" | "stamp">("brush");
   const [brushSize, setBrushSize] = useState<number>(34);
@@ -157,18 +153,14 @@ export default function EnglishColoringIsland({
   const rainbowHueRef = useRef(0);
 
   const currentItem = ENGLISH_LETTERS[currentIndex];
+  function selectLetter(index: number) {
+    setCurrentIndex(index);
+    const item = ENGLISH_LETTERS[index];
+    speakEnglish(item.upper + ". " + item.upper + " is for " + item.word);
+  }
   const CANVAS_W = 680;
   const CANVAS_H = 380;
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("madar_english_completed_ids");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setCompletedIds(parsed);
-      }
-    } catch {}
-  }, []);
 
   // Draw crisp letter mask & outer black outline whenever letter changes
   const resetCanvases = useCallback(() => {
@@ -220,7 +212,7 @@ export default function EnglishColoringIsland({
     };
   };
 
-  const getActiveStrokeStyle = (ctx: CanvasRenderingContext2D) => {
+  const getActiveStrokeStyle = () => {
     if (selectedColor === "rainbow") {
       rainbowHueRef.current = (rainbowHueRef.current + 6) % 360;
       return `hsl(${rainbowHueRef.current}, 92%, 56%)`;
@@ -284,7 +276,7 @@ export default function EnglishColoringIsland({
     }
 
     if (tool === "stamp") {
-      const col = getActiveStrokeStyle(ctx);
+      const col = getActiveStrokeStyle();
       drawStarStamp(ctx, pos.x, pos.y, col);
       playStudioSound("sparkle");
       setStrokeCount((c) => c + 3);
@@ -297,7 +289,7 @@ export default function EnglishColoringIsland({
 
     ctx.save();
     ctx.globalCompositeOperation = "source-atop";
-    ctx.fillStyle = getActiveStrokeStyle(ctx);
+    ctx.fillStyle = getActiveStrokeStyle();
     ctx.beginPath();
     ctx.arc(pos.x, pos.y, brushSize / 2, 0, Math.PI * 2);
     ctx.fill();
@@ -315,7 +307,7 @@ export default function EnglishColoringIsland({
     const pos = getCanvasCoords(e);
     ctx.save();
     ctx.globalCompositeOperation = "source-atop";
-    ctx.strokeStyle = getActiveStrokeStyle(ctx);
+    ctx.strokeStyle = getActiveStrokeStyle();
     ctx.lineWidth = brushSize;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -376,6 +368,7 @@ export default function EnglishColoringIsland({
   return (
     <div
       dir="rtl"
+      className="activity-shell game-activity"
       style={{
         position: "fixed",
         inset: 0,
@@ -433,8 +426,8 @@ export default function EnglishColoringIsland({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ position: "relative", width: 88, height: 34, flexShrink: 0 }}>
-            <Image src="/logo.png" alt="مدار الأمل" fill style={{ objectFit: "contain" }} />
+          <div style={{ position: "relative", width: 48, height: 48, flexShrink: 0 }}>
+            <Image src="/logo.png" alt="العب واتعلم" fill style={{ objectFit: "contain" }} />
           </div>
           <h1
             style={{
@@ -484,6 +477,7 @@ export default function EnglishColoringIsland({
             خريطة الجزر
           </button>
         </div>
+        <LearningAudioControls />
       </header>
 
       {/* Main Coloring Workspace */}
@@ -501,7 +495,7 @@ export default function EnglishColoringIsland({
       >
         <div style={{ width: "100%", maxWidth: 940, display: "flex", flexDirection: "column", gap: 10 }}>
           {/* Top English Word & Phonics Card */}
-          <div
+          <div className="english-word-card"
             style={{
               background: "rgba(255,255,255,0.95)",
               borderRadius: 22,
@@ -703,6 +697,8 @@ export default function EnglishColoringIsland({
                   {[20, 34, 52].map((sz) => (
                     <button
                       key={sz}
+                      aria-label={"حجم الفرشاة " + sz}
+                      aria-pressed={brushSize === sz}
                       onClick={() => setBrushSize(sz)}
                       style={{
                         width: 32,
@@ -814,8 +810,11 @@ export default function EnglishColoringIsland({
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
               />
 
+
+            </div>
+
               {justFinished && (
-                <div
+                <div className="english-finished"
                   style={{
                     position: "absolute",
                     bottom: 12,
@@ -837,7 +836,7 @@ export default function EnglishColoringIsland({
                   <span>فنان رائع! لوّنت حرف {currentItem.upper} بإبداع</span>
                   {currentIndex < ENGLISH_LETTERS.length - 1 ? (
                     <button
-                      onClick={() => setCurrentIndex((i) => i + 1)}
+                      onClick={() => selectLetter(currentIndex + 1)}
                       style={{
                         background: "#FACC15",
                         color: "#78350F",
@@ -868,7 +867,6 @@ export default function EnglishColoringIsland({
                   )}
                 </div>
               )}
-            </div>
 
             {/* Color Palette Swatches */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
@@ -878,6 +876,8 @@ export default function EnglishColoringIsland({
                 return (
                   <button
                     key={col.id}
+                    aria-label={col.name}
+                    aria-pressed={isSelected}
                     title={col.name}
                     onClick={() => {
                       playStudioSound("pop");
@@ -930,9 +930,11 @@ export default function EnglishColoringIsland({
             return (
               <button
                 key={item.id}
+                aria-label={"Letter " + item.upper}
+                aria-current={isActive ? "step" : undefined}
                 onClick={() => {
                   playStudioSound("click");
-                  setCurrentIndex(idx);
+                  selectLetter(idx);
                 }}
                 style={{
                   minWidth: 44,

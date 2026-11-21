@@ -1,1435 +1,591 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 import NumbersIslandAdventure from "@/components/NumbersIslandAdventure";
-import LettersIslandAdventure from "@/components/LettersIslandAdventure";
+import ArabicLetterLesson from "@/components/ArabicLetterLesson";
 import EnglishColoringIsland from "@/components/EnglishColoringIsland";
+import Icon from "@/components/LearningIcon";
+import { useLearningAudio } from "@/lib/learning-audio";
+import {
+  readProgress,
+  saveProgress,
+  validProgress,
+  TOTALS,
+  type LearningIsland,
+} from "@/lib/learning-progress";
 
-interface IslandZone {
-  id: string;
+const islands: {
+  id: LearningIsland;
   title: string;
-  description: string;
-  themeColor: string;
-  imageSrc: string;
-  // Desktop coordinates
-  desktopTop: string;
-  desktopLeft: string;
-  desktopWidth: string;
-  desktopHeight: string;
-  // Tablet coordinates
-  tabletTop: string;
-  tabletLeft: string;
-  tabletWidth: string;
-  tabletHeight: string;
-  // Mobile coordinates
-  mobileTop: string;
-  mobileLeft: string;
-  mobileWidth: string;
-  mobileHeight: string;
-}
-
-const ISLAND_ZONES: IslandZone[] = [
-  {
-    id: "numbers",
-    title: "تعرف على الأرقام",
-    description: "مرحباً بك في جزيرة الأرقام والبالونات الملونة! هيا نفرقع البالونات ونعدّ الأرقام من 1 إلى 10 بأجمل الألعاب والألوان.",
-    themeColor: "#FF5E7E",
-    imageSrc: "/islands/island-numbers.png",
-    desktopTop: "17%",
-    desktopLeft: "12%",
-    desktopWidth: "26%",
-    desktopHeight: "36%",
-    tabletTop: "17%",
-    tabletLeft: "10%",
-    tabletWidth: "30%",
-    tabletHeight: "33%",
-    mobileTop: "20%",
-    mobileLeft: "4%",
-    mobileWidth: "44%",
-    mobileHeight: "20%",
-  },
+  subtitle: string;
+  image: string;
+  badge: string;
+}[] = [
   {
     id: "letters",
-    title: "تعرف على الحروف",
-    description: "جزيرة الحروف السحرية! هيا نفرقع بالونات الحروف العربية من الألف إلى الياء ونتعلم الكلمات والأصوات بأجمل الألوان.",
-    themeColor: "#9333EA",
-    imageSrc: "/islands/island-letters.png",
-    desktopTop: "37%",
-    desktopLeft: "35%",
-    desktopWidth: "27%",
-    desktopHeight: "38%",
-    tabletTop: "38%",
-    tabletLeft: "34%",
-    tabletWidth: "32%",
-    tabletHeight: "34%",
-    mobileTop: "42%",
-    mobileLeft: "27%",
-    mobileWidth: "46%",
-    mobileHeight: "21%",
+    title: "الحروف العربية",
+    subtitle: "نسمع، نتعلم، ونلعب",
+    image: "letters",
+    badge: "أ — ي",
+  },
+  {
+    id: "numbers",
+    title: "عالم الأرقام",
+    subtitle: "نعدّ ونكتشف معًا",
+    image: "numbers",
+    badge: "١ — ١٠",
   },
   {
     id: "english",
-    title: "تلوين الحروف الإنجليزية",
-    description: "استوديو تلوين الحروف الإنجليزية السحري! لوّن حروف A إلى Z بأجمل الألوان والنجوم وتعلم نطق الكلمات الإنجليزية.",
-    themeColor: "#EC4899",
-    imageSrc: "/islands/island-english.png",
-    desktopTop: "22%",
-    desktopLeft: "58%",
-    desktopWidth: "26%",
-    desktopHeight: "36%",
-    tabletTop: "22%",
-    tabletLeft: "58%",
-    tabletWidth: "30%",
-    tabletHeight: "33%",
-    mobileTop: "20%",
-    mobileLeft: "52%",
-    mobileWidth: "44%",
-    mobileHeight: "20%",
-  },
-  {
-    id: "daily-actions",
-    title: "تعرف على الأفعال اليومية",
-    description: "جزيرة الأفعال اليومية مع النجمة اللامعة! نتعلم كيف ننظف أسناننا، نغسل أيدينا، ونرتب كتبنا وألعابنا.",
-    themeColor: "#5B4FA8",
-    imageSrc: "/islands/island-daily-actions.png",
-    desktopTop: "58%",
-    desktopLeft: "63%",
-    desktopWidth: "28%",
-    desktopHeight: "36%",
-    tabletTop: "58%",
-    tabletLeft: "63%",
-    tabletWidth: "32%",
-    tabletHeight: "33%",
-    mobileTop: "65%",
-    mobileLeft: "52%",
-    mobileWidth: "44%",
-    mobileHeight: "20%",
-  },
-  {
-    id: "vehicles",
-    title: "تعرف على المواصلات",
-    description: "أهلاً بك في جزيرة السيارات والطائرات! هيا نقود السيارة ونحلق بالطائرة ونتعرف على وسائل النقل السريعة.",
-    themeColor: "#0077B6",
-    imageSrc: "/islands/island-vehicles.png",
-    desktopTop: "56%",
-    desktopLeft: "6%",
-    desktopWidth: "28%",
-    desktopHeight: "36%",
-    tabletTop: "56%",
-    tabletLeft: "5%",
-    tabletWidth: "32%",
-    tabletHeight: "33%",
-    mobileTop: "65%",
-    mobileLeft: "4%",
-    mobileWidth: "44%",
-    mobileHeight: "20%",
+    title: "الحروف الإنجليزية",
+    subtitle: "حروف وألوان وحكايات",
+    image: "english",
+    badge: "A — Z",
   },
 ];
-
-interface PathSegment {
-  fromId: string;
-  toId: string;
-  desktopD: string;
-  tabletD: string;
-  mobileD: string;
-}
-
-// خطوط ومسارات الخطوات بين كل جزيرة والتالية حسب الترتيب المحدد
-const ISLAND_PATHS: PathSegment[] = [
-  // 1. الأرقام (أعلى اليسار) -> 2. الحروف (الوسط)
-  {
-    fromId: "numbers",
-    toId: "letters",
-    desktopD: "M 25 46 Q 32 58 45 56",
-    tabletD: "M 25 44 Q 33 58 45 56",
-    mobileD: "M 26 38 Q 32 50 44 51",
-  },
-  // 2. الحروف (الوسط) -> 3. تلوين الحروف الإنجليزية (أعلى اليمين)
-  {
-    fromId: "letters",
-    toId: "english",
-    desktopD: "M 52 53 Q 63 50 68 44",
-    tabletD: "M 53 53 Q 63 48 70 42",
-    mobileD: "M 54 48 Q 67 44 70 38",
-  },
-  // 3. الإنجليزية (أعلى اليمين) -> 4. الأفعال اليومية (أسفل اليمين)
-  {
-    fromId: "english",
-    toId: "daily-actions",
-    desktopD: "M 71 47 Q 78 60 76 72",
-    tabletD: "M 72 47 Q 80 62 78 72",
-    mobileD: "M 74 38 Q 80 56 74 72",
-  },
-  // 4. الأفعال اليومية (أسفل اليمين) -> 5. المواصلات (أسفل اليسار)
-  {
-    fromId: "daily-actions",
-    toId: "vehicles",
-    desktopD: "M 70 78 Q 48 85 24 77",
-    tabletD: "M 70 78 Q 48 85 24 76",
-    mobileD: "M 66 77 Q 48 83 28 77",
-  },
-];
-
-function getIslandStatus(zoneId: string, completed: string[], numbersProgressCount: number = 0) {
-  const index = ISLAND_ZONES.findIndex((z) => z.id === zoneId);
-  const isCompleted = completed.includes(zoneId);
-  let isUnlocked = false;
-
-  if (zoneId === "numbers" || zoneId === "letters" || zoneId === "english") {
-    // 1. الأرقام، 2. الحروف، 3. تلوين الإنجليزية مفتوحة للتعلم واللعب المباشر
-    isUnlocked = true;
-  } else {
-    // 3. الفواكه، 4. الأفعال، 5. المواصلات: مقفلة وتفتح بالتسلسل بعد إتمام الجزر السابقة
-    const prevZoneId = index > 0 ? ISLAND_ZONES[index - 1].id : null;
-    isUnlocked = Boolean(numbersProgressCount >= 8 && prevZoneId && completed.includes(prevZoneId));
-  }
-
-  const previousZone = index > 0 ? ISLAND_ZONES[index - 1] : null;
-  const nextZone = index < ISLAND_ZONES.length - 1 ? ISLAND_ZONES[index + 1] : null;
-
-  return { index, isUnlocked, isCompleted, previousZone, nextZone };
-}
-
-const NUMBER_NAMES_MAP: Record<string, string> = {
-  "num-1": "١ (واحد)",
-  "num-2": "٢ (اثنان)",
-  "num-3": "٣ (ثلاثة)",
-  "num-4": "٤ (أربعة)",
-  "num-5": "٥ (خمسة)",
-  "num-6": "٦ (ستة)",
-  "num-7": "٧ (سبعة)",
-  "num-8": "٨ (ثمانية)",
-  "num-9": "٩ (تسعة)",
-  "num-10": "١٠ (عشرة)",
-};
-
-export function calculateHeroCycle(numberIds: string[]) {
-  const uniqueIds = Array.from(new Set(numberIds || []));
-  const count = uniqueIds.length;
-  // 80% من جزيرة الأرقام (8 من 10) لفتح الجزيرة التالية
-  const isNumbersComplete = count >= 8;
-  const trueCompletedIslands = isNumbersComplete ? ["numbers"] : [];
-  const percent = Math.min(100, Math.round((count / 10) * 100));
-  const remainingForVegetables = Math.max(0, 8 - count);
-  const solvedNames = uniqueIds.map((id) => NUMBER_NAMES_MAP[id] || id);
-  return {
-    uniqueIds,
-    count,
-    isNumbersComplete,
-    trueCompletedIslands,
-    percent,
-    remainingForVegetables,
-    solvedNames,
-  };
-}
+type Progress = Record<LearningIsland, string[]>;
+const emptyProgress: Progress = { letters: [], numbers: [], english: [] };
 
 export default function HomePage() {
-  const [currentUser, setCurrentUser] = useState<import("@supabase/supabase-js").User | null>(null);
-  const [activeIsland, setActiveIsland] = useState<IslandZone | null>(null);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [deviceType, setDeviceType] = useState<"desktop" | "tablet" | "mobile">("desktop");
-  const [checkingAuth, setCheckingAuth] = useState(true);
-
-  // نظام دورة تقدم الجزر وتقدم البطل (Cycle)
-  const [completedIslands, setCompletedIslands] = useState<string[]>([]);
-  const [animalsProgressCount, setAnimalsProgressCount] = useState<number>(0);
-  const [animalsCompletedIds, setAnimalsCompletedIds] = useState<string[]>([]);
-  const [lockedNoticeZone, setLockedNoticeZone] = useState<{ zone: IslandZone; prevZone: IslandZone } | null>(null);
-  const [celebrationModal, setCelebrationModal] = useState<{ completedZone: IslandZone; nextZone: IslandZone | null } | null>(null);
-
-  // بيانات ولي الأمر
-  const [parentName, setParentName] = useState("");
+  const [activeIsland, setActiveIsland] = useState<LearningIsland | null>(null);
+  const [tab, setTab] = useState<"home" | "progress">("home");
+  const [progress, setProgress] = useState<Progress>(emptyProgress);
   const [childName, setChildName] = useState("");
+  const [parentName, setParentName] = useState("");
   const [parentPhone, setParentPhone] = useState("");
   const [parentCity, setParentCity] = useState("");
-  const [savingProfile, setSavingProfile] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [lastIsland, setLastIsland] = useState<LearningIsland>("letters");
+  const [profileStatus, setProfileStatus] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState("");
+  const profileRef = useRef<HTMLDialogElement>(null);
+  const audio = useLearningAudio();
+  const router = useRouter();
+  const total = Object.values(progress).reduce(
+    (sum, ids) => sum + ids.length,
+    0,
+  );
 
   useEffect(() => {
-    // 1. دورة حساب التقدم المحلي فور تشغيل المتصفح
-    let localAnimalIds: string[] = [];
-    try {
-      if (localStorage.getItem("madar_lock_v5") !== "active") {
-        localStorage.setItem("madar_lock_v5", "active");
-        localStorage.removeItem("madar_completed_islands");
-      }
-      const savedNumbers = localStorage.getItem("madar_numbers_completed_ids");
-      if (savedNumbers) {
-        const parsed = JSON.parse(savedNumbers);
-        if (Array.isArray(parsed)) localAnimalIds = parsed;
-      }
-    } catch {}
-
-    const initCycle = calculateHeroCycle(localAnimalIds);
-    setAnimalsCompletedIds(initCycle.uniqueIds);
-    setAnimalsProgressCount(initCycle.count);
-    setCompletedIslands(initCycle.trueCompletedIslands);
-    try {
-      localStorage.setItem("madar_completed_islands", JSON.stringify(initCycle.trueCompletedIslands));
-    } catch {}
-
-    function checkOrientation() {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const isPortrait = h > w;
-
-      if (w < 640 || (isPortrait && w < 768)) {
-        setDeviceType("mobile");
-      } else if ((w >= 640 && w <= 1024) || (isPortrait && w >= 768)) {
-        setDeviceType("tablet");
-      } else {
-        setDeviceType("desktop");
-      }
-    }
-    checkOrientation();
-    window.addEventListener("resize", checkOrientation);
-    window.addEventListener("orientationchange", checkOrientation);
-
-    // Helper to activate instant guest session (works offline / without Supabase)
-    const activateGuestSession = () => {
-      const guestUser = {
-        id: "guest-hero",
-        email: "guest@madar-al-amal.com",
-        user_metadata: {
-          parent_name: (typeof window !== "undefined" && localStorage.getItem("madar_parent_name")) || "ولي الأمر",
-          child_name: (typeof window !== "undefined" && localStorage.getItem("madar_child_name")) || "بطل مدار الأمل",
-        },
-      };
-      try {
-        localStorage.setItem("madar_guest_mode", "true");
-      } catch {}
-      setCurrentUser(guestUser as any);
-      setParentName(guestUser.user_metadata.parent_name);
-      setChildName(guestUser.user_metadata.child_name);
-
-      const accountCycle = calculateHeroCycle(localAnimalIds);
-      setAnimalsCompletedIds(accountCycle.uniqueIds);
-      setAnimalsProgressCount(accountCycle.count);
-      setCompletedIslands(accountCycle.trueCompletedIslands);
-      setCheckingAuth(false);
+    let disposed = false;
+    const local: Progress = {
+      letters: readProgress("letters"),
+      numbers: readProgress("numbers"),
+      english: readProgress("english"),
     };
-
-    // 1. Instant path if already in guest mode (0ms wait!)
-    if (typeof window !== "undefined" && localStorage.getItem("madar_guest_mode") === "true") {
-      activateGuestSession();
-    } else {
-      // 2. Try Supabase with a strict 1.5s timeout; fallback seamlessly to guest mode if unreachable
-      import("@/lib/supabase")
-        .then(async ({ supabase }) => {
-          try {
-            const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500));
-            const authPromise = supabase.auth
-              .getUser()
-              .then(({ data }) => data?.user || null)
-              .catch(() => null);
-
-            const user = await Promise.race([authPromise, timeoutPromise]);
-
-            if (user) {
-              setCurrentUser(user);
-              const meta = user.user_metadata || {};
-              setParentName(meta.parent_name || "");
-              setChildName(meta.child_name || "");
-              setParentPhone(meta.parent_phone || meta.phone || "");
-              setParentCity(meta.parent_city || "");
-
-              let serverAnimalIds: string[] = [];
-              if (Array.isArray(meta.numbers_completed_ids)) {
-                serverAnimalIds = meta.numbers_completed_ids;
-              }
-              const mergedAnimalIds = Array.from(new Set([...localAnimalIds, ...serverAnimalIds]));
-              const accountCycle = calculateHeroCycle(mergedAnimalIds);
-
-              setAnimalsCompletedIds(accountCycle.uniqueIds);
-              setAnimalsProgressCount(accountCycle.count);
-              setCompletedIslands(accountCycle.trueCompletedIslands);
-
-              try {
-                localStorage.setItem("madar_numbers_completed_ids", JSON.stringify(accountCycle.uniqueIds));
-                localStorage.setItem("madar_completed_islands", JSON.stringify(accountCycle.trueCompletedIslands));
-                await supabase.auth.updateUser({
-                  data: {
-                    numbers_progress_count: accountCycle.count,
-                    numbers_completed_ids: accountCycle.uniqueIds,
-                    completed_islands: accountCycle.trueCompletedIslands,
-                  },
-                });
-              } catch (syncErr) {
-                console.error("Cycle sync error:", syncErr);
-              }
-              setCheckingAuth(false);
-            } else {
-              // No active Supabase session or Supabase unavailable -> enter directly in guest mode!
-              activateGuestSession();
-            }
-          } catch (err) {
-            console.warn("Auth check error, activating guest mode:", err);
-            activateGuestSession();
-          }
-        })
-        .catch(() => {
-          activateGuestSession();
-        });
+    // Hydrate browser-only progress after the server-rendered shell mounts.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setProgress(local);
+    try {
+      setChildName(localStorage.getItem("madar_child_name") || "");
+      setParentName(localStorage.getItem("madar_parent_name") || "");
+      setParentPhone(localStorage.getItem("madar_parent_phone") || "");
+      setParentCity(localStorage.getItem("madar_parent_city") || "");
+      const recent = localStorage.getItem("madar_last_island");
+      if (recent === "letters" || recent === "numbers" || recent === "english")
+        setLastIsland(recent);
+      if (localStorage.getItem("madar_guest_mode") === "true") return;
+    } catch {
+      /* Browsing without local storage is supported. */
     }
-
+    void import("@/lib/supabase")
+      .then(async ({ supabase }) => {
+        const { data } = await supabase.auth.getUser();
+        if (disposed || !data.user) return;
+        setUser(data.user);
+        const meta = data.user.user_metadata;
+        setChildName(meta.child_name || "");
+        setParentName(meta.parent_name || "");
+        setParentPhone(meta.parent_phone || meta.phone || "");
+        setParentCity(meta.parent_city || "");
+        setProgress((current) => {
+          const merged = { ...current };
+          for (const kind of ["letters", "numbers", "english"] as const) {
+            merged[kind] = validProgress(kind, [
+              ...current[kind],
+              ...validProgress(kind, meta[kind + "_completed_ids"]),
+            ]);
+            saveProgress(kind, merged[kind]);
+          }
+          return merged;
+        });
+      })
+      .catch(() => {
+        /* Guest learning remains available. */
+      });
     return () => {
-      window.removeEventListener("resize", checkOrientation);
-      window.removeEventListener("orientationchange", checkOrientation);
+      disposed = true;
     };
   }, []);
 
-  async function handleSaveParentData() {
-    setSavingProfile(true);
-    setSaveSuccess(false);
+  useEffect(() => {
+    document.body.style.overflow = activeIsland ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [activeIsland]);
 
-    if (typeof window !== "undefined" && localStorage.getItem("madar_guest_mode") === "true") {
-      try {
-        localStorage.setItem("madar_parent_name", parentName);
-        localStorage.setItem("madar_child_name", childName);
-      } catch {}
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-      setSavingProfile(false);
-      return;
+  function openIsland(id: LearningIsland) {
+    audio.stop();
+    setLastIsland(id);
+    try {
+      localStorage.setItem("madar_last_island", id);
+    } catch {
+      /* Optional preference. */
     }
-
+    if (id === "letters") audio.speak("حَرْفُ أَلِف. أَلِف مِثْل أَسَد.");
+    if (id === "english") audio.speak("A. A is for Apple.", "en-US");
+    setActiveIsland(id);
+  }
+  async function syncProgress(next: Progress) {
+    if (!user) return;
     try {
       const { supabase } = await import("@/lib/supabase");
-      const { data, error } = await supabase.auth.updateUser({
+      const { error } = await supabase.auth.updateUser({
         data: {
-          parent_name: parentName,
-          child_name: childName,
-          parent_phone: parentPhone,
-          parent_city: parentCity,
+          letters_completed_ids: next.letters,
+          numbers_completed_ids: next.numbers,
+          english_completed_ids: next.english,
+          numbers_progress_count: next.numbers.length,
         },
       });
-      if (error) throw error;
-      if (data?.user) {
-        setCurrentUser(data.user);
-        try {
-          await supabase.from("profiles").upsert({
-            id: data.user.id,
-            email: data.user.email,
-            parent_name: parentName,
-            child_name: childName,
-            parent_phone: parentPhone,
-            parent_city: parentCity,
-            updated_at: new Date().toISOString(),
-          });
-        } catch {
-          // Table may not exist yet; metadata is safely saved in auth.users
-        }
-      }
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err) {
-      alert("حدث خطأ أثناء حفظ البيانات، يرجى المحاولة لاحقاً");
-      console.error(err);
-    } finally {
-      setSavingProfile(false);
+      if (error)
+        setNotice("تقدمك محفوظ على هذا الجهاز. تعذّرت مزامنته مع الحساب الآن.");
+    } catch {
+      setNotice("تقدمك محفوظ على هذا الجهاز. تعذّرت مزامنته مع الحساب الآن.");
     }
   }
-
-  async function handleSignOut() {
-    try {
-      localStorage.removeItem("madar_guest_mode");
-      const { supabase } = await import("@/lib/supabase");
-      await supabase.auth.signOut();
-    } catch {}
-    window.location.href = "/login";
-  }
-
-  async function handleCompleteIsland(zoneId: string) {
-    const updated = Array.from(new Set([...completedIslands, zoneId]));
-    setCompletedIslands(updated);
-    try {
-      localStorage.setItem("madar_completed_islands", JSON.stringify(updated));
-    } catch {}
-
-    // حفظ التقدم في بيانات المستخدم في Supabase
-    try {
-      const { supabase } = await import("@/lib/supabase");
-      await supabase.auth.updateUser({
-        data: {
-          completed_islands: updated,
-        },
-      });
-    } catch (err) {
-      console.error("Save progress error:", err);
-    }
-
-    const { nextZone } = getIslandStatus(zoneId, updated, animalsProgressCount);
-    const completedZone = ISLAND_ZONES.find((z) => z.id === zoneId)!;
+  function backHome() {
+    audio.stop();
+    const next = {
+      letters: readProgress("letters"),
+      numbers: readProgress("numbers"),
+      english: readProgress("english"),
+    };
+    setProgress(next);
     setActiveIsland(null);
-    setCelebrationModal({ completedZone, nextZone });
+    void syncProgress(next);
   }
-
-  async function handleResetProgress() {
-    if (!confirm("هل تريد إعادة قفل الجزر وبدء التقدم من الصفر للتجربة؟ ستفتح جزيرة الأرقام فقط.")) return;
-    setCompletedIslands([]);
-    setAnimalsProgressCount(0);
-    setAnimalsCompletedIds([]);
+  function completeIsland() {
+    backHome();
+    setTab("progress");
+    setNotice("أحسنت يا بطل! كل خطوة صغيرة إنجاز يستحق الاحتفال.");
+  }
+  async function saveProfile(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setProfileStatus("");
+    let localSaved = true;
     try {
-      localStorage.removeItem("madar_completed_islands");
-      localStorage.removeItem("madar_numbers_completed_ids");
-      const { supabase } = await import("@/lib/supabase");
-      await supabase.auth.updateUser({
-        data: {
-          completed_islands: [],
-          numbers_progress_count: 0,
-          numbers_completed_ids: [],
-        },
-      });
-    } catch {}
-    alert("تمت إعادة تعيين التقدم بنجاح! جزيرة الأرقام فقط مفتوحة وباقي الجزر مقفلة.");
+      localStorage.setItem("madar_child_name", childName.trim());
+      localStorage.setItem("madar_parent_name", parentName.trim());
+      localStorage.setItem("madar_parent_phone", parentPhone.trim());
+      localStorage.setItem("madar_parent_city", parentCity.trim());
+    } catch {
+      localSaved = false;
+    }
+    if (user) {
+      try {
+        const { supabase } = await import("@/lib/supabase");
+        const { error } = await supabase.auth.updateUser({
+          data: {
+            child_name: childName.trim(),
+            parent_name: parentName.trim(),
+            parent_phone: parentPhone.trim(),
+            parent_city: parentCity.trim(),
+          },
+        });
+        if (error) throw error;
+        setProfileStatus("تم حفظ البيانات بنجاح.");
+      } catch {
+        setProfileStatus(
+          localSaved
+            ? "تم الحفظ على هذا الجهاز. تعذّرت مزامنة الحساب الآن."
+            : "تعذّر الحفظ. حاول مرة أخرى.",
+        );
+      }
+    } else
+      setProfileStatus(
+        localSaved
+          ? "تم حفظ البيانات على هذا الجهاز."
+          : "تعذّر الحفظ. تحقق من إعدادات التخزين في المتصفح.",
+      );
+    setSaving(false);
   }
-
-  if (checkingAuth) {
-    return (
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          background: "linear-gradient(180deg, #78D4FA 0%, #AEE6FF 100%)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#5B4FA8",
-          fontSize: 20,
-          fontWeight: 800,
-        }}
-      >
-        <span>جاري تحميل الجزر السحرية...</span>
-      </div>
-    );
+  async function signOut() {
+    try {
+      if (user) {
+        const { supabase } = await import("@/lib/supabase");
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+      }
+      localStorage.removeItem("madar_guest_mode");
+      router.push("/login");
+    } catch {
+      setProfileStatus("تعذّر تسجيل الخروج الآن. حاول مرة أخرى.");
+    }
   }
 
   return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        background: "radial-gradient(circle at center, #A0E4FF 0%, #68C8F7 50%, #4FAEE6 100%)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-        position: "relative",
-      }}
-    >
-      {/* ── Interactive Viewport Canvas ── */}
+    <div className="learning-app">
       <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-        }}
+        inert={activeIsland !== null}
+        aria-hidden={activeIsland !== null ? true : undefined}
       >
-        {/* Responsive Clean Background Map Image */}
-        <Image
-          src={
-            deviceType === "mobile"
-              ? "/islands/map-background-mobile.png"
-              : deviceType === "tablet"
-              ? "/islands/map-background-tablet.png"
-              : "/islands/map-background.png"
-          }
-          alt="خلفية جزر مدار الأمل التعليمية"
-          fill
-          priority
-          sizes="100vw"
-          style={{
-            objectFit: "cover",
-            objectPosition: "center",
-          }}
-        />
-
-        {/* ── Top Center: Madar Al Amal Logo in Sky (لوجو مدار الأمل في السماء) ── */}
-        <div
-          style={{
-            position: "absolute",
-            top:
-              deviceType === "mobile"
-                ? "max(52px, calc(env(safe-area-inset-top, 0px) + 16px))"
-                : deviceType === "tablet"
-                ? "36px"
-                : "68px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: deviceType === "mobile" ? "120px" : deviceType === "tablet" ? "220px" : "360px",
-            height: deviceType === "mobile" ? "42px" : deviceType === "tablet" ? "74px" : "120px",
-            zIndex: 25,
-            pointerEvents: "none",
-            filter: "drop-shadow(0 4px 14px rgba(255, 255, 255, 0.85)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12))",
-          }}
-        >
-          <Image
-            src="/logo.png"
-            alt="مدار الأمل"
-            fill
-            priority
-            style={{ objectFit: "contain" }}
-          />
-        </div>
-
-        {/* ── SVG Connecting Stepping Paths Between Islands ("خطوات بين الجزر") ── */}
-        <svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 18,
-            pointerEvents: "none",
-          }}
-        >
-          <defs>
-            <filter id="pathShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#0F172A" floodOpacity="0.25" />
-            </filter>
-          </defs>
-
-          {ISLAND_PATHS.map((seg) => {
-            const pathD =
-              deviceType === "mobile"
-                ? seg.mobileD
-                : deviceType === "tablet"
-                ? seg.tabletD
-                : seg.desktopD;
-
-            // Target island status
-            const targetStatus = getIslandStatus(seg.toId, completedIslands, animalsProgressCount);
-            const isPathActive = targetStatus.isUnlocked;
-
-            return (
-              <g key={`path-${seg.fromId}-${seg.toId}`} filter="url(#pathShadow)">
-                {/* Underlayer Soft Cloud Glow */}
-                <path
-                  d={pathD}
-                  fill="none"
-                  stroke="rgba(255, 255, 255, 0.9)"
-                  strokeWidth="7"
-                  strokeLinecap="round"
-                  vectorEffect="non-scaling-stroke"
-                />
-
-                {/* Dotted Stepping Stones Path */}
-                <path
-                  d={pathD}
-                  fill="none"
-                  stroke={isPathActive ? "#F59E0B" : "rgba(148, 163, 184, 0.75)"}
-                  strokeWidth={isPathActive ? "5" : "4"}
-                  strokeDasharray="2 10"
-                  strokeLinecap="round"
-                  vectorEffect="non-scaling-stroke"
-                />
-              </g>
-            );
-          })}
-        </svg>
-
-        {/* ── 5 Interactive Individual Island Assets ── */}
-        {ISLAND_ZONES.map((zone) => {
-          const { isUnlocked, isCompleted, previousZone } = getIslandStatus(zone.id, completedIslands, animalsProgressCount);
-
-          const posTop =
-            deviceType === "mobile" ? zone.mobileTop : deviceType === "tablet" ? zone.tabletTop : zone.desktopTop;
-          const posLeft =
-            deviceType === "mobile" ? zone.mobileLeft : deviceType === "tablet" ? zone.tabletLeft : zone.desktopLeft;
-          const posWidth =
-            deviceType === "mobile" ? zone.mobileWidth : deviceType === "tablet" ? zone.tabletWidth : zone.desktopWidth;
-          const posHeight =
-            deviceType === "mobile" ? zone.mobileHeight : deviceType === "tablet" ? zone.tabletHeight : zone.desktopHeight;
-
-          return (
-            <div
-              key={zone.id}
-              className="island-card"
-              onClick={() => {
-                if (zone.id === "numbers" || zone.id === "letters" || zone.id === "english") {
-                  setActiveIsland(zone);
-                } else {
-                  setLockedNoticeZone({ zone, prevZone: ISLAND_ZONES[0] });
-                }
-              }}
-              style={{
-                position: "absolute",
-                top: posTop,
-                left: posLeft,
-                width: posWidth,
-                height: posHeight,
-                cursor: "pointer",
-                zIndex: 20,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
-              }}
-              onMouseEnter={(e) => {
-                if (isUnlocked) e.currentTarget.style.transform = "scale(1.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-              }}
-            >
-              {/* Island Image: Grayscale directly on the PNG when locked, Vibrant color when unlocked */}
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  height: "100%",
-                  filter: isUnlocked
-                    ? "drop-shadow(0 10px 18px rgba(0,0,0,0.18))"
-                    : "grayscale(100%) brightness(0.82) contrast(0.9) drop-shadow(0 6px 12px rgba(0,0,0,0.25))",
-                  opacity: isUnlocked ? 1 : 0.75,
-                  transition: "filter 0.5s ease, opacity 0.5s ease",
-                }}
-              >
-                <Image
-                  src={zone.imageSrc}
-                  alt={zone.title}
-                  fill
-                  priority
-                  style={{
-                    objectFit: "contain",
-                    objectPosition: "center",
-                  }}
-                />
-              </div>
-            </div>
-          );
-        })}
-
-        {/* ── Bottom Controls: خروج + سحابة العنوان الموسعة + حسابي (بفونت أطفال كرتوني) ── */}
-        <footer
-          style={{
-            position: "absolute",
-            bottom: deviceType === "mobile" ? "6px" : deviceType === "tablet" ? "14px" : "18px",
-            left: 0,
-            right: 0,
-            height: deviceType === "mobile" ? "98px" : deviceType === "tablet" ? "150px" : "240px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 35,
-            pointerEvents: "none",
-          }}
-        >
-          {/* Right side (RTL start): زر الخروج */}
-          <button
-            onClick={handleSignOut}
-            style={{
-              position: "absolute",
-              right: deviceType === "mobile" ? "10px" : deviceType === "tablet" ? "24px" : "48px",
-              bottom: deviceType === "mobile" ? "14px" : deviceType === "tablet" ? "22px" : "32px",
-              fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
-              background: "linear-gradient(135deg, #FF6584, #FF4568)",
-              color: "white",
-              border: deviceType === "mobile" ? "2.5px solid white" : "3.5px solid white",
-              borderRadius: deviceType === "mobile" ? "24px" : "36px",
-              padding: deviceType === "mobile" ? "6px 14px" : deviceType === "tablet" ? "10px 24px" : "14px 34px",
-              fontSize: deviceType === "mobile" ? "13px" : deviceType === "tablet" ? "16px" : "21px",
-              fontWeight: 800,
-              cursor: "pointer",
-              boxShadow: "0 6px 18px rgba(255, 69, 104, 0.4)",
-              transition: "transform 0.2s",
-              whiteSpace: "nowrap",
-              pointerEvents: "auto",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          >
-            خروج
-          </button>
-
-          {/* Center: سحابة العنوان الكبيرة مع الفونت الكرتوني المناسب للأطفال */}
-          <div
-            style={{
-              position: "relative",
-              width:
-                deviceType === "mobile"
-                  ? "clamp(240px, 66vw, 275px)"
-                  : deviceType === "tablet"
-                  ? "420px"
-                  : "740px",
-              height:
-                deviceType === "mobile"
-                  ? "94px"
-                  : deviceType === "tablet"
-                  ? "145px"
-                  : "235px",
-              pointerEvents: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+        <header className="app-header">
+          <Link href="/" className="brand" aria-label="العب واتعلم، الرئيسية">
             <Image
-              src="/islands/cloud-banner.png"
-              alt="اختر جزيرتك السحرية"
-              fill
+              src="/logo.png"
+              alt="العب واتعلم"
+              width={64}
+              height={64}
               priority
               style={{ objectFit: "contain" }}
             />
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                textAlign: "center",
-                paddingTop: deviceType === "mobile" ? "2px" : deviceType === "tablet" ? "6px" : "14px",
-              }}
+            <span>العب واتعلم</span>
+          </Link>
+          <div className="header-actions">
+            <button
+              className="icon-button"
+              onClick={audio.toggle}
+              aria-label={audio.enabled ? "إيقاف الصوت" : "تشغيل الصوت"}
+              aria-pressed={audio.enabled}
             >
-              <div
-                style={{
-                  fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
-                  fontSize:
-                    deviceType === "mobile"
-                      ? "18px"
-                      : deviceType === "tablet"
-                      ? "26px"
-                      : "46px",
-                  fontWeight: 900,
-                  color: "#E11D48",
-                  textShadow: `
-                    -2.5px -2.5px 0 #ffffff,
-                     2.5px -2.5px 0 #ffffff,
-                    -2.5px  2.5px 0 #ffffff,
-                     2.5px  2.5px 0 #ffffff,
-                     0px  3.5px 0 #ffffff,
-                     0px -3.5px 0 #ffffff,
-                    -3.5px  0px 0 #ffffff,
-                     3.5px  0px 0 #ffffff,
-                     0 6px 14px rgba(0, 0, 0, 0.22)
-                  `,
-                  lineHeight: 1.15,
-                  whiteSpace: "nowrap",
-                  letterSpacing: "-0.3px",
-                }}
-              >
-                اختر جزيرتك السحرية
-              </div>
-              <div
-                style={{
-                  fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
-                  fontSize:
-                    deviceType === "mobile"
-                      ? "13px"
-                      : deviceType === "tablet"
-                      ? "18px"
-                      : "30px",
-                  fontWeight: 900,
-                  color: "#2563EB",
-                  textShadow: `
-                    -2px -2px 0 #ffffff,
-                     2px -2px 0 #ffffff,
-                    -2px  2px 0 #ffffff,
-                     2px  2px 0 #ffffff,
-                     0px  2.5px 0 #ffffff,
-                     0px -2.5px 0 #ffffff,
-                     0 5px 12px rgba(0, 0, 0, 0.18)
-                  `,
-                  lineHeight: 1.15,
-                  whiteSpace: "nowrap",
-                  marginTop: deviceType === "mobile" ? "1px" : "5px",
-                  letterSpacing: "-0.2px",
-                }}
-              >
-                وابدأ اللعب والتعلم
-              </div>
-            </div>
+              <Icon name={audio.enabled ? "sound" : "muted"} />
+            </button>
+            <button
+              className="parent-button"
+              onClick={() => profileRef.current?.showModal()}
+            >
+              <Icon name="user" />
+              <span>ولي الأمر</span>
+            </button>
           </div>
-
-          {/* Left side (RTL end): زر حسابي */}
+        </header>
+        <main className="home-content" id="main-content">
+          <div className="greeting">
+            <span className="eyebrow">مساحة للتعلم بطريقتك</span>
+            <h1>
+              أهلًا{" "}
+              {childName && childName !== "بطل مدار الأمل"
+                ? childName
+                : "يا بطل"}
+              <span className="greeting-spark" aria-hidden="true">
+                ✦
+              </span>
+            </h1>
+            <p>كل يوم، نكتشف حاجة جديدة مع بعض.</p>
+          </div>
+          {notice && (
+            <div className="notice" role="status">
+              {notice}
+              <button
+                className="icon-button"
+                aria-label="إغلاق التنبيه"
+                onClick={() => setNotice("")}
+              >
+                <Icon name="close" size={18} />
+              </button>
+            </div>
+          )}
+          {tab === "home" ? (
+            <>
+              <section className="journey-hero" aria-labelledby="journey-title">
+                <div className="hero-copy">
+                  <span className="hero-label">
+                    <span /> مغامرة على قدّ خطواتك
+                  </span>
+                  <h2 id="journey-title">
+                    عالم صغير،
+                    <br />
+                    <span>اكتشافات كبيرة!</span>
+                  </h2>
+                  <p>
+                    نسمع الحروف، نلعب بالأرقام،
+                    <br className="desktop-break" /> ونلوّن رحلتنا بالأمل.
+                  </p>
+                  <button
+                    className="primary-button"
+                    onClick={() => openIsland(lastIsland)}
+                  >
+                    {total
+                      ? "نكمل رحلتنا"
+                      : lastIsland === "letters"
+                        ? "هيا نبدأ بالحروف"
+                        : "هيا نكمل الاكتشاف"}
+                    <Icon name="arrow" size={20} />
+                  </button>
+                </div>
+                <div className="hero-art" aria-hidden="true">
+                  <div className="hero-orbit" />
+                  <Image
+                    src="/islands/island-letters.png"
+                    alt=""
+                    fill
+                    sizes="(max-width: 600px) 44vw, 430px"
+                    priority
+                  />
+                  <span className="floating-letter letter-one">أ</span>
+                  <span className="floating-letter letter-two">ب</span>
+                  <span className="art-spark spark-one">✦</span>
+                  <span className="art-spark spark-two">✦</span>
+                </div>
+              </section>
+              <div className="daily-note">
+                <span className="note-icon">
+                  <Icon name="leaf" />
+                </span>
+                <div>
+                  <strong>خطوة صغيرة تصنع فرقًا</strong>
+                  <p>خذ وقتك. نقدر نسمع الحرف ونجرّب أكتر من مرة.</p>
+                </div>
+                <span className="note-stars" aria-hidden="true">
+                  ✦
+                </span>
+              </div>
+              <section aria-labelledby="islands-title">
+                <div className="section-heading">
+                  <div>
+                    <span className="eyebrow">نتعلم باللعب</span>
+                    <h2 id="islands-title">اختار جزيرتك</h2>
+                  </div>
+                  <span className="section-count">٣ عوالم للاستكشاف</span>
+                </div>
+                <div className="islands-grid">
+                  {islands.map((island) => (
+                    <button
+                      key={island.id}
+                      className={"learning-island " + island.id}
+                      onClick={() => openIsland(island.id)}
+                    >
+                      <div className="island-art">
+                        <span className="island-badge">{island.badge}</span>
+                        <Image
+                          src={"/islands/island-" + island.image + ".png"}
+                          alt=""
+                          fill
+                          sizes="(max-width: 600px) 45vw, 320px"
+                        />
+                      </div>
+                      <div className="island-copy">
+                        <h3>{island.title}</h3>
+                        <p>{island.subtitle}</p>
+                        <div className="island-bottom">
+                          <span>
+                            {progress[island.id].length} من {TOTALS[island.id]}{" "}
+                            {island.id === "numbers" ? "رقم" : "حرف"}
+                          </span>
+                          <span className="card-arrow">
+                            <Icon name="arrow" size={18} />
+                          </span>
+                        </div>
+                        <progress
+                          value={progress[island.id].length}
+                          max={TOTALS[island.id]}
+                          aria-label={"تقدم " + island.title}
+                        />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </section>
+              <section className="coming-soon" aria-label="مغامرات قادمة">
+                <div>
+                  <Icon name="book" />
+                  <strong>مغامرات جديدة في الطريق</strong>
+                </div>
+                <p>
+                  الأفعال اليومية والمواصلات <span>قريبًا</span>
+                </p>
+              </section>
+            </>
+          ) : (
+            <section className="progress-page" aria-labelledby="progress-title">
+              <div className="progress-celebration">
+                <span className="achievement-icon">
+                  <Icon name="star" size={36} />
+                </span>
+                <span className="eyebrow">كل محاولة تستحق التشجيع</span>
+                <h2 id="progress-title">رحلتك مليانة إنجازات</h2>
+                <p>
+                  اتعلمت <strong>{total}</strong> من ٦٤ حرف ورقم. نكمل مع بعض؟
+                </p>
+              </div>
+              <div className="progress-list">
+                {islands.map((island) => (
+                  <div className={"progress-item " + island.id} key={island.id}>
+                    <Image
+                      src={"/islands/island-" + island.image + ".png"}
+                      alt=""
+                      width={90}
+                      height={80}
+                    />
+                    <div>
+                      <h3>{island.title}</h3>
+                      <p>
+                        {progress[island.id].length} من {TOTALS[island.id]}{" "}
+                        مكتمل
+                      </p>
+                      <progress
+                        value={progress[island.id].length}
+                        max={TOTALS[island.id]}
+                        aria-label={"تقدم " + island.title}
+                      />
+                    </div>
+                    <button
+                      className="icon-button"
+                      aria-label={"أكمل " + island.title}
+                      onClick={() => openIsland(island.id)}
+                    >
+                      <Icon name="arrow" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <p className="storage-note">
+                {user
+                  ? "تقدمك محفوظ على جهازك وتتم مزامنته مع حسابك عند العودة من النشاط."
+                  : "تقدمك محفوظ على هذا الجهاز. لا تحتاج حسابًا لتبدأ."}
+              </p>
+            </section>
+          )}
+        </main>
+        <nav className="bottom-nav" aria-label="التنقل الرئيسي">
           <button
-            onClick={() => setShowProfileModal(true)}
-            style={{
-              position: "absolute",
-              left: deviceType === "mobile" ? "10px" : deviceType === "tablet" ? "24px" : "48px",
-              bottom: deviceType === "mobile" ? "14px" : deviceType === "tablet" ? "22px" : "32px",
-              fontFamily: "'Baloo Bhaijaan 2', 'Marhey', cursive, sans-serif",
-              background: "rgba(255, 255, 255, 0.96)",
-              padding: deviceType === "mobile" ? "6px 14px" : deviceType === "tablet" ? "10px 24px" : "14px 34px",
-              borderRadius: deviceType === "mobile" ? "24px" : "36px",
-              color: "#5B4FA8",
-              fontWeight: 800,
-              fontSize: deviceType === "mobile" ? "13px" : deviceType === "tablet" ? "16px" : "21px",
-              boxShadow: "0 6px 18px rgba(91, 79, 168, 0.28)",
-              border: deviceType === "mobile" ? "2.5px solid #5B4FA8" : "3.5px solid #5B4FA8",
-              cursor: "pointer",
-              transition: "transform 0.2s, box-shadow 0.2s",
-              whiteSpace: "nowrap",
-              pointerEvents: "auto",
+            aria-current={tab === "home" ? "page" : undefined}
+            onClick={() => {
+              setTab("home");
+              window.scrollTo({ top: 0 });
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            {deviceType === "mobile" ? (childName ? childName : "حسابي") : "حسابي"}
+            <Icon name="home" />
+            <span>جزري</span>
           </button>
-        </footer>
-      </div>
-
-      {/* ── User & Guardian Profile Modal ── */}
-      {showProfileModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3"
-          style={{ background: "rgba(10, 35, 70, 0.65)", backdropFilter: "blur(8px)" }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 32,
-              maxWidth: 460,
-              width: "100%",
-              maxHeight: "92vh",
-              overflowY: "auto",
-              padding: "24px 20px",
-              textAlign: "center",
-              boxShadow: "0 28px 56px rgba(0,0,0,0.35)",
-              border: "4px solid #5B4FA8",
-              position: "relative",
+          <button
+            aria-current={tab === "progress" ? "page" : undefined}
+            onClick={() => {
+              setTab("progress");
+              window.scrollTo({ top: 0 });
             }}
           >
-            <h2 style={{ color: "#5B4FA8", margin: "0 0 4px 0", fontSize: 20, fontWeight: 900 }}>
-              بيانات الحساب وولي الأمر
-            </h2>
-            <p style={{ margin: "0 0 16px 0", color: "#718096", fontSize: 13, fontWeight: 600 }}>
-              مركز مدار الأمل بالمملكة العربية السعودية
-            </p>
-
-            {/* Account Details Box */}
-            <div
-              style={{
-                background: "#F8FAFC",
-                borderRadius: 18,
-                padding: "12px 16px",
-                marginBottom: 16,
-                textAlign: "right",
-                fontSize: 13,
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-                border: "1px solid #E2E8F0",
-              }}
-            >
-              <div>
-                <span style={{ color: "#718096", fontWeight: 700 }}>الحساب المسجل: </span>
-                <span style={{ color: "#2D3748", fontWeight: 800, direction: "ltr", display: "inline-block" }}>
-                  {currentUser?.email || "غير متوفر"}
-                </span>
-              </div>
-
-              <div>
-                <span style={{ color: "#718096", fontWeight: 700 }}>طريقة الدخول: </span>
-                <span style={{ color: "#2D3748", fontWeight: 800 }}>
-                  {currentUser?.app_metadata?.provider === "google" ? "حساب Google" : "البريد الإلكتروني"}
-                </span>
-              </div>
-            </div>
-
-            {/* Guardian & Child Editable Form */}
-            <div
-              style={{
-                background: "#F0FDF4",
-                borderRadius: 20,
-                padding: "14px 16px",
-                marginBottom: 16,
-                textAlign: "right",
-                border: "1.5px solid #BBF7D0",
-              }}
-            >
-              <h3 style={{ color: "#166534", margin: "0 0 12px 0", fontSize: 15, fontWeight: 800, display: "flex", alignItems: "center", gap: 6 }}>
-                <span>بيانات ولي الأمر والطفل</span>
-              </h3>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#374151", marginBottom: 3 }}>
-                    اسم ولي الأمر:
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="مثال: أحمد عبد الله"
-                    value={parentName}
-                    onChange={(e) => setParentName(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: "12px",
-                      border: "1.5px solid #CBD5E1",
-                      fontSize: "13px",
-                      outline: "none",
-                      background: "white",
-                      textAlign: "right",
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#374151", marginBottom: 3 }}>
-                    اسم البطل / الطفل:
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="مثال: سارة أو محمد"
-                    value={childName}
-                    onChange={(e) => setChildName(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: "12px",
-                      border: "1.5px solid #CBD5E1",
-                      fontSize: "13px",
-                      outline: "none",
-                      background: "white",
-                      textAlign: "right",
-                    }}
-                  />
-                </div>
-
-                <div style={{ display: "flex", gap: 8 }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#374151", marginBottom: 3 }}>
-                      رقم الجوال:
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder="05XXXXXXXX"
-                      value={parentPhone}
-                      onChange={(e) => setParentPhone(e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "8px 12px",
-                        borderRadius: "12px",
-                        border: "1.5px solid #CBD5E1",
-                        fontSize: "13px",
-                        outline: "none",
-                        background: "white",
-                        direction: "ltr",
-                        textAlign: "right",
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#374151", marginBottom: 3 }}>
-                      المدينة:
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="الرياض، جدة..."
-                      value={parentCity}
-                      onChange={(e) => setParentCity(e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "8px 12px",
-                        borderRadius: "12px",
-                        border: "1.5px solid #CBD5E1",
-                        fontSize: "13px",
-                        outline: "none",
-                        background: "white",
-                        textAlign: "right",
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Save Button */}
-                <button
-                  onClick={handleSaveParentData}
-                  disabled={savingProfile}
-                  style={{
-                    marginTop: 6,
-                    background: "linear-gradient(135deg, #16A34A 0%, #15803D 100%)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "14px",
-                    padding: "10px",
-                    fontSize: "14px",
-                    fontWeight: 800,
-                    cursor: "pointer",
-                    boxShadow: "0 4px 10px rgba(22, 163, 74, 0.3)",
-                    transition: "transform 0.2s",
-                  }}
-                >
-                  {savingProfile ? "جارٍ الحفظ..." : "حفظ وتحديث البيانات"}
-                </button>
-
-                {saveSuccess && (
-                  <div style={{ color: "#15803D", fontSize: 13, fontWeight: 700, textAlign: "center", marginTop: 4 }}>
-                    تم حفظ وتحديث البيانات بنجاح في قاعدة البيانات!
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Hero Progress Cycle Box */}
-            <div style={{ background: "#F8FAFC", border: "2px solid #E2E8F0", borderRadius: 20, padding: "14px 16px", marginBottom: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <span style={{ fontWeight: 900, color: "#1E293B", fontSize: 13 }}>
-                  دورة تقدم البطل (الحساب الفعلي):
-                </span>
-                <span style={{
-                  background: completedIslands.length > 0 ? "#DCFCE7" : "#F1F5F9",
-                  color: completedIslands.length > 0 ? "#15803D" : "#475569",
-                  padding: "4px 10px",
-                  borderRadius: 12,
-                  fontSize: 12,
-                  fontWeight: 900,
-                  border: "1px solid #CBD5E1"
-                }}>
-                  {completedIslands.length} من {ISLAND_ZONES.length} جزر مكتملة
-                </span>
-              </div>
-
-              {/* بطاقة جزيرة الأرقام */}
-              <div style={{ background: "white", borderRadius: 14, padding: "12px 14px", border: "1.5px solid #FBCFE8", boxShadow: "0 2px 8px rgba(0,0,0,0.03)", marginBottom: 10 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: "#9D174D" }}>
-                    جزيرة الأرقام (مفتوحة):
-                  </span>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: "#E11D48" }}>
-                    {animalsProgressCount} من 10 أرقام ({Math.min(100, Math.round((animalsProgressCount / 10) * 100))}%)
-                  </span>
-                </div>
-
-                <div style={{ height: 10, background: "#FCE7F3", borderRadius: 5, overflow: "hidden", marginBottom: 8 }}>
-                  <div
-                    style={{
-                      height: "100%",
-                      width: `${Math.min(100, Math.round((animalsProgressCount / 10) * 100))}%`,
-                      background: "linear-gradient(90deg, #FF5E7E, #F59E0B, #10B981)",
-                      transition: "width 0.4s",
-                    }}
-                  />
-                </div>
-
-                {animalsCompletedIds.length > 0 && (
-                  <div style={{ fontSize: 12, color: "#334155", fontWeight: 700, marginBottom: 6, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 4 }}>
-                    <span>تم إتقان بنجاح:</span>
-                    {animalsCompletedIds.map((id) => (
-                      <span key={id} style={{ background: "#ECFDF5", color: "#065F46", padding: "2px 8px", borderRadius: 8, border: "1px solid #A7F3D0", fontWeight: 800 }}>
-                        {NUMBER_NAMES_MAP[id] || id}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div style={{ fontSize: 12, color: animalsProgressCount >= 8 ? "#059669" : "#D97706", fontWeight: 800 }}>
-                  {animalsProgressCount >= 8
-                    ? "أحسنت يا بطل! أتممت نسبة 80% وتم فتح الجزيرة التالية بنجاح"
-                    : `متبقي إتقان ${Math.max(0, 8 - animalsProgressCount)} أرقام للوصول إلى 80%`}
-                </div>
-              </div>
-
-              {/* تنبيه حالة قفل الجزر التالية */}
-              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 700, textAlign: "center", background: "#F1F5F9", padding: "6px 10px", borderRadius: 10 }}>
-                باقي الجزر مقفلة تلقائياً وتفتح تباعاً بمجرد إكمال 80% من كل جزيرة
-              </div>
-
-              <button
-                onClick={handleResetProgress}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#94A3B8",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  marginTop: 10,
-                  textDecoration: "underline",
-                  padding: 0,
-                  width: "100%",
-                  textAlign: "center",
-                }}
-              >
-                إعادة قفل الجزر وبدء التقدم من الصفر (للتجربة)
-              </button>
-            </div>
-
-            {/* Bottom Actions */}
-            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              <button
-                onClick={() => setShowProfileModal(false)}
-                style={{
-                  background: "#5B4FA8",
-                  color: "white",
-                  border: "none",
-                  borderRadius: 18,
-                  padding: "9px 24px",
-                  fontSize: 14,
-                  fontWeight: 800,
-                  cursor: "pointer",
-                  boxShadow: "0 4px 12px rgba(91,79,168,0.3)",
-                }}
-              >
-                إغلاق النافذة
-              </button>
-
-              <button
-                onClick={handleSignOut}
-                style={{
-                  background: "#FF5E7E",
-                  color: "white",
-                  border: "none",
-                  borderRadius: 18,
-                  padding: "9px 18px",
-                  fontSize: 14,
-                  fontWeight: 800,
-                  cursor: "pointer",
-                }}
-              >
-                تسجيل الخروج
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Numbers Island Interactive Adventure ── */}
-      {activeIsland?.id === "numbers" && (
-        <NumbersIslandAdventure
-          onBackToMap={() => {
-            // مزامنة دورة الإجابات والتقدم
-            try {
-              const savedNumbers = localStorage.getItem("madar_numbers_completed_ids");
-              if (savedNumbers) {
-                const parsed = JSON.parse(savedNumbers);
-                if (Array.isArray(parsed)) {
-                  const cycle = calculateHeroCycle(parsed);
-                  setAnimalsCompletedIds(cycle.uniqueIds);
-                  setAnimalsProgressCount(cycle.count);
-                  setCompletedIslands(cycle.trueCompletedIslands);
-                }
-              }
-            } catch {}
-            setActiveIsland(null);
+            <Icon name="star" />
+            <span>إنجازاتي</span>
+            {total > 0 && <span className="nav-count">{total}</span>}
+          </button>
+          <button onClick={() => profileRef.current?.showModal()}>
+            <Icon name="user" />
+            <span>حسابي</span>
+          </button>
+        </nav>
+        <dialog
+          ref={profileRef}
+          className="profile-dialog"
+          aria-labelledby="profile-title"
+          onClick={(event) => {
+            if (event.target === event.currentTarget)
+              profileRef.current?.close();
           }}
-          onCompleteIsland={handleCompleteIsland}
-          onProgressUpdate={async (count, total, ids) => {
-            const cycle = calculateHeroCycle(ids || []);
-            setAnimalsCompletedIds(cycle.uniqueIds);
-            setAnimalsProgressCount(cycle.count);
-            setCompletedIslands(cycle.trueCompletedIslands);
-            try {
-              localStorage.setItem("madar_numbers_completed_ids", JSON.stringify(cycle.uniqueIds));
-              localStorage.setItem("madar_completed_islands", JSON.stringify(cycle.trueCompletedIslands));
-              const { supabase } = await import("@/lib/supabase");
-              await supabase.auth.updateUser({
-                data: {
-                  numbers_progress_count: cycle.count,
-                  numbers_completed_ids: cycle.uniqueIds,
-                  completed_islands: cycle.trueCompletedIslands,
-                },
-              });
-            } catch (err) {
-              console.error("Failed to sync numbers progress to supabase:", err);
+        >
+          <div className="dialog-heading">
+            <div>
+              <span className="eyebrow">مساحة ولي الأمر</span>
+              <h2 id="profile-title">نتعلم سوا</h2>
+            </div>
+            <button
+              className="icon-button"
+              onClick={() => profileRef.current?.close()}
+              aria-label="إغلاق الحساب"
+            >
+              <Icon name="close" />
+            </button>
+          </div>
+          <p className="muted-copy">
+            {user
+              ? "عدّل بياناتك وتابع رحلة طفلك."
+              : "أضف اسم طفلك لتكون الرحلة أقرب له."}
+          </p>
+          <form onSubmit={saveProfile}>
+            <label>
+              اسم الطفل
+              <input
+                value={childName}
+                onChange={(e) => setChildName(e.target.value)}
+                maxLength={40}
+                autoComplete="off"
+                placeholder="بطلنا الصغير"
+              />
+            </label>
+            <label>
+              اسم ولي الأمر
+              <input
+                value={parentName}
+                onChange={(e) => setParentName(e.target.value)}
+                maxLength={80}
+                autoComplete="name"
+              />
+            </label>
+            <div className="form-row">
+              <label>
+                رقم الهاتف
+                <input
+                  type="tel"
+                  value={parentPhone}
+                  onChange={(e) => setParentPhone(e.target.value)}
+                  maxLength={24}
+                  autoComplete="tel"
+                />
+              </label>
+              <label>
+                المدينة
+                <input
+                  value={parentCity}
+                  onChange={(e) => setParentCity(e.target.value)}
+                  maxLength={80}
+                  autoComplete="address-level2"
+                />
+              </label>
+            </div>
+            <button className="primary-button" disabled={saving}>
+              {saving ? "جارٍ الحفظ…" : "حفظ البيانات"}
+              <Icon name="check" />
+            </button>
+            <p role="status" className="form-status">
+              {profileStatus}
+            </p>
+          </form>
+          <button className="text-button" onClick={signOut}>
+            {user ? "تسجيل الخروج" : "الانتقال لتسجيل الدخول"}
+          </button>
+        </dialog>
+      </div>
+      {activeIsland === "letters" && (
+        <ArabicLetterLesson onBack={backHome} onComplete={completeIsland} />
+      )}
+      {activeIsland === "numbers" && (
+        <NumbersIslandAdventure
+          onBackToMap={backHome}
+          onCompleteIsland={completeIsland}
+          onProgressUpdate={(_count, _total, ids) => {
+            if (ids) {
+              saveProgress("numbers", ids);
+              setProgress((current) => ({
+                ...current,
+                numbers: validProgress("numbers", ids),
+              }));
             }
           }}
         />
       )}
-
-      {/* ── Letters Island Interactive Adventure ── */}
-      {activeIsland?.id === "letters" && (
-        <LettersIslandAdventure
-          onBackToMap={() => setActiveIsland(null)}
-          onCompleteIsland={handleCompleteIsland}
-        />
-      )}
-
-      {/* ── English Coloring Island Studio ── */}
-      {activeIsland?.id === "english" && (
+      {activeIsland === "english" && (
         <EnglishColoringIsland
-          onBackToMap={() => setActiveIsland(null)}
-          onCompleteIsland={handleCompleteIsland}
+          onBackToMap={backHome}
+          onCompleteIsland={completeIsland}
         />
-      )}
-
-      {/* ── Modal Pop-up on Locked Island Click (توجيه الطفل إلى جزيرة الأرقام) ── */}
-      {lockedNoticeZone && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(10, 35, 70, 0.6)", backdropFilter: "blur(8px)" }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 32,
-              maxWidth: 420,
-              width: "100%",
-              padding: "28px 24px",
-              textAlign: "center",
-              boxShadow: "0 28px 56px rgba(0,0,0,0.35)",
-              border: "4px solid #CBD5E1",
-              position: "relative",
-            }}
-          >
-            <h2 style={{ color: "#475569", margin: "0 0 10px", fontSize: 21, fontWeight: 900 }}>
-              هذه الجزيرة مقفلة حالياً
-            </h2>
-
-            {lockedNoticeZone.zone.id === "vegetables" ? (
-              <>
-                <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
-                  يا بطل! عليك أولاً التوجه إلى <strong>جزيرة الأرقام</strong> وإكمال <strong>80% على الأقل</strong> (إتقان 8 أرقام على الأقل) لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong>!
-                </p>
-                <div
-                  style={{
-                    background: "#FEF3C7",
-                    border: "1.5px solid #F59E0B",
-                    borderRadius: "14px",
-                    padding: "8px 14px",
-                    color: "#B45309",
-                    fontSize: "13px",
-                    fontWeight: 800,
-                    marginBottom: 20,
-                  }}
-                >
-                  درجتك الحالية في الأرقام: {animalsProgressCount} من 10 ({Math.round((animalsProgressCount / 10) * 100)}%)
-                </div>
-              </>
-            ) : (
-              <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
-                يا بطل! عليك أولاً التوجه إلى <strong>جزيرة الأرقام</strong> وإنهاء متطلبات الجزر السابقة لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong> السحرية!
-              </p>
-            )}
-
-            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              <button
-                onClick={() => {
-                  setLockedNoticeZone(null);
-                  setActiveIsland(ISLAND_ZONES[0]); // توجيه مباشر إلى جزيرة الأرقام
-                }}
-                style={{
-                  background: "linear-gradient(135deg, #FF5E7E, #FF9F1C)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: 20,
-                  padding: "10px 22px",
-                  fontSize: 14,
-                  fontWeight: 900,
-                  cursor: "pointer",
-                  boxShadow: "0 4px 14px rgba(255, 94, 126, 0.35)",
-                }}
-              >
-                الذهاب إلى جزيرة الأرقام
-              </button>
-
-              <button
-                onClick={() => setLockedNoticeZone(null)}
-                style={{
-                  background: "#EDF2F7",
-                  color: "#475569",
-                  border: "none",
-                  borderRadius: 20,
-                  padding: "10px 18px",
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                }}
-              >
-                حسناً
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Celebration Modal when an Island is completed ── */}
-      {celebrationModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(10, 35, 70, 0.65)", backdropFilter: "blur(8px)" }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 32,
-              maxWidth: 440,
-              width: "100%",
-              padding: "32px 24px",
-              textAlign: "center",
-              boxShadow: "0 28px 56px rgba(0,0,0,0.4)",
-              border: "5px solid #F59E0B",
-              position: "relative",
-            }}
-          >
-            <h2 style={{ color: "#D97706", margin: "0 0 12px", fontSize: 23, fontWeight: 900 }}>
-              أحسنت يا بطل! عمل رائع!
-            </h2>
-            <p style={{ color: "#4B5563", fontSize: 15, lineHeight: 1.6, marginBottom: 22 }}>
-              لقد أتممت مغامرة <strong>{celebrationModal.completedZone.title}</strong> بنجاح وحصلت على وسام الشجاعة!
-              {celebrationModal.nextZone ? (
-                <>
-                  <br />
-                  <span style={{ color: "#059669", fontWeight: 800, display: "inline-block", marginTop: 8 }}>
-                    تم فتح جزيرة «{celebrationModal.nextZone.title}» الآن!
-                  </span>
-                </>
-              ) : (
-                <>
-                  <br />
-                  <span style={{ color: "#7C3AED", fontWeight: 800, display: "inline-block", marginTop: 8 }}>
-                    مبروك! لقد أنهيت جميع الجزر السحرية وأصبحت بطل المدار!
-                  </span>
-                </>
-              )}
-            </p>
-
-            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              {celebrationModal.nextZone ? (
-                <button
-                  onClick={() => {
-                    const next = celebrationModal.nextZone!;
-                    setCelebrationModal(null);
-                    setActiveIsland(next);
-                  }}
-                  style={{
-                    background: celebrationModal.nextZone.themeColor,
-                    color: "white",
-                    border: "none",
-                    borderRadius: 22,
-                    padding: "11px 22px",
-                    fontSize: 14,
-                    fontWeight: 900,
-                    cursor: "pointer",
-                    boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
-                  }}
-                >
-                  انتقل إلى {celebrationModal.nextZone.title}
-                </button>
-              ) : null}
-
-              <button
-                onClick={() => setCelebrationModal(null)}
-                style={{
-                  background: "#EDF2F7",
-                  color: "#4B5563",
-                  border: "none",
-                  borderRadius: 22,
-                  padding: "11px 20px",
-                  fontSize: 14,
-                  fontWeight: 800,
-                  cursor: "pointer",
-                }}
-              >
-                العودة للخريطة
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

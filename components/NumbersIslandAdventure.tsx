@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
+import { readProgress } from "@/lib/learning-progress";
+import LearningAudioControls from "./LearningAudioControls";
+import { speakLearningText, isLearningSoundEnabled } from "@/lib/learning-audio";
 
 export interface NumberLevel {
   id: string;
@@ -165,6 +168,7 @@ const BALLOON_PALETTE = [
 const SCALE_FREQS = [523.25, 587.33, 659.25, 698.46, 783.99, 880.0, 987.77, 1046.5, 1174.66, 1318.51];
 
 function playSound(type: "pop" | "correct" | "wrong" | "fanfare" | "click", stepIndex = 0) {
+  if (!isLearningSoundEnabled()) return;
   try {
     const AudioCtx =
       window.AudioContext ||
@@ -257,17 +261,7 @@ function playSound(type: "pop" | "correct" | "wrong" | "fanfare" | "click", step
 }
 
 function speakArabic(text: string) {
-  try {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "ar-SA";
-    utter.rate = 0.88;
-    utter.pitch = 1.15;
-    window.speechSynthesis.speak(utter);
-  } catch {
-    // Ignore if speech synthesis unavailable
-  }
+  speakLearningText(text, "ar-SA");
 }
 
 // ── Cute Colorful SVG Counting Item Renderer ──
@@ -496,7 +490,7 @@ export default function NumbersIslandAdventure({
 }: NumbersIslandProps) {
   const [gameMode, setGameMode] = useState<"learn" | "arcade">("learn");
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [completedIds, setCompletedIds] = useState<string[]>([]);
+  const [completedIds, setCompletedIds] = useState<string[]>(() => readProgress("numbers"));
 
   // Stage inside each level: "pop" (pop N balloons) -> "quiz" (count & pick number) -> "solved"
   const [stage, setStage] = useState<"pop" | "quiz" | "solved">("pop");
@@ -519,18 +513,6 @@ export default function NumbersIslandAdventure({
   const burstIdRef = useRef(0);
   const currentLevel = NUMBERS_DATA[currentIndex];
 
-  // Load saved progress
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("madar_numbers_completed_ids");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          setCompletedIds(parsed);
-        }
-      }
-    } catch {}
-  }, []);
 
   // Build fresh floating balloons whenever currentIndex changes
   const initBalloonsForLevel = useCallback((level: NumberLevel) => {
@@ -569,6 +551,8 @@ export default function NumbersIslandAdventure({
   }, []);
 
   useEffect(() => {
+    // Initialize the existing animated game when its selected level changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     initBalloonsForLevel(currentLevel);
   }, [currentLevel, initBalloonsForLevel]);
 
@@ -601,6 +585,8 @@ export default function NumbersIslandAdventure({
 
   useEffect(() => {
     if (gameMode === "arcade") {
+      // Start an arcade round when this game mode mounts.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       initArcadeRound();
     }
   }, [gameMode, initArcadeRound]);
@@ -708,6 +694,7 @@ export default function NumbersIslandAdventure({
   return (
     <div
       dir="rtl"
+      className="activity-shell game-activity"
       style={{
         position: "fixed",
         inset: 0,
@@ -802,8 +789,8 @@ export default function NumbersIslandAdventure({
       >
         {/* Right: Logo + Title */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ position: "relative", width: 88, height: 34, flexShrink: 0 }}>
-            <Image src="/logo.png" alt="مدار الأمل" fill style={{ objectFit: "contain" }} />
+          <div style={{ position: "relative", width: 48, height: 48, flexShrink: 0 }}>
+            <Image src="/logo.png" alt="العب واتعلم" fill style={{ objectFit: "contain" }} />
           </div>
           <div>
             <h1
@@ -915,6 +902,7 @@ export default function NumbersIslandAdventure({
             خريطة الجزر
           </button>
         </div>
+        <LearningAudioControls />
       </header>
 
       {/* ── Main Play Area ── */}
@@ -1380,7 +1368,7 @@ export default function NumbersIslandAdventure({
                       fontSize: 15,
                     }}
                   >
-                    مبروك! وصلت إلى 80% وفتحت الجزيرة التالية (جزيرة الخضار)!
+                    مبروك! أتقنت ٨ أرقام. باقي خطوتين وتكمل جزيرة الأرقام!
                   </div>
                 )}
 
@@ -1672,7 +1660,7 @@ export default function NumbersIslandAdventure({
                 boxShadow: "0 4px 12px rgba(245,158,11,0.4)",
               }}
             >
-              افتح الجزيرة التالية
+              شاهد إنجازاتي
             </button>
           )}
         </footer>

@@ -1,0 +1,905 @@
+{
+  "description": "Locally generated speech for letter names and example words. Arabic: Microsoft Hoda (ar-EG). English: Microsoft Zira (en-US).",
+  "clips": [
+    {
+      "file": "ar/let-1.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ ألف. ألف مِثْل أَسَد.",
+      "aliases": [
+        "حرف ألف",
+        "حرف ألف. أَسَد",
+        "حرف ألف. ألف مثل أَسَد",
+        "حرف ألف. ألف.. أسد شجاع ملك الغابة!"
+      ]
+    },
+    {
+      "file": "ar/let-1-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "أَسَد",
+      "aliases": [
+        "أَسَد"
+      ]
+    },
+    {
+      "file": "ar/let-2.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ باء. باء مِثْل بَطَّة.",
+      "aliases": [
+        "حرف باء",
+        "حرف باء. بَطَّة",
+        "حرف باء. باء مثل بَطَّة",
+        "حرف باء. باء.. بطة جميلة تسبح في البحيرة!"
+      ]
+    },
+    {
+      "file": "ar/let-2-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "بَطَّة",
+      "aliases": [
+        "بَطَّة"
+      ]
+    },
+    {
+      "file": "ar/let-3.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ تاء. تاء مِثْل تُفَّاح.",
+      "aliases": [
+        "حرف تاء",
+        "حرف تاء. تُفَّاح",
+        "حرف تاء. تاء مثل تُفَّاح",
+        "حرف تاء. تاء.. تفاح أحمر لذيذ ومفيد!"
+      ]
+    },
+    {
+      "file": "ar/let-3-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "تُفَّاح",
+      "aliases": [
+        "تُفَّاح"
+      ]
+    },
+    {
+      "file": "ar/let-4.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ ثاء. ثاء مِثْل ثَعْلَب.",
+      "aliases": [
+        "حرف ثاء",
+        "حرف ثاء. ثَعْلَب",
+        "حرف ثاء. ثاء مثل ثَعْلَب",
+        "حرف ثاء. ثاء.. ثعلب ذكي يجري في الغابة!"
+      ]
+    },
+    {
+      "file": "ar/let-4-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "ثَعْلَب",
+      "aliases": [
+        "ثَعْلَب"
+      ]
+    },
+    {
+      "file": "ar/let-5.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ جيم. جيم مِثْل جَمَل.",
+      "aliases": [
+        "حرف جيم",
+        "حرف جيم. جَمَل",
+        "حرف جيم. جيم مثل جَمَل",
+        "حرف جيم. جيم.. جمل صبور سفينة الصحراء!"
+      ]
+    },
+    {
+      "file": "ar/let-5-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "جَمَل",
+      "aliases": [
+        "جَمَل"
+      ]
+    },
+    {
+      "file": "ar/let-6.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ حاء. حاء مِثْل حِصَان.",
+      "aliases": [
+        "حرف حاء",
+        "حرف حاء. حِصَان",
+        "حرف حاء. حاء مثل حِصَان",
+        "حرف حاء. حاء.. حصان عربي أصيل وسريع!"
+      ]
+    },
+    {
+      "file": "ar/let-6-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حِصَان",
+      "aliases": [
+        "حِصَان"
+      ]
+    },
+    {
+      "file": "ar/let-7.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ خاء. خاء مِثْل خَرُوف.",
+      "aliases": [
+        "حرف خاء",
+        "حرف خاء. خَرُوف",
+        "حرف خاء. خاء مثل خَرُوف",
+        "حرف خاء. خاء.. خروف أبيض لطيف يعطينا الصوف!"
+      ]
+    },
+    {
+      "file": "ar/let-7-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "خَرُوف",
+      "aliases": [
+        "خَرُوف"
+      ]
+    },
+    {
+      "file": "ar/let-8.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ دال. دال مِثْل دُبّ.",
+      "aliases": [
+        "حرف دال",
+        "حرف دال. دُبّ",
+        "حرف دال. دال مثل دُبّ",
+        "حرف دال. دال.. دب قوي يحب العسل اللذيذ!"
+      ]
+    },
+    {
+      "file": "ar/let-8-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "دُبّ",
+      "aliases": [
+        "دُبّ"
+      ]
+    },
+    {
+      "file": "ar/let-9.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ ذال. ذال مِثْل ذُرَة.",
+      "aliases": [
+        "حرف ذال",
+        "حرف ذال. ذُرَة",
+        "حرف ذال. ذال مثل ذُرَة",
+        "حرف ذال. ذال.. ذرة صفراء حلوة ومقرمشة!"
+      ]
+    },
+    {
+      "file": "ar/let-9-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "ذُرَة",
+      "aliases": [
+        "ذُرَة"
+      ]
+    },
+    {
+      "file": "ar/let-10.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ راء. راء مِثْل رِيشَة.",
+      "aliases": [
+        "حرف راء",
+        "حرف راء. رِيشَة",
+        "حرف راء. راء مثل رِيشَة",
+        "حرف راء. راء.. ريشة ملونة خفيفة تطير في الهواء!"
+      ]
+    },
+    {
+      "file": "ar/let-10-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "رِيشَة",
+      "aliases": [
+        "رِيشَة"
+      ]
+    },
+    {
+      "file": "ar/let-11.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ زاي. زاي مِثْل زَرَافَة.",
+      "aliases": [
+        "حرف زاي",
+        "حرف زاي. زَرَافَة",
+        "حرف زاي. زاي مثل زَرَافَة",
+        "حرف زاي. زاي.. زرافة طويلة العنق تأكل أوراق الشجر!"
+      ]
+    },
+    {
+      "file": "ar/let-11-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "زَرَافَة",
+      "aliases": [
+        "زَرَافَة"
+      ]
+    },
+    {
+      "file": "ar/let-12.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ سين. سين مِثْل سَمَكَة.",
+      "aliases": [
+        "حرف سين",
+        "حرف سين. سَمَكَة",
+        "حرف سين. سين مثل سَمَكَة",
+        "حرف سين. سين.. سمكة ملونة تسبح في البحر الأزرق!"
+      ]
+    },
+    {
+      "file": "ar/let-12-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "سَمَكَة",
+      "aliases": [
+        "سَمَكَة"
+      ]
+    },
+    {
+      "file": "ar/let-13.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ شين. شين مِثْل شَمْس.",
+      "aliases": [
+        "حرف شين",
+        "حرف شين. شَمْس",
+        "حرف شين. شين مثل شَمْس",
+        "حرف شين. شين.. شمس مشرقة تمنحنا النور والدفء!"
+      ]
+    },
+    {
+      "file": "ar/let-13-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "شَمْس",
+      "aliases": [
+        "شَمْس"
+      ]
+    },
+    {
+      "file": "ar/let-14.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ صاد. صاد مِثْل صَقْر.",
+      "aliases": [
+        "حرف صاد",
+        "حرف صاد. صَقْر",
+        "حرف صاد. صاد مثل صَقْر",
+        "حرف صاد. صاد.. صقر حر يحلّق عالياً في السماء!"
+      ]
+    },
+    {
+      "file": "ar/let-14-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "صَقْر",
+      "aliases": [
+        "صَقْر"
+      ]
+    },
+    {
+      "file": "ar/let-15.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ ضاد. ضاد مِثْل ضِفْدَع.",
+      "aliases": [
+        "حرف ضاد",
+        "حرف ضاد. ضِفْدَع",
+        "حرف ضاد. ضاد مثل ضِفْدَع",
+        "حرف ضاد. ضاد.. ضفدع أخضر يقفز بمرح قرب الماء!"
+      ]
+    },
+    {
+      "file": "ar/let-15-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "ضِفْدَع",
+      "aliases": [
+        "ضِفْدَع"
+      ]
+    },
+    {
+      "file": "ar/let-16.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ طاء. طاء مِثْل طَائِرَة.",
+      "aliases": [
+        "حرف طاء",
+        "حرف طاء. طَائِرَة",
+        "حرف طاء. طاء مثل طَائِرَة",
+        "حرف طاء. طاء.. طائرة سريعة تحلق فوق السحاب!"
+      ]
+    },
+    {
+      "file": "ar/let-16-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "طَائِرَة",
+      "aliases": [
+        "طَائِرَة"
+      ]
+    },
+    {
+      "file": "ar/let-17.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ ظاء. ظاء مِثْل ظَرْف.",
+      "aliases": [
+        "حرف ظاء",
+        "حرف ظاء. ظَرْف",
+        "حرف ظاء. ظاء مثل ظَرْف",
+        "حرف ظاء. ظاء.. ظرف رسالة يحمل أجمل الكلمات!"
+      ]
+    },
+    {
+      "file": "ar/let-17-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "ظَرْف",
+      "aliases": [
+        "ظَرْف"
+      ]
+    },
+    {
+      "file": "ar/let-18.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ عين. عين مِثْل عُصْفُور.",
+      "aliases": [
+        "حرف عين",
+        "حرف عين. عُصْفُور",
+        "حرف عين. عين مثل عُصْفُور",
+        "حرف عين. عين.. عصفور صغير يغرد بأعذب الألحان!"
+      ]
+    },
+    {
+      "file": "ar/let-18-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "عُصْفُور",
+      "aliases": [
+        "عُصْفُور"
+      ]
+    },
+    {
+      "file": "ar/let-19.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ غين. غين مِثْل غَزَال.",
+      "aliases": [
+        "حرف غين",
+        "حرف غين. غَزَال",
+        "حرف غين. غين مثل غَزَال",
+        "حرف غين. غين.. غزال رشيق يجري بخفة وجمال!"
+      ]
+    },
+    {
+      "file": "ar/let-19-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "غَزَال",
+      "aliases": [
+        "غَزَال"
+      ]
+    },
+    {
+      "file": "ar/let-20.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ فاء. فاء مِثْل فَرَاشَة.",
+      "aliases": [
+        "حرف فاء",
+        "حرف فاء. فَرَاشَة",
+        "حرف فاء. فاء مثل فَرَاشَة",
+        "حرف فاء. فاء.. فراشة ملونة ترقص بين الأزهار!"
+      ]
+    },
+    {
+      "file": "ar/let-20-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "فَرَاشَة",
+      "aliases": [
+        "فَرَاشَة"
+      ]
+    },
+    {
+      "file": "ar/let-21.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ قاف. قاف مِثْل قَمَر.",
+      "aliases": [
+        "حرف قاف",
+        "حرف قاف. قَمَر",
+        "حرف قاف. قاف مثل قَمَر",
+        "حرف قاف. قاف.. قمر مضيء يزين السماء ليلاً!"
+      ]
+    },
+    {
+      "file": "ar/let-21-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "قَمَر",
+      "aliases": [
+        "قَمَر"
+      ]
+    },
+    {
+      "file": "ar/let-22.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ كاف. كاف مِثْل كِتَاب.",
+      "aliases": [
+        "حرف كاف",
+        "حرف كاف. كِتَاب",
+        "حرف كاف. كاف مثل كِتَاب",
+        "حرف كاف. كاف.. كتاب مفيد يعلمنا أجمل الحكايات!"
+      ]
+    },
+    {
+      "file": "ar/let-22-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "كِتَاب",
+      "aliases": [
+        "كِتَاب"
+      ]
+    },
+    {
+      "file": "ar/let-23.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ لام. لام مِثْل لَيْمُون.",
+      "aliases": [
+        "حرف لام",
+        "حرف لام. لَيْمُون",
+        "حرف لام. لام مثل لَيْمُون",
+        "حرف لام. لام.. ليمون أصفر منعش مليء بالفيتامين!"
+      ]
+    },
+    {
+      "file": "ar/let-23-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "لَيْمُون",
+      "aliases": [
+        "لَيْمُون"
+      ]
+    },
+    {
+      "file": "ar/let-24.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ ميم. ميم مِثْل مَوْز.",
+      "aliases": [
+        "حرف ميم",
+        "حرف ميم. مَوْز",
+        "حرف ميم. ميم مثل مَوْز",
+        "حرف ميم. ميم.. موز أصفر لذيذ يمنحنا الطاقة!"
+      ]
+    },
+    {
+      "file": "ar/let-24-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "مَوْز",
+      "aliases": [
+        "مَوْز"
+      ]
+    },
+    {
+      "file": "ar/let-25.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ نون. نون مِثْل نَحْلَة.",
+      "aliases": [
+        "حرف نون",
+        "حرف نون. نَحْلَة",
+        "حرف نون. نون مثل نَحْلَة",
+        "حرف نون. نون.. نحلة نشيطة تصنع العسل الشهي!"
+      ]
+    },
+    {
+      "file": "ar/let-25-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "نَحْلَة",
+      "aliases": [
+        "نَحْلَة"
+      ]
+    },
+    {
+      "file": "ar/let-26.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ هاء. هاء مِثْل هَدِيَّة.",
+      "aliases": [
+        "حرف هاء",
+        "حرف هاء. هَدِيَّة",
+        "حرف هاء. هاء مثل هَدِيَّة",
+        "حرف هاء. هاء.. هدية جميلة تسعد الأصدقاء!"
+      ]
+    },
+    {
+      "file": "ar/let-26-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "هَدِيَّة",
+      "aliases": [
+        "هَدِيَّة"
+      ]
+    },
+    {
+      "file": "ar/let-27.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ واو. واو مِثْل وَرْدَة.",
+      "aliases": [
+        "حرف واو",
+        "حرف واو. وَرْدَة",
+        "حرف واو. واو مثل وَرْدَة",
+        "حرف واو. واو.. وردة عطرة بألوان زاهية وجميلة!"
+      ]
+    },
+    {
+      "file": "ar/let-27-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "وَرْدَة",
+      "aliases": [
+        "وَرْدَة"
+      ]
+    },
+    {
+      "file": "ar/let-28.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "حَرْفُ ياء. ياء مِثْل يَمَامَة.",
+      "aliases": [
+        "حرف ياء",
+        "حرف ياء. يَمَامَة",
+        "حرف ياء. ياء مثل يَمَامَة",
+        "حرف ياء. ياء.. يمامة بيضاء جميلة ترمز للسلام!"
+      ]
+    },
+    {
+      "file": "ar/let-28-word.mp3",
+      "language": "ar-EG",
+      "voice": "Hoda",
+      "text": "يَمَامَة",
+      "aliases": [
+        "يَمَامَة"
+      ]
+    },
+    {
+      "file": "en/en-A.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "A. A is for Apple.",
+      "aliases": [
+        "A. A is for Apple",
+        "A! Apple!",
+        "A is for Apple",
+        "Awesome! A is for Apple!"
+      ]
+    },
+    {
+      "file": "en/en-B.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "B. B is for Ball.",
+      "aliases": [
+        "B. B is for Ball",
+        "B! Ball!",
+        "B is for Ball",
+        "Awesome! B is for Ball!"
+      ]
+    },
+    {
+      "file": "en/en-C.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "C. C is for Cat.",
+      "aliases": [
+        "C. C is for Cat",
+        "C! Cat!",
+        "C is for Cat",
+        "Awesome! C is for Cat!"
+      ]
+    },
+    {
+      "file": "en/en-D.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "D. D is for Duck.",
+      "aliases": [
+        "D. D is for Duck",
+        "D! Duck!",
+        "D is for Duck",
+        "Awesome! D is for Duck!"
+      ]
+    },
+    {
+      "file": "en/en-E.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "E. E is for Elephant.",
+      "aliases": [
+        "E. E is for Elephant",
+        "E! Elephant!",
+        "E is for Elephant",
+        "Awesome! E is for Elephant!"
+      ]
+    },
+    {
+      "file": "en/en-F.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "F. F is for Fish.",
+      "aliases": [
+        "F. F is for Fish",
+        "F! Fish!",
+        "F is for Fish",
+        "Awesome! F is for Fish!"
+      ]
+    },
+    {
+      "file": "en/en-G.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "G. G is for Giraffe.",
+      "aliases": [
+        "G. G is for Giraffe",
+        "G! Giraffe!",
+        "G is for Giraffe",
+        "Awesome! G is for Giraffe!"
+      ]
+    },
+    {
+      "file": "en/en-H.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "H. H is for Home.",
+      "aliases": [
+        "H. H is for Home",
+        "H! Home!",
+        "H is for Home",
+        "Awesome! H is for Home!"
+      ]
+    },
+    {
+      "file": "en/en-I.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "I. I is for Ice Cream.",
+      "aliases": [
+        "I. I is for Ice Cream",
+        "I! Ice Cream!",
+        "I is for Ice Cream",
+        "Awesome! I is for Ice Cream!"
+      ]
+    },
+    {
+      "file": "en/en-J.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "J. J is for Juice.",
+      "aliases": [
+        "J. J is for Juice",
+        "J! Juice!",
+        "J is for Juice",
+        "Awesome! J is for Juice!"
+      ]
+    },
+    {
+      "file": "en/en-K.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "K. K is for Kite.",
+      "aliases": [
+        "K. K is for Kite",
+        "K! Kite!",
+        "K is for Kite",
+        "Awesome! K is for Kite!"
+      ]
+    },
+    {
+      "file": "en/en-L.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "L. L is for Lion.",
+      "aliases": [
+        "L. L is for Lion",
+        "L! Lion!",
+        "L is for Lion",
+        "Awesome! L is for Lion!"
+      ]
+    },
+    {
+      "file": "en/en-M.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "M. M is for Moon.",
+      "aliases": [
+        "M. M is for Moon",
+        "M! Moon!",
+        "M is for Moon",
+        "Awesome! M is for Moon!"
+      ]
+    },
+    {
+      "file": "en/en-N.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "N. N is for Nest.",
+      "aliases": [
+        "N. N is for Nest",
+        "N! Nest!",
+        "N is for Nest",
+        "Awesome! N is for Nest!"
+      ]
+    },
+    {
+      "file": "en/en-O.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "O. O is for Orange.",
+      "aliases": [
+        "O. O is for Orange",
+        "O! Orange!",
+        "O is for Orange",
+        "Awesome! O is for Orange!"
+      ]
+    },
+    {
+      "file": "en/en-P.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "P. P is for Panda.",
+      "aliases": [
+        "P. P is for Panda",
+        "P! Panda!",
+        "P is for Panda",
+        "Awesome! P is for Panda!"
+      ]
+    },
+    {
+      "file": "en/en-Q.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "Q. Q is for Queen.",
+      "aliases": [
+        "Q. Q is for Queen",
+        "Q! Queen!",
+        "Q is for Queen",
+        "Awesome! Q is for Queen!"
+      ]
+    },
+    {
+      "file": "en/en-R.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "R. R is for Rainbow.",
+      "aliases": [
+        "R. R is for Rainbow",
+        "R! Rainbow!",
+        "R is for Rainbow",
+        "Awesome! R is for Rainbow!"
+      ]
+    },
+    {
+      "file": "en/en-S.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "S. S is for Sun.",
+      "aliases": [
+        "S. S is for Sun",
+        "S! Sun!",
+        "S is for Sun",
+        "Awesome! S is for Sun!"
+      ]
+    },
+    {
+      "file": "en/en-T.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "T. T is for Tree.",
+      "aliases": [
+        "T. T is for Tree",
+        "T! Tree!",
+        "T is for Tree",
+        "Awesome! T is for Tree!"
+      ]
+    },
+    {
+      "file": "en/en-U.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "U. U is for Umbrella.",
+      "aliases": [
+        "U. U is for Umbrella",
+        "U! Umbrella!",
+        "U is for Umbrella",
+        "Awesome! U is for Umbrella!"
+      ]
+    },
+    {
+      "file": "en/en-V.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "V. V is for Van.",
+      "aliases": [
+        "V. V is for Van",
+        "V! Van!",
+        "V is for Van",
+        "Awesome! V is for Van!"
+      ]
+    },
+    {
+      "file": "en/en-W.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "W. W is for Whale.",
+      "aliases": [
+        "W. W is for Whale",
+        "W! Whale!",
+        "W is for Whale",
+        "Awesome! W is for Whale!"
+      ]
+    },
+    {
+      "file": "en/en-X.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "X. X is for Xylophone.",
+      "aliases": [
+        "X. X is for Xylophone",
+        "X! Xylophone!",
+        "X is for Xylophone",
+        "Awesome! X is for Xylophone!"
+      ]
+    },
+    {
+      "file": "en/en-Y.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "Y. Y is for Yo-Yo.",
+      "aliases": [
+        "Y. Y is for Yo-Yo",
+        "Y! Yo-Yo!",
+        "Y is for Yo-Yo",
+        "Awesome! Y is for Yo-Yo!"
+      ]
+    },
+    {
+      "file": "en/en-Z.mp3",
+      "language": "en-US",
+      "voice": "Zira",
+      "text": "Z. Z is for Zebra.",
+      "aliases": [
+        "Z. Z is for Zebra",
+        "Z! Zebra!",
+        "Z is for Zebra",
+        "Awesome! Z is for Zebra!"
+      ]
+    }
+  ]
+}

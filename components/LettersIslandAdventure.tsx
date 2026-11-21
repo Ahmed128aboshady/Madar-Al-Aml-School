@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
+import { readProgress } from "@/lib/learning-progress";
+import LearningAudioControls from "./LearningAudioControls";
+import { speakLearningText, isLearningSoundEnabled } from "@/lib/learning-audio";
 
 export interface LetterLevel {
   id: string;
@@ -500,6 +503,7 @@ const CONFETTI_COLORS = ["#FF4D6D", "#FF9F1C", "#10B981", "#0EA5E9", "#8B5CF6", 
 
 // ── Mario-Inspired Retro Web Audio Synthesizer ──
 function playMarioSound(type: "jump" | "coin" | "wrong" | "fanfare" | "click") {
+  if (!isLearningSoundEnabled()) return;
   try {
     const AudioCtx =
       window.AudioContext ||
@@ -577,15 +581,7 @@ function playMarioSound(type: "jump" | "coin" | "wrong" | "fanfare" | "click") {
 }
 
 function speakArabicLetter(text: string) {
-  try {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "ar-SA";
-    utter.rate = 0.85;
-    utter.pitch = 1.15;
-    window.speechSynthesis.speak(utter);
-  } catch {}
+  speakLearningText(text, "ar-SA");
 }
 
 // ── Mario-Style Platformer Canvas Component ──
@@ -638,10 +634,10 @@ function MarioLetterRunnerCanvas({
 
   // Keep latest callbacks in refs so RAF loop never restarts unnecessarily
   const callbacksRef = useRef({ onCollectTarget, onWrongLetter, onArcadeScore });
-  callbacksRef.current = { onCollectTarget, onWrongLetter, onArcadeScore };
+  useEffect(() => { callbacksRef.current = { onCollectTarget, onWrongLetter, onArcadeScore }; }, [onCollectTarget, onWrongLetter, onArcadeScore]);
 
   const targetRef = useRef(targetLevel);
-  targetRef.current = targetLevel;
+  useEffect(() => { targetRef.current = targetLevel; }, [targetLevel]);
 
   const triggerJump = useCallback(() => {
     jumpRequestRef.current = true;
@@ -1183,7 +1179,7 @@ function MarioLetterRunnerCanvas({
         />
 
         {/* Top Floating Hint Pill */}
-        <div
+        <div className="runner-instruction"
           style={{
             position: "absolute",
             top: 12,
@@ -1208,7 +1204,7 @@ function MarioLetterRunnerCanvas({
       </div>
 
       {/* Giant Kid-Friendly Jump Button */}
-      <button
+      <button className="runner-jump"
         type="button"
         onPointerDown={(e) => {
           e.preventDefault();
@@ -1254,7 +1250,7 @@ export default function LettersIslandAdventure({
 }: LettersIslandProps) {
   const [gameMode, setGameMode] = useState<"learn" | "arcade">("learn");
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [completedIds, setCompletedIds] = useState<string[]>([]);
+  const [completedIds, setCompletedIds] = useState<string[]>(() => readProgress("letters"));
 
   // Stages: "run" (Mario Runner collect 3 coins) -> "quiz" (Word match) -> "solved"
   const [stage, setStage] = useState<"run" | "quiz" | "solved">("run");
@@ -1270,24 +1266,14 @@ export default function LettersIslandAdventure({
 
   const currentLevel = LETTERS_DATA[currentIndex];
   const arcadeLevel = LETTERS_DATA[arcadeTargetIdx];
+  function selectLetter(index: number) {
+    setCurrentIndex(index);
+    setCollectedCoins(0); setRunnerHint(null); setWrongWord(null); setStage("run");
+    const item = LETTERS_DATA[index];
+    speakArabicLetter("حرف " + item.name + ". " + item.name + " مثل " + item.word);
+  }
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("madar_letters_completed_ids");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setCompletedIds(parsed);
-      }
-    } catch {}
-  }, []);
 
-  // Reset level state when switching letter
-  useEffect(() => {
-    setCollectedCoins(0);
-    setRunnerHint(null);
-    setWrongWord(null);
-    setStage("run");
-  }, [currentIndex]);
 
   const handleCollectTarget = useCallback(
     (newCount: number) => {
@@ -1317,7 +1303,9 @@ export default function LettersIslandAdventure({
     setArcadeStreak((st) => st + 1);
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 900);
-    setArcadeTargetIdx(Math.floor(Math.random() * LETTERS_DATA.length));
+    const next = Math.floor(Math.random() * LETTERS_DATA.length);
+    setArcadeTargetIdx(next);
+    speakArabicLetter("حرف " + LETTERS_DATA[next].name);
   }, []);
 
   const handleWordChoice = (opt: { word: string; icon: string; isCorrect: boolean }) => {
@@ -1349,6 +1337,7 @@ export default function LettersIslandAdventure({
   return (
     <div
       dir="rtl"
+      className="activity-shell game-activity"
       style={{
         position: "fixed",
         inset: 0,
@@ -1411,8 +1400,8 @@ export default function LettersIslandAdventure({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ position: "relative", width: 88, height: 34, flexShrink: 0 }}>
-            <Image src="/logo.png" alt="مدار الأمل" fill style={{ objectFit: "contain" }} />
+          <div style={{ position: "relative", width: 48, height: 48, flexShrink: 0 }}>
+            <Image src="/logo.png" alt="العب واتعلم" fill style={{ objectFit: "contain" }} />
           </div>
           <h1
             style={{
@@ -1444,6 +1433,7 @@ export default function LettersIslandAdventure({
             onClick={() => {
               playMarioSound("click");
               setGameMode("learn");
+              speakArabicLetter("حرف " + currentLevel.name);
             }}
             style={{
               padding: "6px 14px",
@@ -1462,6 +1452,7 @@ export default function LettersIslandAdventure({
             onClick={() => {
               playMarioSound("click");
               setGameMode("arcade");
+              speakArabicLetter("حرف " + arcadeLevel.name);
             }}
             style={{
               padding: "6px 14px",
@@ -1511,6 +1502,7 @@ export default function LettersIslandAdventure({
             خريطة الجزر
           </button>
         </div>
+        <LearningAudioControls />
       </header>
 
       {/* Main Content */}
@@ -1774,7 +1766,7 @@ export default function LettersIslandAdventure({
                     <button
                       onClick={() => {
                         playMarioSound("click");
-                        setCurrentIndex((i) => i + 1);
+                        selectLetter(currentIndex + 1);
                       }}
                       style={{
                         padding: "11px 28px",
@@ -1894,7 +1886,7 @@ export default function LettersIslandAdventure({
                   key={item.id}
                   onClick={() => {
                     playMarioSound("click");
-                    setCurrentIndex(idx);
+                    selectLetter(idx);
                   }}
                   style={{
                     minWidth: 46,
