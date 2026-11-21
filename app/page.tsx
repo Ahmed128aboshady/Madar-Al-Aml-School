@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import AnimalsIslandAdventure from "@/components/AnimalsIslandAdventure";
+import NumbersIslandAdventure from "@/components/NumbersIslandAdventure";
 
 interface IslandZone {
   id: string;
@@ -29,11 +29,11 @@ interface IslandZone {
 
 const ISLAND_ZONES: IslandZone[] = [
   {
-    id: "animals",
-    title: "تعرف على الحيوانات",
-    description: "مرحباً بك في جزيرة الأسد والأصدقاء! سنكتشف سوياً أصوات الحيوانات وأشكالها الجميلة بطريقة سهلة وممتعة.",
-    themeColor: "#E07820",
-    imageSrc: "/islands/island-animals.png",
+    id: "numbers",
+    title: "تعرف على الأرقام",
+    description: "مرحباً بك في جزيرة الأرقام والبالونات الملونة! هيا نفرقع البالونات ونعدّ الأرقام من 1 إلى 10 بأجمل الألعاب والألوان.",
+    themeColor: "#FF5E7E",
+    imageSrc: "/islands/island-numbers.png",
     desktopTop: "17%",
     desktopLeft: "12%",
     desktopWidth: "26%",
@@ -135,9 +135,9 @@ interface PathSegment {
 
 // خطوط ومسارات الخطوات بين كل جزيرة والتالية حسب الترتيب المحدد
 const ISLAND_PATHS: PathSegment[] = [
-  // 1. الحيوانات (أعلى اليسار) -> 2. الخضار (الوسط)
+  // 1. الأرقام (أعلى اليسار) -> 2. الخضار (الوسط)
   {
-    fromId: "animals",
+    fromId: "numbers",
     toId: "vegetables",
     desktopD: "M 25 46 Q 32 58 45 56",
     tabletD: "M 25 44 Q 33 58 45 56",
@@ -169,21 +169,21 @@ const ISLAND_PATHS: PathSegment[] = [
   },
 ];
 
-function getIslandStatus(zoneId: string, completed: string[], animalsProgressCount: number = 0) {
+function getIslandStatus(zoneId: string, completed: string[], numbersProgressCount: number = 0) {
   const index = ISLAND_ZONES.findIndex((z) => z.id === zoneId);
   const isCompleted = completed.includes(zoneId);
   let isUnlocked = false;
 
-  if (zoneId === "animals") {
-    // 1. الجزيرة الأولى (الحيوانات) فقط هي المفتوحة
+  if (zoneId === "numbers") {
+    // 1. الجزيرة الأولى (الأرقام) فقط هي المفتوحة
     isUnlocked = true;
   } else if (zoneId === "vegetables") {
-    // 2. الجزيرة الثانية (الخضار) مقفلة تماماً وتفتح فقط عند حل 80% على الأقل من جزيرة الحيوانات (10 من 13)
-    isUnlocked = animalsProgressCount >= 10;
+    // 2. الجزيرة الثانية (الخضار) مقفلة تماماً وتفتح فقط عند حل 80% على الأقل من جزيرة الأرقام (8 من 10)
+    isUnlocked = numbersProgressCount >= 8;
   } else {
-    // 3. الفواكه، 4. الأفعال، 5. المواصلات: مقفلة تماماً وتفتح بالتسلسل فقط بعد 80% من الحيوانات وإنهاء الجزيرة السابقة
+    // 3. الفواكه، 4. الأفعال، 5. المواصلات: مقفلة تماماً وتفتح بالتسلسل فقط بعد 80% من الأرقام وإنهاء الجزيرة السابقة
     const prevZoneId = index > 0 ? ISLAND_ZONES[index - 1].id : null;
-    isUnlocked = Boolean(animalsProgressCount >= 10 && prevZoneId && completed.includes(prevZoneId));
+    isUnlocked = Boolean(numbersProgressCount >= 8 && prevZoneId && completed.includes(prevZoneId));
   }
 
   const previousZone = index > 0 ? ISLAND_ZONES[index - 1] : null;
@@ -192,35 +192,32 @@ function getIslandStatus(zoneId: string, completed: string[], animalsProgressCou
   return { index, isUnlocked, isCompleted, previousZone, nextZone };
 }
 
-const ANIMAL_NAMES_MAP: Record<string, string> = {
-  cat: "القطة",
-  dog: "الكلب",
-  horse: "الحصان",
-  sheep: "الخروف",
-  cow: "البقرة",
-  lion: "الأسد",
-  elephant: "الفيل",
-  monkey: "القرد",
-  rabbit: "الأرنب",
-  bird: "العصفور",
-  duck: "البطة",
-  giraffe: "الزرافة",
-  bear: "الدب",
+const NUMBER_NAMES_MAP: Record<string, string> = {
+  "num-1": "١ (واحد)",
+  "num-2": "٢ (اثنان)",
+  "num-3": "٣ (ثلاثة)",
+  "num-4": "٤ (أربعة)",
+  "num-5": "٥ (خمسة)",
+  "num-6": "٦ (ستة)",
+  "num-7": "٧ (سبعة)",
+  "num-8": "٨ (ثمانية)",
+  "num-9": "٩ (تسعة)",
+  "num-10": "١٠ (عشرة)",
 };
 
-export function calculateHeroCycle(animalIds: string[]) {
-  const uniqueIds = Array.from(new Set(animalIds || []));
+export function calculateHeroCycle(numberIds: string[]) {
+  const uniqueIds = Array.from(new Set(numberIds || []));
   const count = uniqueIds.length;
-  // 80% من جزيرة الحيوانات (10 من 13) لفتح الجزيرة التالية
-  const isAnimalsComplete = count >= 10;
-  const trueCompletedIslands = isAnimalsComplete ? ["animals"] : [];
-  const percent = Math.min(100, Math.round((count / 13) * 100));
-  const remainingForVegetables = Math.max(0, 10 - count);
-  const solvedNames = uniqueIds.map((id) => ANIMAL_NAMES_MAP[id] || id);
+  // 80% من جزيرة الأرقام (8 من 10) لفتح الجزيرة التالية
+  const isNumbersComplete = count >= 8;
+  const trueCompletedIslands = isNumbersComplete ? ["numbers"] : [];
+  const percent = Math.min(100, Math.round((count / 10) * 100));
+  const remainingForVegetables = Math.max(0, 8 - count);
+  const solvedNames = uniqueIds.map((id) => NUMBER_NAMES_MAP[id] || id);
   return {
     uniqueIds,
     count,
-    isAnimalsComplete,
+    isNumbersComplete,
     trueCompletedIslands,
     percent,
     remainingForVegetables,
@@ -258,9 +255,9 @@ export default function HomePage() {
         localStorage.setItem("madar_lock_v5", "active");
         localStorage.removeItem("madar_completed_islands");
       }
-      const savedAnimals = localStorage.getItem("madar_animals_completed_ids");
-      if (savedAnimals) {
-        const parsed = JSON.parse(savedAnimals);
+      const savedNumbers = localStorage.getItem("madar_numbers_completed_ids");
+      if (savedNumbers) {
+        const parsed = JSON.parse(savedNumbers);
         if (Array.isArray(parsed)) localAnimalIds = parsed;
       }
     } catch {}
@@ -312,10 +309,10 @@ export default function HomePage() {
 
           // 2. دورة حساب ومزامنة حساب المستخدم السحابي (Supabase Cycle)
           let serverAnimalIds: string[] = [];
-          if (Array.isArray(meta.animals_completed_ids)) {
-            serverAnimalIds = meta.animals_completed_ids;
+          if (Array.isArray(meta.numbers_completed_ids)) {
+            serverAnimalIds = meta.numbers_completed_ids;
           }
-          // دمج الحيوانات المحلولة بدون تكرار
+          // دمج الأرقام المحلولة بدون تكرار
           const mergedAnimalIds = Array.from(new Set([...localAnimalIds, ...serverAnimalIds]));
           const accountCycle = calculateHeroCycle(mergedAnimalIds);
 
@@ -325,12 +322,12 @@ export default function HomePage() {
 
           // تصحيح فوري وتحديث شامل في Supabase و localStorage
           try {
-            localStorage.setItem("madar_animals_completed_ids", JSON.stringify(accountCycle.uniqueIds));
+            localStorage.setItem("madar_numbers_completed_ids", JSON.stringify(accountCycle.uniqueIds));
             localStorage.setItem("madar_completed_islands", JSON.stringify(accountCycle.trueCompletedIslands));
             await supabase.auth.updateUser({
               data: {
-                animals_progress_count: accountCycle.count,
-                animals_completed_ids: accountCycle.uniqueIds,
+                numbers_progress_count: accountCycle.count,
+                numbers_completed_ids: accountCycle.uniqueIds,
                 completed_islands: accountCycle.trueCompletedIslands,
               },
             });
@@ -471,23 +468,23 @@ export default function HomePage() {
   }
 
   async function handleResetProgress() {
-    if (!confirm("هل تريد إعادة قفل الجزر وبدء التقدم من الصفر للتجربة؟ ستفتح جزيرة الحيوانات فقط.")) return;
+    if (!confirm("هل تريد إعادة قفل الجزر وبدء التقدم من الصفر للتجربة؟ ستفتح جزيرة الأرقام فقط.")) return;
     setCompletedIslands([]);
     setAnimalsProgressCount(0);
     setAnimalsCompletedIds([]);
     try {
       localStorage.removeItem("madar_completed_islands");
-      localStorage.removeItem("madar_animals_completed_ids");
+      localStorage.removeItem("madar_numbers_completed_ids");
       const { supabase } = await import("@/lib/supabase");
       await supabase.auth.updateUser({
         data: {
           completed_islands: [],
-          animals_progress_count: 0,
-          animals_completed_ids: [],
+          numbers_progress_count: 0,
+          numbers_completed_ids: [],
         },
       });
     } catch {}
-    alert("تمت إعادة تعيين التقدم بنجاح! جزيرة الحيوانات فقط مفتوحة وباقي الجزر مقفلة.");
+    alert("تمت إعادة تعيين التقدم بنجاح! جزيرة الأرقام فقط مفتوحة وباقي الجزر مقفلة.");
   }
 
   if (checkingAuth) {
@@ -659,7 +656,7 @@ export default function HomePage() {
               key={zone.id}
               className="island-card"
               onClick={() => {
-                if (zone.id === "animals") {
+                if (zone.id === "numbers") {
                   setActiveIsland(zone);
                 } else {
                   setLockedNoticeZone({ zone, prevZone: ISLAND_ZONES[0] });
@@ -1099,23 +1096,23 @@ export default function HomePage() {
                 </span>
               </div>
 
-              {/* بطاقة جزيرة الحيوانات */}
-              <div style={{ background: "white", borderRadius: 14, padding: "12px 14px", border: "1.5px solid #FED7AA", boxShadow: "0 2px 8px rgba(0,0,0,0.03)", marginBottom: 10 }}>
+              {/* بطاقة جزيرة الأرقام */}
+              <div style={{ background: "white", borderRadius: 14, padding: "12px 14px", border: "1.5px solid #FBCFE8", boxShadow: "0 2px 8px rgba(0,0,0,0.03)", marginBottom: 10 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: "#9A3412" }}>
-                    🐾 جزيرة الحيوانات (مفتوحة):
+                  <span style={{ fontSize: 13, fontWeight: 900, color: "#9D174D" }}>
+                    🎈 جزيرة الأرقام (مفتوحة):
                   </span>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: "#EA580C" }}>
-                    {animalsProgressCount} من 13 حيوان ({Math.min(100, Math.round((animalsProgressCount / 13) * 100))}%)
+                  <span style={{ fontSize: 13, fontWeight: 900, color: "#E11D48" }}>
+                    {animalsProgressCount} من 10 أرقام ({Math.min(100, Math.round((animalsProgressCount / 10) * 100))}%)
                   </span>
                 </div>
 
-                <div style={{ height: 10, background: "#FFEDD5", borderRadius: 5, overflow: "hidden", marginBottom: 8 }}>
+                <div style={{ height: 10, background: "#FCE7F3", borderRadius: 5, overflow: "hidden", marginBottom: 8 }}>
                   <div
                     style={{
                       height: "100%",
-                      width: `${Math.min(100, Math.round((animalsProgressCount / 13) * 100))}%`,
-                      background: "linear-gradient(90deg, #F97316, #10B981)",
+                      width: `${Math.min(100, Math.round((animalsProgressCount / 10) * 100))}%`,
+                      background: "linear-gradient(90deg, #FF5E7E, #F59E0B, #10B981)",
                       transition: "width 0.4s",
                     }}
                   />
@@ -1123,19 +1120,19 @@ export default function HomePage() {
 
                 {animalsCompletedIds.length > 0 && (
                   <div style={{ fontSize: 12, color: "#334155", fontWeight: 700, marginBottom: 6, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 4 }}>
-                    <span>تم حل بنجاح:</span>
+                    <span>تم إتقان بنجاح:</span>
                     {animalsCompletedIds.map((id) => (
                       <span key={id} style={{ background: "#ECFDF5", color: "#065F46", padding: "2px 8px", borderRadius: 8, border: "1px solid #A7F3D0", fontWeight: 800 }}>
-                        {ANIMAL_NAMES_MAP[id] || id}
+                        {NUMBER_NAMES_MAP[id] || id}
                       </span>
                     ))}
                   </div>
                 )}
 
-                <div style={{ fontSize: 12, color: animalsProgressCount >= 10 ? "#059669" : "#D97706", fontWeight: 800 }}>
-                  {animalsProgressCount >= 10
+                <div style={{ fontSize: 12, color: animalsProgressCount >= 8 ? "#059669" : "#D97706", fontWeight: 800 }}>
+                  {animalsProgressCount >= 8
                     ? "أحسنت يا بطل! أتممت نسبة 80% وتم فتح جزيرة الخضار بنجاح! 🔓"
-                    : `متبقي حل ${Math.max(0, 10 - animalsProgressCount)} حيوانات للوصول إلى 80% وفتح جزيرة الخضار`}
+                    : `متبقي إتقان ${Math.max(0, 8 - animalsProgressCount)} أرقام للوصول إلى 80% وفتح جزيرة الخضار`}
                 </div>
               </div>
 
@@ -1203,15 +1200,15 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* ── Animals Island Interactive Adventure ── */}
-      {activeIsland?.id === "animals" && (
-        <AnimalsIslandAdventure
+      {/* ── Numbers Island Interactive Adventure ── */}
+      {activeIsland?.id === "numbers" && (
+        <NumbersIslandAdventure
           onBackToMap={() => {
             // مزامنة دورة الإجابات والتقدم
             try {
-              const savedAnimals = localStorage.getItem("madar_animals_completed_ids");
-              if (savedAnimals) {
-                const parsed = JSON.parse(savedAnimals);
+              const savedNumbers = localStorage.getItem("madar_numbers_completed_ids");
+              if (savedNumbers) {
+                const parsed = JSON.parse(savedNumbers);
                 if (Array.isArray(parsed)) {
                   const cycle = calculateHeroCycle(parsed);
                   setAnimalsCompletedIds(cycle.uniqueIds);
@@ -1229,25 +1226,24 @@ export default function HomePage() {
             setAnimalsProgressCount(cycle.count);
             setCompletedIslands(cycle.trueCompletedIslands);
             try {
-              localStorage.setItem("madar_animals_completed_ids", JSON.stringify(cycle.uniqueIds));
+              localStorage.setItem("madar_numbers_completed_ids", JSON.stringify(cycle.uniqueIds));
               localStorage.setItem("madar_completed_islands", JSON.stringify(cycle.trueCompletedIslands));
               const { supabase } = await import("@/lib/supabase");
               await supabase.auth.updateUser({
                 data: {
-                  animals_progress_count: cycle.count,
-                  animals_completed_ids: cycle.uniqueIds,
+                  numbers_progress_count: cycle.count,
+                  numbers_completed_ids: cycle.uniqueIds,
                   completed_islands: cycle.trueCompletedIslands,
                 },
               });
             } catch (err) {
-              console.error("Failed to sync animals progress to supabase:", err);
+              console.error("Failed to sync numbers progress to supabase:", err);
             }
           }}
-          deviceType={deviceType}
         />
       )}
 
-      {/* ── Modal Pop-up on Locked Island Click (توجيه الطفل إلى جزيرة الحيوانات) ── */}
+      {/* ── Modal Pop-up on Locked Island Click (توجيه الطفل إلى جزيرة الأرقام) ── */}
       {lockedNoticeZone && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -1273,7 +1269,7 @@ export default function HomePage() {
             {lockedNoticeZone.zone.id === "vegetables" ? (
               <>
                 <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
-                  يا بطل! عليك أولاً التوجه إلى <strong>جزيرة الحيوانات</strong> وإكمال <strong>80% على الأقل</strong> (حل 10 حيوانات على الأقل) لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong>!
+                  يا بطل! عليك أولاً التوجه إلى <strong>جزيرة الأرقام</strong> وإكمال <strong>80% على الأقل</strong> (إتقان 8 أرقام على الأقل) لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong>!
                 </p>
                 <div
                   style={{
@@ -1287,12 +1283,12 @@ export default function HomePage() {
                     marginBottom: 20,
                   }}
                 >
-                  درجتك الحالية في الحيوانات: {animalsProgressCount} من 13 ({Math.round((animalsProgressCount / 13) * 100)}%)
+                  درجتك الحالية في الأرقام: {animalsProgressCount} من 10 ({Math.round((animalsProgressCount / 10) * 100)}%)
                 </div>
               </>
             ) : (
               <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
-                يا بطل! عليك أولاً التوجه إلى <strong>جزيرة الحيوانات</strong> وإنهاء متطلبات الجزر السابقة لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong> السحرية!
+                يا بطل! عليك أولاً التوجه إلى <strong>جزيرة الأرقام</strong> وإنهاء متطلبات الجزر السابقة لتفتح لك جزيرة <strong>{lockedNoticeZone.zone.title}</strong> السحرية!
               </p>
             )}
 
@@ -1300,10 +1296,10 @@ export default function HomePage() {
               <button
                 onClick={() => {
                   setLockedNoticeZone(null);
-                  setActiveIsland(ISLAND_ZONES[0]); // توجيه مباشر إلى جزيرة الحيوانات
+                  setActiveIsland(ISLAND_ZONES[0]); // توجيه مباشر إلى جزيرة الأرقام
                 }}
                 style={{
-                  background: "#E07820",
+                  background: "linear-gradient(135deg, #FF5E7E, #FF9F1C)",
                   color: "white",
                   border: "none",
                   borderRadius: 20,
@@ -1311,10 +1307,10 @@ export default function HomePage() {
                   fontSize: 14,
                   fontWeight: 900,
                   cursor: "pointer",
-                  boxShadow: "0 4px 14px rgba(224, 120, 32, 0.35)",
+                  boxShadow: "0 4px 14px rgba(255, 94, 126, 0.35)",
                 }}
               >
-                الذهاب إلى جزيرة الحيوانات
+                الذهاب إلى جزيرة الأرقام
               </button>
 
               <button
