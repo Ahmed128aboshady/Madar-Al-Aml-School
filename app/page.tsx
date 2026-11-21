@@ -231,6 +231,19 @@ export default function HomePage() {
     }
   }
 
+  function handleCheckForUpdates() {
+    const bridge = (
+      window as unknown as {
+        AndroidApp?: { checkForUpdate?: () => void; getVersionName?: () => string };
+      }
+    ).AndroidApp;
+    if (bridge?.checkForUpdate) {
+      bridge.checkForUpdate();
+    } else {
+      setNotice("فحص التحديثات التلقائي يعمل من داخل تطبيق الأندرويد المثبت على الجوال.");
+    }
+  }
+
   return (
     <div className="learning-app">
       <div
@@ -257,6 +270,13 @@ export default function HomePage() {
               aria-pressed={audio.enabled}
             >
               <Icon name={audio.enabled ? "sound" : "muted"} />
+            </button>
+            <button
+              className="parent-button"
+              onClick={handleCheckForUpdates}
+              aria-label="فحص التحديثات"
+            >
+              <span>فحص التحديثات</span>
             </button>
             <button
               className="parent-button"
@@ -558,9 +578,14 @@ export default function HomePage() {
               {profileStatus}
             </p>
           </form>
-          <button className="text-button" onClick={signOut}>
-            {user ? "تسجيل الخروج" : "الانتقال لتسجيل الدخول"}
-          </button>
+          <div style={{ display: "flex", gap: 10, justifyContent: "space-between", flexWrap: "wrap", marginTop: 8 }}>
+            <button className="text-button" type="button" onClick={handleCheckForUpdates}>
+              فحص التحديثات
+            </button>
+            <button className="text-button" onClick={signOut}>
+              {user ? "تسجيل الخروج" : "الانتقال لتسجيل الدخول"}
+            </button>
+          </div>
         </dialog>
       </div>
       {activeIsland === "letters" && (
